@@ -7,13 +7,7 @@
   <meta name="description" content="STORIA 52 - gioco narrativo competitivo con un mazzo di carte.">
   <title>STORIA 52</title>
   <script>
-    (() => {
-      try {
-        document.documentElement.dataset.theme = localStorage.getItem('storia52_theme') === 'dark' ? 'dark' : 'light';
-      } catch (_) {
-        document.documentElement.dataset.theme = 'light';
-      }
-    })();
+    (()=>{try{document.documentElement.dataset.theme=localStorage.getItem('storia52_theme')==='dark'?'dark':'light'}catch(_){document.documentElement.dataset.theme='light'}})();
   </script>
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
@@ -31,10 +25,7 @@
         <p class="brand-kicker">GIOCO NARRATIVO CON UN MAZZO DI CARTE</p>
         <div class="brand-line">
           <h1>STORIA 52</h1>
-          <button type="button" id="themeToggle" class="theme-toggle" aria-label="Passa al tema scuro" aria-pressed="false">
-            <span class="theme-toggle-icon" aria-hidden="true">◐</span>
-            <span class="theme-toggle-label">Tema scuro</span>
-          </button>
+          <button type="button" id="themeToggle" class="theme-toggle" aria-label="Passa al tema scuro" aria-pressed="false"><span class="theme-toggle-icon" aria-hidden="true">◐</span><span class="theme-toggle-label">Tema scuro</span></button>
         </div>
       </div>
       <div class="brand-suits" aria-hidden="true"><span>♥</span><span>♦</span><span>♣</span><span>♠</span></div>
@@ -101,7 +92,7 @@
         <div class="page-banner">
           <p class="eyebrow">ARCHIVIO DEL MAZZO</p>
           <h2 id="cards-title">Una carta alla volta.</h2>
-          <p>Scegli categoria, seme e numero.</p>
+          <p>Scegli categoria, seme e numero. Niente liste infinite.</p>
         </div>
 
         <div class="card-browser">
@@ -159,7 +150,7 @@
             <div class="details-body">
               <p><b>Pari:</b> avvicina il protagonista al suo obiettivo.</p>
               <p><b>Dispari:</b> allontana il protagonista dal suo obiettivo.</p>
-              <div class="figure-grid"><span><b>JACK</b> nuovo oggetto</span><span><b>DONNA</b> nuovo personaggio</span><span><b>RE</b> nuovo luogo</span><span><b>ASSO</b> nuovo ribaltamento</span></div>
+              <div class="figure-grid"><span><b>JACK</b> nuovo oggetto</span><span><b>DONNA</b> nuovo personaggio</span><span><b>RE</b> nuovo luogo</span><span><b>ASSO</b> ribalta la situazione</span></div>
               <p class="note">Le figure non hanno parità e si giocano da sole.</p>
             </div>
           </details>
@@ -215,5 +206,7 @@
   <script src="app.js"></script>
   <script src="ui-core.js"></script>
   <script src="ui-modes.js"></script>
+  <link rel="stylesheet" href="mobile-fix.css">
+  <script src="mobile-fix.js"></script>
 </body>
 </html>
