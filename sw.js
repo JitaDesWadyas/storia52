@@ -1,12 +1,14 @@
-const CACHE="storia52-v2";
-const FILES=["./","index.html","style.css","app.js","ui.js","icon.svg","manifest.webmanifest"];
+const CACHE="storia52-v3";
+const FILES=["./","index.html","style.css","update.css","app.js","ui.js","ui-core.js","ui-modes.js","icon.svg","manifest.webmanifest"];
 
 self.addEventListener("install",event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)));
 });
 
 self.addEventListener("activate",event=>{
-  event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))));
+  event.waitUntil(caches.keys().then(keys=>Promise.all(
+    keys.filter(key=>key!==CACHE).map(key=>caches.delete(key))
+  )));
 });
 
 self.addEventListener("fetch",event=>{
