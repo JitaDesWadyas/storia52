@@ -1,14 +1,25 @@
 <!doctype html>
-<html lang="it">
+<html lang="it" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#11100e">
   <meta name="description" content="STORIA 52 - gioco narrativo competitivo con un mazzo di carte.">
   <title>STORIA 52</title>
+  <script>
+    (() => {
+      try {
+        document.documentElement.dataset.theme = localStorage.getItem('storia52_theme') === 'dark' ? 'dark' : 'light';
+      } catch (_) {
+        document.documentElement.dataset.theme = 'light';
+      }
+    })();
+  </script>
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="update.css">
+  <link rel="stylesheet" href="editorial-polish.css">
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -20,7 +31,10 @@
         <p class="brand-kicker">GIOCO NARRATIVO CON UN MAZZO DI CARTE</p>
         <div class="brand-line">
           <h1>STORIA 52</h1>
-          <span class="edition-tag">WEB DECK</span>
+          <button type="button" id="themeToggle" class="theme-toggle" aria-label="Passa al tema scuro" aria-pressed="false">
+            <span class="theme-toggle-icon" aria-hidden="true">◐</span>
+            <span class="theme-toggle-label">Tema scuro</span>
+          </button>
         </div>
       </div>
       <div class="brand-suits" aria-hidden="true"><span>♥</span><span>♦</span><span>♣</span><span>♠</span></div>
@@ -70,7 +84,7 @@
           </button>
           <button type="button" class="mode-card" data-mode="multi">
             <span class="mode-index">02</span><span class="mode-suit">♦</span>
-            <span class="mode-copy"><b>Un telefono a testa</b><small>Stesso codice partita, numero giocatore diverso.</small></span>
+            <span class="mode-copy"><b>Un telefono a testa</b><small>Gli inviti assegnano automaticamente il numero del giocatore.</small></span>
             <span class="mode-arrow">→</span>
           </button>
           <button type="button" class="mode-card" data-mode="quick">
@@ -87,7 +101,7 @@
         <div class="page-banner">
           <p class="eyebrow">ARCHIVIO DEL MAZZO</p>
           <h2 id="cards-title">Una carta alla volta.</h2>
-          <p>Scegli categoria, seme e numero. Niente liste infinite.</p>
+          <p>Scegli categoria, seme e numero.</p>
         </div>
 
         <div class="card-browser">
@@ -136,7 +150,7 @@
             <div class="details-body suit-rules">
               <p><b class="red">♥ CUORI</b><span>Cambia un rapporto.</span></p>
               <p><b class="red">♦ QUADRI</b><span>Rivela un’informazione, una verità o un indizio.</span></p>
-              <p><b>♣ FIORI</b><span>Tenta un’azione e mostra il suo esito.</span></p>
+              <p><b>♣ FIORI</b><span>Tenta un’azione.</span></p>
               <p><b>♠ PICCHE</b><span>Introduce una conseguenza, un ostacolo o una perdita.</span></p>
             </div>
           </details>
@@ -145,7 +159,7 @@
             <div class="details-body">
               <p><b>Pari:</b> avvicina il protagonista al suo obiettivo.</p>
               <p><b>Dispari:</b> allontana il protagonista dal suo obiettivo.</p>
-              <div class="figure-grid"><span><b>JACK</b> oggetto</span><span><b>DONNA</b> personaggio</span><span><b>RE</b> luogo</span><span><b>ASSO</b> ribaltamento</span></div>
+              <div class="figure-grid"><span><b>JACK</b> nuovo oggetto</span><span><b>DONNA</b> nuovo personaggio</span><span><b>RE</b> nuovo luogo</span><span><b>ASSO</b> nuovo ribaltamento</span></div>
               <p class="note">Le figure non hanno parità e si giocano da sole.</p>
             </div>
           </details>
@@ -160,7 +174,7 @@
           <details>
             <summary><span>04</span> Turno</summary>
             <div class="details-body numbered-list">
-              <p><i>1</i> Scarta 1 carta e pesca.</p>
+              <p><i>1</i> Scarta 1 carta e pesca. Se hai una sola carta, puoi scegliere di tenerla.</p>
               <p><i>2</i> Gioca 1 carta oppure 2 carte compatibili.</p>
               <p><i>3</i> Racconta una sola scena breve.</p>
               <p><i>4</i> Pesca oppure riduci la mano.</p>
@@ -178,14 +192,14 @@
           <details>
             <summary><span>06</span> Finale e opposizione</summary>
             <div class="details-body">
-              <p>Puoi chiudere quando, dopo lo scarto, restano <b>1 carta</b> oppure <b>2 carte compatibili</b>.</p>
+              <p>Puoi chiudere quando ti resta <b>1 carta</b> oppure <b>2 carte compatibili</b>. Se inizi il turno con una sola carta, puoi non scartarla e tentare subito il finale.</p>
               <div class="numbered-list">
                 <p><i>1</i> Gioca le carte rimaste.</p>
                 <p><i>2</i> Mostra il tuo Obiettivo segreto.</p>
                 <p><i>3</i> Raggiungi il finale indicato dalla carta.</p>
                 <p><i>4</i> Chiudi il problema usando elementi già introdotti.</p>
               </div>
-              <div class="opposition-box"><b>OPPOSIZIONE</b><p>Un solo avversario può modificare la conseguenza con una carta compatibile, senza annullare il finale.</p></div>
+              <div class="opposition-box"><b>OPPOSIZIONE</b><p>Un solo avversario può aggiungere un elemento al finale con una carta compatibile. Non può modificarlo né annullarlo.</p></div>
             </div>
           </details>
         </div>
@@ -198,14 +212,8 @@
   </div>
 
   <div id="toast" role="status" aria-live="polite"></div>
-  <div id="legacyCompat" hidden aria-hidden="true">
-    <button id="menu" type="button"></button>
-    <select id="suit"><option value="all">Tutti</option></select>
-    <select id="num"><option value="all">Tutti</option></select>
-    <input id="search">
-    <div id="grid"></div>
-  </div>
   <script src="app.js"></script>
-  <script src="ui.js"></script>
+  <script src="ui-core.js"></script>
+  <script src="ui-modes.js"></script>
 </body>
 </html>

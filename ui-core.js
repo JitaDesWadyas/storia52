@@ -14,27 +14,7 @@ const $$=selector=>[...document.querySelectorAll(selector)];
 let browserState={type:'protagonist',suit:'hearts',number:2};
 
 function prepareStaticDom(){
-  if(!document.querySelector('link[href="update.css"]')){
-    const stylesheet=document.createElement('link');stylesheet.rel='stylesheet';stylesheet.href='update.css';document.head.appendChild(stylesheet);
-  }
-  if(!$('#themeToggle')){
-    const edition=$('.edition-tag');
-    if(edition){edition.outerHTML='<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambia tema"><span aria-hidden="true">◐</span><b>Carte scure</b></button>'}
-  }
-  $$('.suit-rules p').forEach(row=>{if(row.textContent.includes('FIORI'))row.innerHTML='<b>♣ FIORI</b><span>Tenta un’azione.</span>'});
-  const figureGrid=$('.figure-grid');
-  if(figureGrid)figureGrid.innerHTML='<span><b>JACK</b> nuovo oggetto</span><span><b>DONNA</b> nuovo personaggio</span><span><b>RE</b> nuovo luogo</span><span><b>ASSO</b> nuovo ribaltamento</span>';
-  $$('.numbered-list p').forEach(row=>{if(row.textContent.trim()==='1 Scarta 1 carta e pesca.')row.innerHTML='<i>1</i> Scarta 1 carta e pesca. Se hai una sola carta, puoi scegliere di tenerla.'});
-  $$('.rules-accordion details').forEach(section=>{
-    const summary=section.querySelector('summary')?.textContent||'';
-    if(summary.includes('Finale e opposizione')){
-      const body=section.querySelector('.details-body');
-      const first=body?.querySelector(':scope > p');
-      if(first)first.innerHTML='Puoi chiudere quando ti resta <b>1 carta</b> oppure <b>2 carte compatibili</b>. Se inizi il turno con una sola carta, puoi non scartarla e tentare subito il finale.';
-      const opposition=body?.querySelector('.opposition-box p');
-      if(opposition)opposition.textContent='Un solo avversario può aggiungere un elemento al finale con una carta compatibile. Non può modificarlo né annullarlo.';
-    }
-  });
+  /* Le regole, il pulsante tema e il CSS sono ora presenti direttamente nell'HTML. */
 }
 
 function hash(value){let h=2166136261;for(const char of value){h^=char.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
@@ -56,20 +36,33 @@ function parseCard(value){const map={h:'hearts',d:'diamonds',c:'clubs',s:'spades
 function serializeStory(story){return [story.protagonist,story.situation,story.problem].map(serializeCard).join('.')}
 function parseStory(value){const cards=String(value||'').split('.').map(parseCard);if(cards.length!==3||cards.some(card=>!card))return null;return{protagonist:cards[0],situation:cards[1],problem:cards[2]}}
 
-function initTheme(){
-  const saved=localStorage.getItem('storia52_theme')||'light';
-  document.body.dataset.theme=saved;
+function storedTheme(){
+  try{return localStorage.getItem('storia52_theme')==='dark'?'dark':'light'}catch{return'light'}
+}
+function applyTheme(theme,{persist=true}={}){
+  const next=theme==='dark'?'dark':'light';
+  document.documentElement.dataset.theme=next;
+  if(persist){try{localStorage.setItem('storia52_theme',next)}catch{}}
   updateThemeButton();
-  $('#themeToggle')?.addEventListener('click',()=>{
-    document.body.dataset.theme=document.body.dataset.theme==='light'?'dark':'light';
-    localStorage.setItem('storia52_theme',document.body.dataset.theme);
-    updateThemeButton();
+}
+function initTheme(){
+  applyTheme(document.documentElement.dataset.theme||storedTheme(),{persist:false});
+  const button=$('#themeToggle');
+  if(!button)return;
+  button.addEventListener('click',()=>{
+    const current=document.documentElement.dataset.theme;
+    applyTheme(current==='dark'?'light':'dark');
   });
 }
 function updateThemeButton(){
   const button=$('#themeToggle');if(!button)return;
-  const dark=document.body.dataset.theme==='dark';
-  button.innerHTML=`<span aria-hidden="true">${dark?'☀':'◐'}</span><b>${dark?'Carte chiare':'Carte scure'}</b>`;
+  const dark=document.documentElement.dataset.theme==='dark';
+  button.setAttribute('aria-pressed',String(dark));
+  button.setAttribute('aria-label',dark?'Passa al tema chiaro':'Passa al tema scuro');
+  const icon=button.querySelector('.theme-toggle-icon');
+  const label=button.querySelector('.theme-toggle-label');
+  if(icon)icon.textContent=dark?'☀':'◐';
+  if(label)label.textContent=dark?'Tema chiaro':'Tema scuro';
 }
 
 function openPage(pageId){
@@ -140,7 +133,7 @@ function bindSelectors(root,selections,onChange){
     }));
   });
 }
-function choiceToggle(current,onRandom,onManual){
+function choiceToggle(current){
   return `<div class="choice-toggle"><button type="button" class="${current==='random'?'active':''}" data-choice="random">Casuali</button><button type="button" class="${current==='manual'?'active':''}" data-choice="manual">Scegli le carte</button></div>`;
 }
 function bindChoiceToggle(root,onRandom,onManual){
