@@ -1,0 +1,224 @@
+/* Final mobile and card-system pass */
+
+.main-nav{
+  background:var(--card-bg)!important;
+  border-color:var(--card-line)!important;
+  border-radius:10px!important;
+  box-shadow:0 12px 28px rgba(0,0,0,.34)!important;
+}
+.main-nav button{
+  background:transparent!important;
+  color:var(--card-muted)!important;
+  border:1px solid transparent!important;
+  border-radius:7px!important;
+}
+.main-nav button.active{
+  background:var(--card-bg-2)!important;
+  color:var(--card-ink)!important;
+  border-color:var(--card-line)!important;
+  box-shadow:none!important;
+}
+.main-nav button.active svg{color:var(--amber-deep)!important}
+html[data-theme="dark"] .main-nav button.active svg{color:var(--amber-bright)!important}
+
+.mode-suit,
+.preview-suit,
+.story-slip .slip-card,
+.choice-mini,
+.player-badge,
+.secret-lock,
+.front-card,
+.back-card{
+  color:var(--card-ink)!important;
+}
+.mode-card:first-child .mode-suit,
+.mode-card:nth-child(2) .mode-suit,
+.playing-card-preview.red .preview-suit,
+.story-slip .slip-card.red,
+.choice-mini.red{color:var(--red)!important}
+
+.amber-banner{
+  background:var(--card-bg-2)!important;
+  color:var(--card-ink)!important;
+  border:1px solid var(--card-line)!important;
+  border-left:5px solid var(--amber)!important;
+  border-radius:6px!important;
+  text-align:left!important;
+  box-shadow:none!important;
+  letter-spacing:.035em!important;
+}
+
+.choice-toggle{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:6px!important;
+  padding:4px!important;
+  margin:12px 0 16px!important;
+  background:var(--card-bg-3)!important;
+  border:1px solid var(--card-line-soft)!important;
+  border-radius:6px!important;
+}
+.choice-toggle button{
+  min-height:42px!important;
+  padding:9px 12px!important;
+  border:1px solid transparent!important;
+  border-radius:4px!important;
+  background:transparent!important;
+  color:var(--card-muted)!important;
+  font-weight:800!important;
+}
+.choice-toggle button.active{
+  background:var(--card-bg-2)!important;
+  color:var(--card-ink)!important;
+  border-color:var(--card-line)!important;
+}
+
+.button-row{gap:10px!important}
+.button{border-radius:4px!important;box-shadow:none!important}
+.button-primary{background:var(--amber)!important;color:#211609!important}
+.button-dark{background:var(--card-ink)!important;color:var(--card-bg-2)!important;border-color:var(--card-ink)!important}
+.button-ghost{background:transparent!important;color:var(--card-ink)!important;border-color:var(--card-line)!important}
+
+.invite-panel{
+  margin-top:18px!important;
+  padding:16px!important;
+  background:var(--card-bg)!important;
+  border:1px solid var(--card-line)!important;
+  border-radius:8px!important;
+  box-shadow:none!important;
+}
+.next-player{
+  display:flex!important;
+  justify-content:space-between!important;
+  align-items:flex-start!important;
+  gap:12px!important;
+  padding-bottom:14px!important;
+  border-bottom:1px solid var(--card-line-soft)!important;
+}
+.invite-player{
+  margin-top:4px;
+  color:var(--card-ink)!important;
+  font:700 1.55rem/1 Georgia,"Times New Roman",serif;
+}
+.invite-badge{
+  display:grid;
+  place-items:center;
+  min-width:44px;
+  height:44px;
+  padding:0 10px;
+  background:var(--card-bg-2)!important;
+  color:var(--amber-deep)!important;
+  border:1px solid var(--card-line)!important;
+  border-radius:4px!important;
+  font-weight:900;
+}
+html[data-theme="dark"] .invite-badge{color:var(--amber-bright)!important}
+.invite-ready{
+  margin-top:16px!important;
+  padding:14px!important;
+  background:var(--card-bg-2)!important;
+  border:1px solid var(--card-line)!important;
+  border-radius:6px!important;
+}
+.invite-ready p{margin:6px 0 0!important;color:var(--card-muted)!important}
+.assigned-list{display:grid!important;gap:8px!important;margin-top:14px!important}
+.assigned-chip{
+  display:flex!important;
+  justify-content:space-between!important;
+  align-items:center!important;
+  gap:12px!important;
+  padding:10px 12px!important;
+  background:var(--card-bg-2)!important;
+  color:var(--card-muted)!important;
+  border:1px solid var(--card-line-soft)!important;
+  border-radius:4px!important;
+  white-space:normal!important;
+  font-size:.84rem!important;
+}
+.assigned-chip b{color:var(--card-ink)!important}
+.assigned-chip span:last-child{font:700 1rem Georgia,"Times New Roman",serif;color:var(--card-ink)!important}
+
+.player-list{display:grid;grid-template-columns:1fr;gap:10px}
+.player-slot{
+  display:grid!important;
+  grid-template-columns:44px 1fr auto!important;
+  grid-template-rows:auto!important;
+  align-items:center!important;
+  gap:12px!important;
+  min-height:72px!important;
+  padding:11px 13px!important;
+  background:var(--card-bg-2)!important;
+  color:var(--card-ink)!important;
+  border:1px solid var(--card-line-soft)!important;
+  border-radius:6px!important;
+  box-shadow:none!important;
+  text-align:left!important;
+}
+.player-badge{
+  display:grid;
+  place-items:center;
+  width:40px;
+  height:50px;
+  background:var(--card-bg)!important;
+  border:1px solid var(--card-line)!important;
+  border-radius:4px!important;
+  font:700 1.05rem Georgia,"Times New Roman",serif;
+}
+.player-meta{display:grid;gap:3px}
+.player-meta b{font:700 1.04rem Georgia,"Times New Roman",serif}
+.player-meta small{color:var(--card-muted)!important}
+.player-action{color:var(--amber-deep)!important;font-size:.72rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+html[data-theme="dark"] .player-action{color:var(--amber-bright)!important}
+.player-slot.viewed{background:var(--card-bg-3)!important;border-color:var(--card-line)!important}
+
+.player-modal{
+  position:fixed;
+  inset:0;
+  z-index:300;
+  display:grid;
+  place-items:center;
+  padding:18px;
+}
+.player-modal-backdrop{position:absolute;inset:0;border:0;background:rgba(0,0,0,.68)}
+.player-modal-card{
+  position:relative;
+  z-index:1;
+  width:min(100%,520px);
+  max-height:calc(100vh - 36px);
+  overflow:auto;
+  padding:16px;
+  background:var(--card-bg)!important;
+  color:var(--card-ink)!important;
+  border:1px solid var(--card-line)!important;
+  border-radius:8px!important;
+  box-shadow:0 22px 48px rgba(0,0,0,.42)!important;
+}
+.modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
+.modal-head h3{margin:4px 0 4px!important;color:var(--card-ink)!important}
+.modal-head p{margin:0;color:var(--card-muted)!important}
+.icon-button{
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  width:38px;
+  height:38px;
+  background:var(--card-bg-2)!important;
+  color:var(--card-ink)!important;
+  border:1px solid var(--card-line-soft)!important;
+  border-radius:4px!important;
+  font-size:1.25rem;
+}
+
+@media(max-width:699px){
+  .game-header{flex-direction:column!important;align-items:flex-start!important}
+  .button-row{display:grid!important;grid-template-columns:1fr!important}
+  .button-row .button{width:100%!important}
+  .invite-ready .button-row{grid-template-columns:1fr 1fr!important}
+  .next-player{flex-direction:row!important}
+  .player-slot{grid-template-columns:40px 1fr!important}
+  .player-action{grid-column:2!important}
+}
+
+@media(min-width:700px){
+  .player-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
