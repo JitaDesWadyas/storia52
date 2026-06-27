@@ -1,0 +1,17 @@
+{
+  "name": "STORIA 52",
+  "short_name": "STORIA 52",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0d0c0a",
+  "theme_color": "#11100e",
+  "description": "Gioco narrativo competitivo con un mazzo di carte.",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
