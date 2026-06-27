@@ -1,5 +1,5 @@
-const CACHE="storia52-v5";
-const FILES=["./","index.html","style.css","update.css","editorial-polish.css","app.js","ui-core.js","ui-modes.js","icon.svg","manifest.webmanifest"];
+const CACHE="storia52-v6";
+const FILES=["./","index.html","style.css","update.css","editorial-polish.css","mobile-fix.css","app.js","ui-core.js","ui-modes.js","mobile-fix.js","icon.svg","manifest.webmanifest"];
 
 self.addEventListener("install",event=>{
   self.skipWaiting();
