@@ -1,8 +1,211 @@
-<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0f0f0f"><title>STORIA 52</title><link rel="stylesheet" href="style.css"></head><body>
-<header><div><small>GIOCO NARRATIVO</small><h1>STORIA 52</h1></div><button id="menu">☰</button></header>
-<nav><button data-page="play" class="active">Gioca</button><button data-page="cards">Carte</button><button data-page="rules">Regole</button></nav>
-<main>
-<section id="play" class="page active"><div class="hero panel"><b>CREA LA STORIA. NASCONDI IL TUO OBIETTIVO.</b><h2>Un generatore narrativo competitivo, rapido e mobile.</h2><p>Genera protagonista, situazione e problema. Ogni giocatore riceve un obiettivo segreto collegato al proprio finale.</p></div><div class="modes"><button data-mode="single" class="panel"><b>Un solo telefono</b><span>Passa il telefono a turno per vedere gli obiettivi.</span></button><button data-mode="multi" class="panel"><b>Un telefono a testa</b><span>Stesso codice partita, numero giocatore diverso.</span></button><button data-mode="quick" class="panel"><b>Generatore rapido</b><span>Genera subito una storia completa.</span></button></div><div id="game" class="panel hidden"></div></section>
-<section id="cards" class="page"><small>ARCHIVIO</small><h2>Trova subito una carta</h2><div id="tabs" class="tabs"></div><div class="filters panel"><label>Seme<select id="suit"><option value="all">Tutti</option><option value="hearts">♥ Cuori</option><option value="diamonds">♦ Quadri</option><option value="clubs">♣ Fiori</option><option value="spades">♠ Picche</option></select></label><label>Numero<select id="num"><option value="all">Tutti</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></label><label>Cerca<input id="search" placeholder="fiducia, indizio, errore…"></label></div><div id="grid" class="grid"></div></section>
-<section id="rules" class="page"><small>GUIDA RAPIDA</small><h2>Regole</h2><div class="rules"><article class="panel"><h3>Preparazione</h3><p>Generate protagonista, situazione e problema. Ogni giocatore riceve 5 carte e un Obiettivo segreto numerico.</p></article><article class="panel"><h3>Semi</h3><p>♥ cambia un rapporto.<br>♦ rivela una verità.<br>♣ tenta un’azione e mostra l’esito.<br>♠ introduce ostacolo, perdita o conseguenza.</p></article><article class="panel"><h3>Parità</h3><p>Pari: avvicina il protagonista al suo obiettivo. Dispari: lo allontana. Jack: oggetto. Donna: personaggio. Re: luogo. Asso: ribaltamento.</p></article><article class="panel"><h3>Turno</h3><p>Scarta 1 carta e pesca. Gioca 1 carta oppure 2 compatibili. Racconta una scena breve. Poi pesca oppure riduci la mano.</p></article><article class="panel"><h3>Finale</h3><p>Puoi chiudere con 1 carta o 2 compatibili. Mostra l’Obiettivo e raggiungi il finale indicato usando elementi già introdotti.</p></article><article class="panel"><h3>Opposizione</h3><p>Un avversario può aggiungere un prezzo o una conseguenza con una carta compatibile, senza annullare il finale.</p></article></div></section>
-</main><div id="toast"></div><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#11100e">
+  <meta name="description" content="STORIA 52 - gioco narrativo competitivo con un mazzo di carte.">
+  <title>STORIA 52</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+
+  <div class="app-shell">
+    <header class="masthead">
+      <div class="brand-lockup">
+        <p class="brand-kicker">GIOCO NARRATIVO CON UN MAZZO DI CARTE</p>
+        <div class="brand-line">
+          <h1>STORIA 52</h1>
+          <span class="edition-tag">WEB DECK</span>
+        </div>
+      </div>
+      <div class="brand-suits" aria-hidden="true"><span>♥</span><span>♦</span><span>♣</span><span>♠</span></div>
+    </header>
+
+    <nav class="main-nav" aria-label="Navigazione principale">
+      <button type="button" data-page="play" class="active" aria-current="page">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4.75h8A3.25 3.25 0 0 1 19.25 8v8A3.25 3.25 0 0 1 16 19.25H8A3.25 3.25 0 0 1 4.75 16V8A3.25 3.25 0 0 1 8 4.75Z"/><path d="m10 9 5 3-5 3V9Z"/></svg>
+        <span>Gioca</span>
+      </button>
+      <button type="button" data-page="cards">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3.75" width="12" height="16.5" rx="2.25"/><path d="M9.25 8.25h5.5M9.25 12h5.5M9.25 15.75h3.5"/></svg>
+        <span>Archivio</span>
+      </button>
+      <button type="button" data-page="rules">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5.25A2.25 2.25 0 0 1 7.25 3H19v15.75H7.25A2.25 2.25 0 0 0 5 21V5.25Z"/><path d="M5 18.75A2.25 2.25 0 0 1 7.25 16.5H19M9 7.5h6M9 11h6"/></svg>
+        <span>Regole</span>
+      </button>
+    </nav>
+
+    <main>
+      <section id="play" class="page active" aria-labelledby="play-title">
+        <div class="hero-board">
+          <div class="hero-copy">
+            <p class="section-kicker">CREA LA STORIA. CHIUDILA CON IL TUO OBIETTIVO SEGRETO.</p>
+            <h2 id="play-title">Una storia diversa ogni volta.</h2>
+            <p>Il mazzo decide i vincoli. Voi decidete cosa succede.</p>
+            <div class="hero-pills"><span>2-10 giocatori</span><span>Un solo mazzo</span><span>Obiettivi segreti</span></div>
+          </div>
+          <div class="deck-scene" aria-hidden="true">
+            <div class="display-card back-card back-left"><span>52</span></div>
+            <div class="display-card back-card back-right"><span>♠</span></div>
+            <div class="display-card front-card"><b>STORIA</b><strong>52</strong><small>♥ ♦ ♣ ♠</small></div>
+          </div>
+        </div>
+
+        <div class="section-heading">
+          <div><p class="eyebrow">SCEGLI LA MODALITÀ</p><h2>Inizia una partita</h2></div>
+          <span class="rule-line" aria-hidden="true"></span>
+        </div>
+
+        <div class="mode-grid">
+          <button type="button" class="mode-card" data-mode="single">
+            <span class="mode-index">01</span><span class="mode-suit">♥</span>
+            <span class="mode-copy"><b>Un solo telefono</b><small>Passalo a turno: ogni giocatore vede solo il proprio obiettivo.</small></span>
+            <span class="mode-arrow">→</span>
+          </button>
+          <button type="button" class="mode-card" data-mode="multi">
+            <span class="mode-index">02</span><span class="mode-suit">♦</span>
+            <span class="mode-copy"><b>Un telefono a testa</b><small>Stesso codice partita, numero giocatore diverso.</small></span>
+            <span class="mode-arrow">→</span>
+          </button>
+          <button type="button" class="mode-card" data-mode="quick">
+            <span class="mode-index">03</span><span class="mode-suit">♣</span>
+            <span class="mode-copy"><b>Generatore rapido</b><small>Crea un incipit e un obiettivo segreto in pochi secondi.</small></span>
+            <span class="mode-arrow">→</span>
+          </button>
+        </div>
+
+        <div id="game" class="game-stage hidden" aria-live="polite"></div>
+      </section>
+
+      <section id="cards" class="page" aria-labelledby="cards-title">
+        <div class="page-banner">
+          <p class="eyebrow">ARCHIVIO DEL MAZZO</p>
+          <h2 id="cards-title">Una carta alla volta.</h2>
+          <p>Scegli categoria, seme e numero. Niente liste infinite.</p>
+        </div>
+
+        <div class="card-browser">
+          <div class="browser-step">
+            <div class="step-label"><span>1</span><b>Categoria</b></div>
+            <div id="tabs" class="type-tabs" role="tablist" aria-label="Categoria della carta"></div>
+          </div>
+
+          <div class="browser-step">
+            <div class="step-label"><span>2</span><b>Seme</b></div>
+            <div id="suitPicker" class="suit-picker" aria-label="Seme"></div>
+          </div>
+
+          <div class="browser-step">
+            <div class="step-label"><span>3</span><b>Numero</b></div>
+            <div id="numberPicker" class="number-picker" aria-label="Numero"></div>
+          </div>
+
+          <div class="browser-result">
+            <div id="cardPreview" class="playing-card-preview"></div>
+            <div class="browser-actions">
+              <button type="button" id="randomCard" class="button button-primary">Carta casuale</button>
+              <button type="button" id="copyCard" class="button button-ghost">Copia testo</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="rules" class="page" aria-labelledby="rules-title">
+        <div class="rulebook-cover">
+          <p class="brand-kicker">GIOCO NARRATIVO CON UN MAZZO DI CARTE</p>
+          <div><h2 id="rules-title">STORIA 52</h2><span>GUIDA RAPIDA</span></div>
+        </div>
+
+        <div class="amber-banner">CREA LA STORIA. CHIUDILA CON IL TUO OBIETTIVO SEGRETO.</div>
+
+        <div class="rules-intro">
+          <div class="rules-step"><span>1</span><p><b>Genera l’incipit</b> con protagonista, situazione e problema.</p></div>
+          <div class="rules-step"><span>2</span><p><b>Ricevi l’obiettivo segreto</b> e tienilo separato dalla mano.</p></div>
+          <div class="rules-step"><span>3</span><p><b>Costruisci la storia</b> usando le carte e prepara il tuo finale.</p></div>
+        </div>
+
+        <div class="rules-accordion">
+          <details open>
+            <summary><span>01</span> Carte e semi</summary>
+            <div class="details-body suit-rules">
+              <p><b class="red">♥ CUORI</b><span>Cambia un rapporto.</span></p>
+              <p><b class="red">♦ QUADRI</b><span>Rivela un’informazione, una verità o un indizio.</span></p>
+              <p><b>♣ FIORI</b><span>Tenta un’azione e mostra il suo esito.</span></p>
+              <p><b>♠ PICCHE</b><span>Introduce una conseguenza, un ostacolo o una perdita.</span></p>
+            </div>
+          </details>
+          <details>
+            <summary><span>02</span> Parità e figure</summary>
+            <div class="details-body">
+              <p><b>Pari:</b> avvicina il protagonista al suo obiettivo.</p>
+              <p><b>Dispari:</b> allontana il protagonista dal suo obiettivo.</p>
+              <div class="figure-grid"><span><b>JACK</b> oggetto</span><span><b>DONNA</b> personaggio</span><span><b>RE</b> luogo</span><span><b>ASSO</b> ribaltamento</span></div>
+              <p class="note">Le figure non hanno parità e si giocano da sole.</p>
+            </div>
+          </details>
+          <details>
+            <summary><span>03</span> Preparazione</summary>
+            <div class="details-body numbered-list">
+              <p><i>1</i> Cinque carte a giocatore.</p>
+              <p><i>2</i> Un Obiettivo segreto numerico per giocatore.</p>
+              <p><i>3</i> Protagonista, situazione, problema e obiettivo iniziale della storia.</p>
+            </div>
+          </details>
+          <details>
+            <summary><span>04</span> Turno</summary>
+            <div class="details-body numbered-list">
+              <p><i>1</i> Scarta 1 carta e pesca.</p>
+              <p><i>2</i> Gioca 1 carta oppure 2 carte compatibili.</p>
+              <p><i>3</i> Racconta una sola scena breve.</p>
+              <p><i>4</i> Pesca oppure riduci la mano.</p>
+            </div>
+          </details>
+          <details>
+            <summary><span>05</span> Due carte</summary>
+            <div class="details-body">
+              <p><b>Compatibili se hanno:</b></p>
+              <p>• stesso seme e parità diversa;</p>
+              <p>• stessa parità e seme diverso.</p>
+              <p class="note">Le figure non possono essere abbinate.</p>
+            </div>
+          </details>
+          <details>
+            <summary><span>06</span> Finale e opposizione</summary>
+            <div class="details-body">
+              <p>Puoi chiudere quando, dopo lo scarto, restano <b>1 carta</b> oppure <b>2 carte compatibili</b>.</p>
+              <div class="numbered-list">
+                <p><i>1</i> Gioca le carte rimaste.</p>
+                <p><i>2</i> Mostra il tuo Obiettivo segreto.</p>
+                <p><i>3</i> Raggiungi il finale indicato dalla carta.</p>
+                <p><i>4</i> Chiudi il problema usando elementi già introdotti.</p>
+              </div>
+              <div class="opposition-box"><b>OPPOSIZIONE</b><p>Un solo avversario può modificare la conseguenza con una carta compatibile, senza annullare il finale.</p></div>
+            </div>
+          </details>
+        </div>
+
+        <p class="victory-line">VINCE CHI CONCLUDE LA STORIA CON IL PROPRIO OBIETTIVO SEGRETO.</p>
+      </section>
+    </main>
+
+    <footer><span>STORIA 52</span><span>PROTOTIPO WEB</span></footer>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <div id="legacyCompat" hidden aria-hidden="true">
+    <button id="menu" type="button"></button>
+    <select id="suit"><option value="all">Tutti</option></select>
+    <select id="num"><option value="all">Tutti</option></select>
+    <input id="search">
+    <div id="grid"></div>
+  </div>
+  <script src="app.js"></script>
+  <script src="ui.js"></script>
+</body>
+</html>
