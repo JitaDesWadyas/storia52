@@ -24,7 +24,8 @@ function createCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';const value
 function normalizeCard(card){return{...card,index:Number(card.number)-2,number:Number(card.number)}}
 function cardLabel(card){return `${card.number}${SUITS[card.suit].symbol}`}
 function cardText(type,card){return DATA[type][card.suit][card.index]}
-function storyFromSeed(seed){return{protagonist:pick(seed,1),situation:pick(seed,2),problem:pick(seed,3)}}
+function storyFromSeed(seed){return{protagonist:pick(seed,1),situation:pick(seed,2),problem:pick(seed,3),goal:pick(seed,4)}}
+function withStoryGoal(story,seed='STORIA52'){return story?.goal?story:{...story,goal:pick(seed,4)}}
 function objectiveFromSeed(seed,player){return pick(`${seed}-PLAYER-${player}`,40+player)}
 function escapeHtml(value){return String(value).replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]))}
 function showToast(message){const toast=$('#toast');toast.textContent=message;toast.classList.add('show');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>toast.classList.remove('show'),1700)}
@@ -33,8 +34,12 @@ function scrollToGame(){setTimeout(()=>$('#game')?.scrollIntoView({behavior:'smo
 function randomCard(){return pick(createCode(),Math.floor(Math.random()*900)+1)}
 function serializeCard(card){return `${card.suit[0]}${card.number}`}
 function parseCard(value){const map={h:'hearts',d:'diamonds',c:'clubs',s:'spades'};const suit=map[String(value||'')[0]];const number=Number(String(value||'').slice(1));if(!suit||number<2||number>10)return null;return{suit,number,index:number-2}}
-function serializeStory(story){return [story.protagonist,story.situation,story.problem].map(serializeCard).join('.')}
-function parseStory(value){const cards=String(value||'').split('.').map(parseCard);if(cards.length!==3||cards.some(card=>!card))return null;return{protagonist:cards[0],situation:cards[1],problem:cards[2]}}
+function serializeStory(story){const complete=withStoryGoal(story);return [complete.protagonist,complete.situation,complete.problem,complete.goal].map(serializeCard).join('.')}
+function parseStory(value,seed='STORIA52'){
+  const cards=String(value||'').split('.').map(parseCard);
+  if(![3,4].includes(cards.length)||cards.some(card=>!card))return null;
+  return withStoryGoal({protagonist:cards[0],situation:cards[1],problem:cards[2],goal:cards[3]},seed);
+}
 
 function storedTheme(){
   try{return localStorage.getItem('storia52_theme')==='dark'?'dark':'light'}catch{return'light'}
@@ -113,7 +118,7 @@ function storySlip(title,type,card){
   const red=SUITS[card.suit].red?' red':'';
   return `<div class="story-slip"><span class="slip-card${red}">${cardLabel(card)}</span><small>${title.toUpperCase()}</small>${cardText(type,card)}</div>`;
 }
-function storyStack(story){return `<div class="story-stack">${storySlip('Protagonista','protagonist',story.protagonist)}${storySlip('Situazione','situation',story.situation)}${storySlip('Problema','problem',story.problem)}</div>`}
+function storyStack(story,seed){const complete=withStoryGoal(story,seed);return `<div class="story-stack">${storySlip('Protagonista','protagonist',complete.protagonist)}${storySlip('Situazione','situation',complete.situation)}${storySlip('Obiettivo della storia','objective',complete.goal)}${storySlip('Problema','problem',complete.problem)}</div>`}
 function secretContent(card){return `<div class="secret-content"><div class="secret-rank">${cardLabel(card)}</div><div class="secret-type">OBIETTIVO SEGRETO</div><p>${cardText('objective',card)}</p><small class="secret-final"><b>FINALE DA RAGGIUNGERE</b><br>${cardText('finale',card)}</small></div>`}
 function secretClosed(label='Obiettivo nascosto',sub='Assicurati che nessuno guardi.'){
   return `<div class="secret-closed"><span class="secret-lock" aria-hidden="true">♠</span><b>${label}</b><p>${sub}</p><small>PREMI “RIVELA” QUANDO SEI PRONTO</small></div>`;
