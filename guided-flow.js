@@ -16,6 +16,13 @@
     problem: { label: 'PROBLEMA', type: 'problem', role: 'Che cosa ostacola o complica tutto.' }
   };
 
+  const CONTEXT_STEPS = [
+    { key: 'identity', label: 'PROTAGONISTA', question: 'Chi è concretamente questa persona?', link: 'PROTAGONISTA', placeholder: 'Esempio: un giovane al suo primo giorno di lavoro' },
+    { key: 'place', label: 'SITUAZIONE', question: 'Dove e quando comincia la scena?', link: 'SITUAZIONE', placeholder: 'Esempio: in una stazione quasi vuota, poco prima dell’alba' },
+    { key: 'opening', label: 'OBIETTIVO', question: 'Che cosa sta facendo adesso per raggiungerlo?', link: 'OBIETTIVO', placeholder: 'Esempio: sta cercando di convincere qualcuno ad aiutarlo' },
+    { key: 'stakes', label: 'PROBLEMA', question: 'Come si manifesta subito e perché è grave?', link: 'PROBLEMA', placeholder: 'Esempio: qualcuno interrompe il piano e gli impone una scelta' }
+  ];
+
   const shuffled = key => {
     const items = [...SUGGESTIONS[key]];
     for (let i = items.length - 1; i > 0; i -= 1) {
@@ -39,6 +46,7 @@
     for (const key of Object.keys(SUGGESTIONS)) {
       if (!Array.isArray(session.suggestions[key]) || session.suggestions[key].length < 3) session.suggestions[key] = shuffled(key);
     }
+    session.contextStep = Math.min(CONTEXT_STEPS.length - 1, Math.max(0, Number(session.contextStep) || 0));
     session.story = withStoryGoal(session.story, session.seed);
     return session;
   };
@@ -52,6 +60,7 @@
       objectives: Array.from({ length: count }, (_, i) => objectiveFromSeed(seed, i + 1)),
       confirmed: Array(count).fill(false),
       contextMode: null,
+      contextStep: 0,
       context: {},
       suggestions: {}
     });
@@ -95,7 +104,8 @@
     let next = randomCard();
     let attempts = 0;
     while (cardLabel(next) === cardLabel(current) && attempts < 10) {
-      next = randomCard(); attempts += 1;
+      next = randomCard();
+      attempts += 1;
     }
     session.story[key] = next;
     session.context.finalOpening = '';
@@ -113,24 +123,28 @@
   };
 
   G.flow.setup = () => {
-    G.screen(`<div class="screen-heading"><p class="eyebrow">PARTITA GUIDATA</p><h2>Quanti siete?</h2><p>Serve un mazzo francese da 52 carte senza jolly e un solo telefono.</p></div>
+    G.screen(`${G.progressMarkup('story')}<div class="screen-heading"><p class="eyebrow">PARTITA GUIDATA</p><h2>Quanti siete?</h2><p>Serve un mazzo francese da 52 carte senza jolly e un solo telefono.</p></div>
       <label class="player-count-field"><span>NUMERO DI GIOCATORI</span><select id="guidedCount">${Array.from({ length: 9 }, (_, i) => i + 2).map(v => `<option value="${v}"${v === 4 ? ' selected' : ''}>${v} giocatori</option>`).join('')}</select></label>
       <div class="simple-note"><b>Il telefono resterà al centro.</b><p>Lo passerete soltanto per leggere gli obiettivi segreti.</p></div>
-      <button type="button" class="main-action" id="createGuided">Crea la storia</button>`, 'Partita guidata');
+      <button type="button" class="main-action" id="createGuided">Genera le quattro carte</button>`, 'Partita guidata');
     document.querySelector('#createGuided').addEventListener('click', () => {
       const session = makeSession(Number(document.querySelector('#guidedCount').value));
-      G.save(session); G.flow.story(session);
+      G.save(session);
+      G.flow.story(session);
     });
   };
 
   G.flow.story = rawSession => {
     const session = normalizeSession(rawSession);
-    session.stage = 'story'; G.save(session);
-    G.screen(`<div class="screen-heading"><p class="eyebrow">LE QUATTRO CARTE</p><h2>Prima capite che funzione ha ciascuna.</h2><p>Non devono essere già perfettamente coerenti. Il vostro lavoro è inventare il collegamento fra loro; se una continua a stonare, cambiate soltanto quella.</p></div>
+    session.stage = 'story';
+    G.save(session);
+    G.screen(`${G.progressMarkup('story')}<div class="screen-heading"><p class="eyebrow">FASE 1 · LE QUATTRO CARTE</p><h2>Prima capite che funzione ha ciascuna.</h2><p>Non devono essere già perfettamente coerenti. Il gioco comincia quando inventate un collegamento credibile fra loro.</p></div>
       ${storyReference(session, { editable: true, title: 'Questi sono i quattro vincoli della storia' })}
       <div class="story-connection"><span>COME SI COLLEGANO</span><p><b>Seguite il protagonista</b> dentro la situazione iniziale. Fategli inseguire il suo obiettivo, mentre il problema gli impedisce di ottenerlo facilmente.</p><div><i>PROTAGONISTA</i><b>→</b><i>SITUAZIONE</i><b>→</b><i>OBIETTIVO</i><b>↔</b><i>PROBLEMA</i></div></div>
-      <button type="button" class="main-action" id="buildOpening">Rendiamo concreta la prima scena</button>
-      <button type="button" class="text-action" id="changeAllStory">Cambia tutte e quattro le carte</button>`, 'Creazione dell’incipit');
+      <details class="inline-explainer"><summary>Vedi un esempio concreto</summary><div><p><b>Carte immaginarie:</b> una viaggiatrice, una stazione vuota, trovare una persona, un blackout.</p><p><b>Prima scena:</b> “Marta arriva nella stazione prima dell’alba per incontrare suo fratello. Le luci si spengono e l’ultimo treno riparte senza di lui.”</p><p>Non sono quattro frasi separate: sono un solo momento che contiene tutte le carte.</p></div></details>
+      <details class="inline-explainer compact"><summary>Che cos’è un incipit?</summary><div>${G.glossaryMarkup()}</div></details>
+      <button type="button" class="main-action" id="buildOpening">Costruisci la prima scena</button>
+      <button type="button" class="text-action" id="changeAllStory">Cambia tutte e quattro le carte</button>`, '1/4 · Carte della storia');
     bindStoryChanges(session);
     document.querySelector('#buildOpening').addEventListener('click', () => G.flow.contextChoice(session));
     document.querySelector('#changeAllStory').addEventListener('click', () => replaceAllStoryParts(session));
@@ -138,25 +152,26 @@
 
   G.flow.contextChoice = rawSession => {
     const session = normalizeSession(rawSession);
-    session.stage = 'context'; G.save(session);
-    G.screen(`<div class="screen-heading"><p class="eyebrow">COMPLETA L’INCIPIT</p><h2>Come volete costruire la prima scena?</h2><p>Le carte restano sempre visibili. Le risposte servono a spiegare concretamente come quelle quattro idee possono accadere insieme.</p></div>
+    session.stage = 'context';
+    G.save(session);
+    G.screen(`${G.progressMarkup('opening')}<div class="screen-heading"><p class="eyebrow">FASE 2 · COMPLETA L’INCIPIT</p><h2>Trasformate le carte in una scena vera.</h2><p>Alla fine avrete già l’inizio della storia. Il primo giocatore dovrà soltanto continuare da lì.</p></div>
       ${storyReference(session, { editable: true, compact: true, title: 'Usate tutte queste informazioni' })}
       <div class="context-choice-list">
-        <button type="button" id="useSuggestions"><b>Aiutaci con dei suggerimenti</b><small>Scegliete, modificate o ignorate le idee proposte.</small><span>→</span></button>
-        <button type="button" id="writeOurselves"><b>Facciamo tutto da soli</b><small>Scrivete direttamente i dettagli decisi dal gruppo.</small><span>→</span></button>
+        <button type="button" id="useSuggestions"><b>Aiutaci con dei suggerimenti</b><small>Una domanda alla volta, con idee da scegliere o modificare.</small><span>→</span></button>
+        <button type="button" id="writeOurselves"><b>Facciamo tutto da soli</b><small>Una domanda alla volta, senza proposte automatiche.</small><span>→</span></button>
       </div>
-      <button type="button" class="text-action" id="skipContext">Salta: collegheremo le carte a voce</button>`, 'Creazione dell’incipit');
+      <button type="button" class="text-action" id="skipContext">Salta: scriveremo direttamente l’incipit</button>`, '2/4 · Creazione dell’incipit');
     bindStoryChanges(session);
-    document.querySelector('#useSuggestions').addEventListener('click', () => { session.contextMode = 'suggestions'; G.save(session); G.flow.contextForm(session); });
-    document.querySelector('#writeOurselves').addEventListener('click', () => { session.contextMode = 'manual'; G.save(session); G.flow.contextForm(session); });
+    document.querySelector('#useSuggestions').addEventListener('click', () => { session.contextMode = 'suggestions'; session.contextStep = 0; G.save(session); G.flow.contextForm(session); });
+    document.querySelector('#writeOurselves').addEventListener('click', () => { session.contextMode = 'manual'; session.contextStep = 0; G.save(session); G.flow.contextForm(session); });
     document.querySelector('#skipContext').addEventListener('click', () => { session.contextMode = 'skipped'; G.save(session); G.flow.opening(session); });
   };
 
   const suggestionButtons = (session, key) => `${session.suggestions[key].map(item => `<button type="button" class="suggestion-chip${session.context[key] === item ? ' selected' : ''}" data-key="${key}" data-value="${escapeHtml(item)}">${escapeHtml(item)}</button>`).join('')}<button type="button" class="refresh-suggestions" data-refresh="${key}">↻ Altre idee</button>`;
 
-  const contextField = (session, key, label, question, link, placeholder) => {
-    const ideas = session.contextMode === 'suggestions' ? `<div class="suggestion-row" data-suggestion-row="${key}">${suggestionButtons(session, key)}</div>` : '';
-    return `<section class="context-field" data-context-field="${key}"><span>${label}</span><h3>${question}</h3><p class="context-link">Completa la carta <b>${link}</b>, senza sostituirla.</p>${ideas}<textarea id="context-${key}" rows="2" placeholder="${placeholder}">${escapeHtml(session.context[key])}</textarea></section>`;
+  const contextField = (session, step) => {
+    const ideas = session.contextMode === 'suggestions' ? `<div class="suggestion-row" data-suggestion-row="${step.key}">${suggestionButtons(session, step.key)}</div>` : '';
+    return `<section class="context-field" data-context-field="${step.key}"><span>${session.contextStep + 1} · ${step.label}</span><h3>${step.question}</h3><p class="context-link">Rendi concreta la carta <b>${step.link}</b>, senza sostituirla.</p>${ideas}<textarea id="context-${step.key}" rows="3" placeholder="${step.placeholder}">${escapeHtml(session.context[step.key])}</textarea></section>`;
   };
 
   const syncContext = session => {
@@ -168,6 +183,23 @@
     if (name) session.context.name = name.value.trim();
     session.context.finalOpening = '';
     G.save(session);
+  };
+
+  const contextStepMarkup = session => {
+    const step = CONTEXT_STEPS[session.contextStep];
+    const nameField = step.key === 'identity' ? `<section class="context-field name-field"><span>NOME · FACOLTATIVO</span><h3>Come si chiama?</h3><p class="context-link">Serve soltanto a rendere più naturale il racconto.</p><input id="context-name" value="${escapeHtml(session.context.name)}" placeholder="Esempio: Luca"></section>` : '';
+    const isLast = session.contextStep === CONTEXT_STEPS.length - 1;
+    return `<div class="context-step-status"><span>DOMANDA ${session.contextStep + 1} DI ${CONTEXT_STEPS.length}</span><div aria-hidden="true">${CONTEXT_STEPS.map((_, index) => `<i class="${index < session.contextStep ? 'done' : ''}${index === session.contextStep ? ' current' : ''}"></i>`).join('')}</div></div>
+      <div class="context-step-card">${contextField(session, step)}${nameField}</div>
+      <div class="context-step-actions">${session.contextStep > 0 ? '<button type="button" class="secondary-action" data-context-back>Indietro</button>' : '<span></span>'}<button type="button" class="main-action" ${isLast ? 'data-context-confirm' : 'data-context-next'}>${isLast ? 'Componi l’incipit' : 'Avanti'}</button></div>`;
+  };
+
+  const drawContextStep = (session, direction = 'forward') => {
+    const host = document.querySelector('#contextStepHost');
+    if (!host) return;
+    host.innerHTML = contextStepMarkup(session);
+    host.dataset.direction = direction;
+    G.pulse(host, direction === 'back' ? 'step-back' : 'step-forward');
   };
 
   const bindContextInteractions = session => {
@@ -197,31 +229,41 @@
         const row = refresh.closest('.suggestion-row');
         row.innerHTML = suggestionButtons(session, key);
         G.pulse(row, 'is-refreshing');
+        return;
+      }
+      if (event.target.closest('[data-context-next]')) {
+        syncContext(session);
+        session.contextStep = Math.min(CONTEXT_STEPS.length - 1, session.contextStep + 1);
+        G.save(session);
+        drawContextStep(session, 'forward');
+        return;
+      }
+      if (event.target.closest('[data-context-back]')) {
+        syncContext(session);
+        session.contextStep = Math.max(0, session.contextStep - 1);
+        G.save(session);
+        drawContextStep(session, 'back');
+        return;
+      }
+      if (event.target.closest('[data-context-confirm]')) {
+        syncContext(session);
+        G.flow.opening(session);
       }
     });
   };
 
   G.flow.contextForm = rawSession => {
     const session = normalizeSession(rawSession);
-    session.stage = 'context'; G.save(session);
-    G.screen(`<div class="screen-heading compact"><p class="eyebrow">COSTRUISCI LA PRIMA SCENA</p><h2>Ogni domanda completa una carta precisa.</h2><p>Non inventate quattro idee nuove: spiegate come le quattro carte possono esistere nello stesso momento.</p></div>
+    session.stage = 'context';
+    G.save(session);
+    G.screen(`${G.progressMarkup('opening')}<div class="screen-heading compact"><p class="eyebrow">FASE 2 · COSTRUISCI LA PRIMA SCENA</p><h2>Una domanda alla volta.</h2><p>Non inventate quattro idee nuove: spiegate come le quattro carte possono esistere nello stesso momento.</p></div>
       <div class="context-workspace">
         ${storyReference(session, { editable: true, compact: true, sticky: true, title: 'Le carte che state collegando' })}
-        <div class="context-editor">
-          <div class="context-form">
-            ${contextField(session, 'identity', '1 · PROTAGONISTA', 'Chi è concretamente questa persona?', 'PROTAGONISTA', 'Esempio: un giovane al suo primo giorno di lavoro')}
-            <section class="context-field name-field"><span>NOME · FACOLTATIVO</span><h3>Come si chiama?</h3><p class="context-link">Serve soltanto a rendere più naturale il racconto.</p><input id="context-name" value="${escapeHtml(session.context.name)}" placeholder="Esempio: Luca"></section>
-            ${contextField(session, 'place', '2 · SITUAZIONE', 'Dove e quando sta accadendo?', 'SITUAZIONE', 'Esempio: in una stazione quasi vuota, poco prima dell’alba')}
-            ${contextField(session, 'opening', '3 · OBIETTIVO', 'Che cosa sta facendo adesso per raggiungerlo?', 'OBIETTIVO', 'Esempio: sta cercando di convincere qualcuno ad aiutarlo')}
-            ${contextField(session, 'stakes', '4 · PROBLEMA', 'Come si manifesta subito e perché è grave?', 'PROBLEMA', 'Esempio: qualcuno interrompe il piano e gli impone una scelta')}
-          </div>
-          <button type="button" class="main-action" id="confirmContext">Componi l’incipit</button>
-          <button type="button" class="text-action" id="changeContextMode">Cambia modalità</button>
-        </div>
-      </div>`, 'Creazione dell’incipit');
+        <div class="context-editor"><div id="contextStepHost"></div><button type="button" class="text-action" id="changeContextMode">Cambia modalità</button></div>
+      </div>`, '2/4 · Creazione dell’incipit');
     bindStoryChanges(session);
+    drawContextStep(session);
     bindContextInteractions(session);
-    document.querySelector('#confirmContext').addEventListener('click', () => { syncContext(session); G.flow.opening(session); });
     document.querySelector('#changeContextMode').addEventListener('click', () => { syncContext(session); G.flow.contextChoice(session); });
   };
 
@@ -251,32 +293,68 @@
     return session.context.finalOpening?.trim() || generatedOpeningText(session);
   };
 
+  G.flow.openingPanel = (rawSession, options = {}) => {
+    const session = normalizeSession(rawSession);
+    const { open = false, compact = false, intro = 'Questa è la scena da cui continua la partita.' } = options;
+    return `<details class="opening-dock${compact ? ' compact' : ''}"${open ? ' open' : ''}><summary><span>INCIPIT DELLA STORIA</span><b>Rileggi la prima scena</b><i aria-hidden="true">⌄</i></summary><div class="opening-dock-body"><p class="opening-dock-intro">${intro}</p><blockquote>${escapeHtml(G.flow.openingText(session))}</blockquote><div class="opening-dock-actions"><button type="button" data-copy-opening>Copia incipit</button><button type="button" data-print-opening>Stampa / salva PDF</button></div></div></details>`;
+  };
+
+  const printOpening = session => {
+    const story = withStoryGoal(session.story, session.seed);
+    const cards = Object.keys(STORY_PARTS).map(key => {
+      const spec = STORY_PARTS[key];
+      return `<li><b>${spec.label}</b><span>${escapeHtml(cardText(spec.type, story[key]))}</span></li>`;
+    }).join('');
+    const popup = window.open('', '_blank');
+    if (!popup) {
+      showToast('Il browser ha bloccato la stampa');
+      return;
+    }
+    popup.opener = null;
+    popup.document.write(`<!doctype html><html lang="it"><head><meta charset="utf-8"><title>STORIA 52 · Incipit</title><style>body{max-width:760px;margin:48px auto;padding:0 24px;color:#17130d;font:18px/1.6 Georgia,serif}h1{font-size:42px;margin:0 0 4px}small{font:700 12px Arial,sans-serif;letter-spacing:.12em}blockquote{margin:28px 0;padding:24px;border:2px solid #17130d;font-size:23px;line-height:1.55}ul{padding:0;list-style:none}li{display:grid;gap:3px;padding:10px 0;border-bottom:1px solid #bbb}li b{font:800 11px Arial,sans-serif;letter-spacing:.1em}@media print{body{margin:0}}</style></head><body><small>GIOCO NARRATIVO CON UN MAZZO DI CARTE</small><h1>STORIA 52</h1><p>Incipit della partita</p><blockquote>${escapeHtml(G.flow.openingText(session))}</blockquote><h2>Le quattro carte</h2><ul>${cards}</ul><script>window.addEventListener('load',()=>setTimeout(()=>window.print(),150));<\/script></body></html>`);
+    popup.document.close();
+  };
+
+  G.flow.bindOpeningPanel = (session, root = document) => {
+    root.querySelectorAll('[data-copy-opening]').forEach(button => button.addEventListener('click', async () => {
+      const copied = await G.copyText(G.flow.openingText(session));
+      showToast(copied ? 'Incipit copiato' : 'Copia non riuscita');
+    }));
+    root.querySelectorAll('[data-print-opening]').forEach(button => button.addEventListener('click', () => printOpening(session)));
+  };
+
   G.flow.opening = rawSession => {
     const session = normalizeSession(rawSession);
     session.stage = 'opening';
     if (!session.context.finalOpening) session.context.finalOpening = generatedOpeningText(session);
     G.save(session);
     const completed = ['identity', 'place', 'opening', 'stakes'].some(key => Boolean(session.context[key]));
-    G.screen(`<div class="screen-heading"><p class="eyebrow">INCIPIT PRONTO</p><h2>Leggetelo e sistematelo insieme.</h2><p>Il testo è modificabile. Controllate che tutte e quattro le carte siano presenti e che il collegamento sia comprensibile.</p></div>
+    G.screen(`${G.progressMarkup('opening')}<div class="screen-heading"><p class="eyebrow">FASE 2 · INCIPIT PRONTO</p><h2>Questa è già la prima scena.</h2><p>Leggetela e sistematela insieme. Quando inizierà la partita, il primo giocatore racconterà soltanto ciò che succede subito dopo.</p></div>
       ${storyReference(session, { editable: false, compact: true, title: 'Controllate che l’incipit contenga tutto' })}
       <label class="opening-editor"><span>LA PRIMA SCENA</span><textarea id="finalOpening" rows="8">${escapeHtml(session.context.finalOpening)}</textarea><small>Potete riscrivere liberamente il testo senza cambiare le quattro carte.</small></label>
+      <div class="story-start-bridge"><span>COME DIVENTA UNA PARTITA</span><ol><li><b>Adesso:</b> fissate questa prima scena.</li><li><b>Poi:</b> ogni giocatore legge il proprio obiettivo segreto.</li><li><b>Primo turno:</b> si continua dall’ultima frase dell’incipit usando la carta giocata.</li></ol><p>Non dovete creare un altro inizio e non dovete ricominciare da zero.</p></div>
       ${completed ? '' : '<div class="simple-note"><b>Avete saltato i dettagli.</b><p>Prima di continuare, chiarite almeno dove si trova il protagonista e come compare il problema.</p></div>'}
-      <button type="button" class="main-action" id="openingReady">L’incipit è chiaro</button>
-      <button type="button" class="text-action" id="editOpening">Torna alle domande</button>`, 'Creazione dell’incipit');
+      <div class="opening-export-actions"><button type="button" class="secondary-action" data-copy-opening>Copia incipit</button><button type="button" class="secondary-action" data-print-opening>Stampa / salva PDF</button></div>
+      <button type="button" class="main-action" id="openingReady">Continua agli obiettivi segreti</button>
+      <button type="button" class="text-action" id="editOpening">Torna alle domande</button>`, '2/4 · Incipit pronto');
     const editor = document.querySelector('#finalOpening');
     editor.addEventListener('input', () => { session.context.finalOpening = editor.value.trim(); G.save(session); });
+    G.flow.bindOpeningPanel(session);
     document.querySelector('#openingReady').addEventListener('click', () => { session.context.finalOpening = editor.value.trim(); G.save(session); G.flow.objectives(session); });
     document.querySelector('#editOpening').addEventListener('click', () => { if (session.contextMode === 'skipped') session.contextMode = 'manual'; G.flow.contextForm(session); });
   };
 
   G.flow.objectives = rawSession => {
     const session = normalizeSession(rawSession);
-    session.stage = 'objectives'; G.save(session);
+    session.stage = 'objectives';
+    G.save(session);
     const ready = session.confirmed.filter(Boolean).length;
-    G.screen(`<div class="screen-heading"><p class="eyebrow">OBIETTIVI SEGRETI</p><h2>Passate il telefono.</h2><p>Apre soltanto il giocatore indicato. Gli altri non guardano.</p></div>
+    G.screen(`${G.progressMarkup('objectives')}<div class="screen-heading"><p class="eyebrow">FASE 3 · OBIETTIVI SEGRETI</p><h2>La storia è pronta. Ora passate il telefono.</h2><p>Apre soltanto il giocatore indicato. Gli altri non guardano.</p></div>
+      ${G.flow.openingPanel(session, { compact: true, intro: 'L’incipit resta qui: potete rileggerlo senza tornare indietro.' })}
       <div class="objective-progress"><b>${ready}/${session.count}</b><span>giocatori pronti</span></div>
       <div class="player-list">${session.objectives.map((_, i) => `<button type="button" class="player-slot${session.confirmed[i] ? ' confirmed' : ''}" data-player="${i}"><span>${i + 1}</span><p><b>Giocatore ${i + 1}</b><small>${session.confirmed[i] ? 'Obiettivo memorizzato' : 'Da leggere'}</small></p><i>${session.confirmed[i] ? 'Riapri' : 'Apri'}</i></button>`).join('')}</div>
-      ${ready === session.count ? '<button type="button" class="main-action" id="objectivesDone">Tutti pronti</button>' : ''}`, 'Obiettivi segreti');
+      ${ready === session.count ? '<button type="button" class="main-action" id="objectivesDone">Tutti pronti · prepara il tavolo</button>' : ''}`, '3/4 · Obiettivi segreti');
+    G.flow.bindOpeningPanel(session);
     document.querySelectorAll('[data-player]').forEach(button => button.addEventListener('click', () => G.flow.objectiveModal(session, Number(button.dataset.player), false)));
     document.querySelector('#objectivesDone')?.addEventListener('click', () => G.flow.table(session));
   };
@@ -285,28 +363,36 @@
     let revealed = false;
     const modal = document.createElement('div');
     modal.className = 'focus-modal objective-modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
     const close = () => {
       modal.classList.add('is-closing');
       window.setTimeout(() => modal.remove(), 180);
     };
     const draw = () => {
-      modal.innerHTML = `<div class="focus-modal-backdrop"></div><div class="focus-modal-card"><button type="button" class="modal-close">×</button><p class="eyebrow">GIOCATORE ${index + 1}</p><h2>${revealed ? 'Il tuo obiettivo' : `Passa il telefono al giocatore ${index + 1}`}</h2><div class="secret-card${revealed ? ' open' : ''}">${revealed ? secretContent(session.objectives[index]) : secretClosed(`Solo Giocatore ${index + 1} deve guardare`, 'Gli altri distolgono lo sguardo.')}</div><div class="modal-actions"><button type="button" class="main-action" id="toggleObjective">${revealed ? 'Nascondi' : 'Rivela'}</button>${revealed && !duringGame ? '<button type="button" class="secondary-action" id="confirmObjective">Ho letto e memorizzato</button>' : ''}${duringGame ? '<button type="button" class="secondary-action" id="closeObjective">Chiudi</button>' : ''}</div></div>`;
+      modal.innerHTML = `<div class="focus-modal-backdrop"></div><div class="focus-modal-card"><button type="button" class="modal-close" aria-label="Chiudi">×</button><p class="eyebrow">GIOCATORE ${index + 1}</p><h2>${revealed ? 'Il tuo obiettivo' : `Passa il telefono al giocatore ${index + 1}`}</h2><div class="secret-card${revealed ? ' open' : ''}">${revealed ? secretContent(session.objectives[index]) : secretClosed(`Solo Giocatore ${index + 1} deve guardare`, 'Gli altri distolgono lo sguardo.')}</div><div class="modal-actions"><button type="button" class="main-action" id="toggleObjective">${revealed ? 'Nascondi' : 'Rivela'}</button>${revealed && !duringGame ? '<button type="button" class="secondary-action" id="confirmObjective">Ho letto e memorizzato</button>' : ''}${duringGame ? '<button type="button" class="secondary-action" id="closeObjective">Chiudi</button>' : ''}</div></div>`;
       modal.querySelector('.focus-modal-backdrop').addEventListener('click', close);
       modal.querySelector('.modal-close').addEventListener('click', close);
       modal.querySelector('#closeObjective')?.addEventListener('click', close);
       modal.querySelector('#toggleObjective').addEventListener('click', () => { revealed = !revealed; draw(); G.pulse(modal.querySelector('.secret-card'), 'is-revealing'); });
       modal.querySelector('#confirmObjective')?.addEventListener('click', () => { session.confirmed[index] = true; G.save(session); close(); window.setTimeout(() => G.flow.objectives(session), 180); });
     };
-    document.body.appendChild(modal); draw(); requestAnimationFrame(() => modal.classList.add('is-visible'));
+    document.body.appendChild(modal);
+    draw();
+    requestAnimationFrame(() => modal.classList.add('is-visible'));
   };
 
   G.flow.table = rawSession => {
     const session = normalizeSession(rawSession);
-    session.stage = 'table'; G.save(session);
-    G.screen(`<div class="screen-heading"><p class="eyebrow">PREPARATE IL MAZZO</p><h2>Quattro cose, poi iniziate.</h2></div>
+    session.stage = 'table';
+    G.save(session);
+    G.screen(`${G.progressMarkup('objectives')}<div class="screen-heading"><p class="eyebrow">FASE 3 · PREPARATE IL MAZZO</p><h2>Quattro cose, poi la storia continua.</h2></div>
+      ${G.flow.openingPanel(session, { open: true, intro: 'Leggetelo ad alta voce prima di premere “Inizia la partita”.' })}
       <ol class="plain-steps"><li><span>1</span><p><b>Togliete i jolly e mescolate.</b></p></li><li><span>2</span><p><b>Date 5 carte a ogni giocatore.</b></p></li><li><span>3</span><p><b>Mettete mazzo e scarti al centro.</b></p></li><li><span>4</span><p><b>L’obiettivo sul telefono non fa parte della mano.</b></p></li></ol>
       <div class="first-player"><span>COMINCIA</span><b>Giocatore ${session.firstPlayer + 1}</b></div>
-      <button type="button" class="main-action" id="startPlaying">Inizia la partita</button>`, 'Preparazione');
+      <div class="start-story-callout"><span>IL PRIMO TURNO NON CREA UN NUOVO INIZIO</span><b>Giocatore ${session.firstPlayer + 1} continua dall’ultima frase dell’incipit.</b><p>Gioca la carta, applica il suo significato e racconta il fatto successivo.</p></div>
+      <button type="button" class="main-action" id="startPlaying">Inizia: continua la storia</button>`, '3/4 · Preparazione');
+    G.flow.bindOpeningPanel(session);
     document.querySelector('#startPlaying').addEventListener('click', () => { session.stage = 'play'; session.currentPlayer = session.firstPlayer; session.round = 1; G.save(session); G.playMode.turn(session); });
   };
 

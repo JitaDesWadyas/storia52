@@ -8,6 +8,13 @@
     document.head.appendChild(polish);
   }
 
+  if (!document.querySelector('link[href="guided-clarity.css"]')) {
+    const clarity = document.createElement('link');
+    clarity.rel = 'stylesheet';
+    clarity.href = 'guided-clarity.css';
+    document.head.appendChild(clarity);
+  }
+
   const G = window.G52;
   const SUITS = {
     hearts: { symbol: '♥', name: 'Cuori', rule: 'Cambia un rapporto.', red: true },
@@ -18,28 +25,38 @@
   const FIGURES = { A: 'Ribalta la situazione.', J: 'Introduce un nuovo oggetto.', Q: 'Introduce un nuovo personaggio.', K: 'Introduce un nuovo luogo.' };
 
   G.playMode.turn = session => {
-    session.stage = 'play'; G.save(session);
+    session.stage = 'play';
+    G.save(session);
     const player = session.currentPlayer;
-    G.screen(`<div class="turn-header"><div><p class="eyebrow">GIRO ${session.round}</p><h1>Giocatore ${player + 1}</h1><p>È il tuo turno.</p></div><button type="button" class="objective-button" id="peekObjective">Il mio obiettivo</button></div>
-      <div class="turn-core">
-        <div><span>1</span><p><b>Scarta e ripesca</b><small>Se hai una sola carta, puoi tenerla per tentare il finale.</small></p></div>
-        <div><span>2</span><p><b>Gioca 1 carta o 2 compatibili</b><small>Le figure si giocano sempre da sole.</small></p></div>
-        <div><span>3</span><p><b>Racconta una scena breve</b><small>Usa almeno un elemento già introdotto nella storia.</small></p></div>
-        <div><span>4</span><p><b>Pesca oppure resta con una carta in meno</b></p></div>
-      </div>
-      <details class="optional-help"><summary>Mi serve aiuto</summary><div class="optional-help-actions"><button type="button" id="helpCard">Interpreta una carta</button><button type="button" id="helpPair">Verifica due carte</button><button type="button" id="helpFinal">Voglio tentare il finale</button><button type="button" id="helpStory">Rivedi l’incipit</button></div></details>
-      <button type="button" class="main-action" id="finishTurn">Turno finito · passa a Giocatore ${(player + 1) % session.count + 1}</button>`, 'Partita in corso');
+    const firstTurn = session.round === 1 && player === session.firstPlayer;
+    G.screen(`${G.progressMarkup('play')}<div class="turn-header"><div><p class="eyebrow">FASE 4 · GIRO ${session.round}</p><h1>Giocatore ${player + 1}</h1><p>${firstTurn ? 'Continua la scena iniziale.' : 'È il tuo turno.'}</p></div><button type="button" class="objective-button" id="peekObjective">Il mio obiettivo segreto</button></div>
+      <div class="play-workspace">
+        <aside class="play-story-side">${G.flow.openingPanel(session, { open: firstTurn, compact: true, intro: firstTurn ? 'Parti dall’ultima frase. Non creare un secondo incipit.' : 'Usalo per mantenere la storia collegata al punto di partenza.' })}</aside>
+        <section class="turn-panel">
+          ${firstTurn ? '<div class="turn-continuity"><span>PRIMO TURNO</span><b>La storia è già iniziata.</b><p>Guarda l’ultima frase dell’incipit, gioca la carta e racconta che cosa accade subito dopo.</p></div>' : ''}
+          <div class="turn-core">
+            <div><span>1</span><p><b>Scarta e ripesca</b><small>Se hai una sola carta, puoi tenerla per tentare il finale.</small></p></div>
+            <div><span>2</span><p><b>Gioca 1 carta o 2 compatibili</b><small>Le figure si giocano sempre da sole.</small></p></div>
+            <div class="scene-step"><span>3</span><p><b>Racconta il fatto successivo</b><small>Usa almeno un elemento già introdotto e applica la carta giocata.</small></p></div>
+            <div><span>4</span><p><b>Pesca oppure resta con una carta in meno</b></p></div>
+          </div>
+          <details class="scene-example"><summary>Come trasformo la carta in una scena?</summary><div><p><b>Formula semplice:</b> riprendi un elemento già presente → applica il significato della carta → mostra una conseguenza.</p><p><b>Esempio:</b> l’incipit termina con una porta bloccata. Giochi un <b>Fiori pari</b>: il protagonista tenta un’azione che lo avvicina all’obiettivo, quindi forza la serratura e trova un indizio utile.</p><p>Racconta un solo evento. Il giocatore dopo continuerà da quella conseguenza.</p></div></details>
+          <details class="optional-help"><summary>Altri aiuti</summary><div class="optional-help-actions"><button type="button" id="helpCard">Interpreta una carta</button><button type="button" id="helpPair">Verifica due carte</button><button type="button" id="helpFinal">Voglio tentare il finale</button></div></details>
+          <button type="button" class="main-action" id="finishTurn">Turno finito · passa a Giocatore ${(player + 1) % session.count + 1}</button>
+        </section>
+      </div>`, '4/4 · Partita in corso');
 
+    G.flow.bindOpeningPanel(session);
     document.querySelector('#peekObjective').addEventListener('click', () => G.flow.objectiveModal(session, player, true));
     document.querySelector('#helpCard').addEventListener('click', cardInterpreter);
     document.querySelector('#helpPair').addEventListener('click', pairChecker);
     document.querySelector('#helpFinal').addEventListener('click', () => finalHelp(session, player));
-    document.querySelector('#helpStory').addEventListener('click', () => G.modal('Il vostro incipit', `<div class="opening-result small"><p>${escapeHtml(G.flow.openingText(session))}</p></div>`));
     document.querySelector('#finishTurn').addEventListener('click', () => {
       const next = (session.currentPlayer + 1) % session.count;
       if (next === session.firstPlayer) session.round += 1;
       session.currentPlayer = next;
-      G.save(session); G.playMode.turn(session);
+      G.save(session);
+      G.playMode.turn(session);
     });
   };
 
@@ -51,7 +68,7 @@
     const number = Number(rank);
     if (Number.isFinite(number)) {
       const favorable = number % 2 === 0;
-      return `<div class="card-answer-rank${suit.red ? ' red' : ''}">${rank}${suit.symbol}</div><p><b>${suit.name}:</b> ${suit.rule}</p><p><b>${favorable ? 'Pari' : 'Dispari'}:</b> ${favorable ? 'avvicina il protagonista al suo obiettivo.' : 'allontana il protagonista dal suo obiettivo.'}</p><div class="answer-prompt">Racconta una scena che rispetti entrambe le indicazioni e riprenda qualcosa già successo.</div>`;
+      return `<div class="card-answer-rank${suit.red ? ' red' : ''}">${rank}${suit.symbol}</div><p><b>${suit.name}:</b> ${suit.rule}</p><p><b>${favorable ? 'Pari' : 'Dispari'}:</b> ${favorable ? 'avvicina il protagonista al suo obiettivo.' : 'allontana il protagonista dal suo obiettivo.'}</p><div class="answer-prompt">Riprendi qualcosa già presente, applica entrambe le indicazioni e racconta una sola conseguenza.</div>`;
     }
     return `<div class="card-answer-rank${suit.red ? ' red' : ''}">${rank}${suit.symbol}</div><p><b>Figura:</b> ${FIGURES[rank]}</p><p><b>${suit.red ? 'Rossa' : 'Nera'}:</b> ${suit.red ? 'introduci l’elemento in modo favorevole.' : 'introduci l’elemento come ostacolo o complicazione.'}</p><div class="answer-prompt">Le figure non hanno parità e si giocano da sole.</div>`;
   };
@@ -86,13 +103,16 @@
   }
 
   function finalHelp(session, player) {
-    const modal = G.modal('Tentare il finale', `<ol class="plain-steps compact"><li><span>1</span><p><b>Devi avere 1 carta oppure 2 carte compatibili.</b></p></li><li><span>2</span><p><b>Gioca le carte e mostra il tuo obiettivo segreto.</b></p></li><li><span>3</span><p><b>Raggiungi il finale indicato dall’obiettivo.</b></p></li><li><span>4</span><p><b>Chiudi o trasforma il problema usando elementi già comparsi.</b></p></li></ol><div class="simple-note"><b>Opposizione</b><p>Un solo avversario può aggiungere un elemento con una carta compatibile. Non può annullare il finale.</p></div><button type="button" class="main-action" id="finalSucceeded">Il finale è riuscito</button>`);
+    const modal = G.modal('Tentare il finale', `<ol class="plain-steps compact"><li><span>1</span><p><b>Devi avere 1 carta oppure 2 carte compatibili.</b></p></li><li><span>2</span><p><b>Gioca le carte e mostra il tuo obiettivo segreto.</b></p></li><li><span>3</span><p><b>Raggiungi il finale indicato dall’obiettivo.</b></p></li><li><span>4</span><p><b>Chiudi o trasforma il problema usando elementi già comparsi.</b></p></li></ol><div class="simple-note"><b>Il finale deve appartenere a questa storia.</b><p>Riprendi l’incipit e almeno un elemento introdotto nei turni. Non risolvere tutto con qualcosa inventato soltanto adesso.</p></div><div class="simple-note"><b>Opposizione</b><p>Un solo avversario può aggiungere un elemento con una carta compatibile. Non può annullare il finale.</p></div><button type="button" class="main-action" id="finalSucceeded">Il finale è riuscito</button>`);
     modal.querySelector('#finalSucceeded').addEventListener('click', () => { modal.remove(); G.playMode.victory(session, player); });
   }
 
   G.playMode.victory = (session, player) => {
-    session.stage = 'finished'; session.winner = player; G.save(session);
-    G.screen(`<div class="victory"><span>♥ ♦ ♣ ♠</span><p class="eyebrow">STORIA CONCLUSA</p><h1>Vince Giocatore ${player + 1}</h1><p>Ha concluso la storia raggiungendo il proprio obiettivo segreto.</p><button type="button" class="main-action" id="newGame">Nuova partita</button></div>`, 'Storia conclusa');
+    session.stage = 'finished';
+    session.winner = player;
+    G.save(session);
+    G.screen(`${G.progressMarkup('play')}<div class="victory"><span>♥ ♦ ♣ ♠</span><p class="eyebrow">STORIA CONCLUSA</p><h1>Vince Giocatore ${player + 1}</h1><p>Ha concluso la storia raggiungendo il proprio obiettivo segreto.</p></div>${G.flow.openingPanel(session, { compact: true, intro: 'Questo era il punto da cui è partita la vostra storia.' })}<button type="button" class="main-action" id="newGame">Nuova partita</button>`, 'Storia conclusa');
+    G.flow.bindOpeningPanel(session);
     document.querySelector('#newGame').addEventListener('click', () => { G.clear(); G.flow.setup(); });
   };
 
