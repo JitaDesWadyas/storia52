@@ -60,21 +60,135 @@
   };
 
   G.glossaryMarkup = () => `<div class="glossary-grid">
-    <p><b>Incipit</b><span>È la prima scena vera della storia: da lì parte il primo turno.</span></p>
-    <p><b>Scena breve</b><span>Un solo fatto importante, raccontato in poche frasi.</span></p>
-    <p><b>Obiettivo della storia</b><span>Ciò che il protagonista cerca di ottenere dall’inizio alla fine.</span></p>
-    <p><b>Obiettivo segreto</b><span>Il tipo di conclusione che ogni giocatore proverà a realizzare.</span></p>
-    <p><b>Finale</b><span>L’ultima scena: chiude o trasforma il problema iniziale.</span></p>
+    <p><b>Incipit</b><span>La prima scena vera della storia. Il primo turno continua da lì.</span></p>
+    <p><b>Scena breve</b><span>Un solo fatto importante raccontato in poche frasi.</span></p>
+    <p><b>Obiettivo della storia</b><span>Ciò che il protagonista cerca di ottenere per tutta la storia.</span></p>
+    <p><b>Obiettivo segreto</b><span>La conclusione che ogni giocatore proverà a realizzare. Non fa parte della mano.</span></p>
+    <p><b>Finale</b><span>L’ultima scena: raggiunge l’obiettivo segreto e chiude o trasforma il problema iniziale.</span></p>
   </div>`;
 
-  G.rulesMarkup = () => `<div class="session-rules-content">
-    <section><span>PAROLE CHIAVE</span>${G.glossaryMarkup()}</section>
-    <section><span>IL TURNO</span><ol><li>Scarta 1 carta e pescane 1. Con una sola carta puoi tenerla.</li><li>Gioca 1 carta oppure 2 carte compatibili.</li><li>Racconta una scena breve usando qualcosa già introdotto.</li><li>Pesca 1 carta oppure resta con una carta in meno.</li></ol></section>
-    <section><span>SEMI</span><div class="rule-mini-grid"><p><b class="red">♥ Cuori</b>Cambia un rapporto.</p><p><b class="red">♦ Quadri</b>Rivela una verità o un indizio.</p><p><b>♣ Fiori</b>Tenta un’azione.</p><p><b>♠ Picche</b>Crea una conseguenza, un ostacolo o una perdita.</p></div></section>
-    <section><span>VALORI</span><p><b>Pari:</b> avvicina il protagonista al suo obiettivo. <b>Dispari:</b> lo allontana.</p><p><b>J, Q, K, A:</b> nuovo oggetto, personaggio, luogo o ribaltamento. Le figure si giocano da sole.</p></section>
-    <section><span>DUE CARTE</span><p>Sono compatibili con <b>stesso seme e parità diversa</b>, oppure <b>stessa parità e seme diverso</b>.</p></section>
-    <section><span>FINALE</span><p>Con 1 carta o 2 compatibili, mostra l’obiettivo segreto e chiudi o trasforma il problema usando elementi già comparsi.</p></section>
-  </div>`;
+  G.cardTypesMarkup = (options = {}) => `<section class="card-types-guide${options.compact ? ' compact' : ''}">
+    <div class="card-types-head"><span>QUALI CARTE ESISTONO</span><h3>Tre funzioni diverse, da non confondere.</h3></div>
+    <div class="card-types-grid">
+      <article><span>1</span><div><b>Quattro carte della storia</b><p><strong>Protagonista</strong>, <strong>Situazione</strong>, <strong>Obiettivo della storia</strong> e <strong>Problema</strong>. Insieme formano l’incipit comune.</p></div></article>
+      <article><span>2</span><div><b>Carte fisiche in mano</b><p>Durante il turno il <strong>seme</strong> dice che cosa accade e il <strong>valore</strong> dice se aiuta o ostacola il protagonista.</p></div></article>
+      <article><span>3</span><div><b>Obiettivo segreto</b><p>È la carta privata sul telefono. Indica il finale da raggiungere e resta separata dalle carte in mano.</p></div></article>
+    </div>
+  </section>`;
+
+  G.cardGuideMarkup = (options = {}) => {
+    const { compact = false, open = false, title = 'Come si legge una carta giocata' } = options;
+    return `<details class="card-rules-guide${compact ? ' compact' : ''}"${open ? ' open' : ''}>
+      <summary><span>CARTE DEL TURNO</span><b>${title}</b><i aria-hidden="true">⌄</i></summary>
+      <div class="card-rules-guide-body">
+        <div class="card-rule-suits">
+          <p><b class="red">♥ Cuori</b><span>Cambia un rapporto.</span></p>
+          <p><b class="red">♦ Quadri</b><span>Rivela una verità, un’informazione o un indizio.</span></p>
+          <p><b>♣ Fiori</b><span>Tenta un’azione.</span></p>
+          <p><b>♠ Picche</b><span>Introduce una conseguenza, un ostacolo o una perdita.</span></p>
+        </div>
+        <div class="card-rule-values">
+          <p><b>Numero pari</b><span>Avvicina il protagonista al suo obiettivo.</span></p>
+          <p><b>Numero dispari</b><span>Lo allontana dal suo obiettivo.</span></p>
+        </div>
+        <div class="card-rule-figures">
+          <p><b>J</b><span>Nuovo oggetto</span></p><p><b>Q</b><span>Nuovo personaggio</span></p><p><b>K</b><span>Nuovo luogo</span></p><p><b>A</b><span>Ribalta la situazione</span></p>
+        </div>
+        <p class="card-rule-note"><b>J, Q, K e A non hanno parità e si giocano da soli.</b> Se sono rossi introducono l’elemento in modo favorevole; se sono neri lo introducono come ostacolo o complicazione.</p>
+      </div>
+    </details>`;
+  };
+
+  G.rulebookMarkup = (options = {}) => {
+    const { embedded = false } = options;
+    return `<div class="unified-rulebook${embedded ? ' embedded' : ''}">
+      ${embedded ? '' : `<div class="rulebook-cover"><p class="brand-kicker">GIOCO NARRATIVO CON UN MAZZO DI CARTE</p><div><h2 id="rules-title">STORIA 52</h2><span>REGOLAMENTO</span></div></div><div class="amber-banner">CREA LA STORIA. CHIUDILA CON IL TUO OBIETTIVO SEGRETO.</div>`}
+      <div class="rules-intro">
+        <div class="rules-step"><span>1</span><p><b>Create l’incipit</b> usando tutte e quattro le carte della storia.</p></div>
+        <div class="rules-step"><span>2</span><p><b>Ricevete gli obiettivi segreti</b> e distribuite cinque carte fisiche a testa.</p></div>
+        <div class="rules-step"><span>3</span><p><b>Continuate la storia</b> turno dopo turno fino a un finale valido.</p></div>
+      </div>
+      <div class="rulebook-controls"><button type="button" data-rules-expand>Apri tutte</button><button type="button" data-rules-collapse>Chiudi tutte</button></div>
+      <div class="rules-accordion">
+        <details open>
+          <summary><span>01</span> Le tre funzioni delle carte</summary>
+          <div class="details-body">${G.cardTypesMarkup({ compact: true })}</div>
+        </details>
+        <details>
+          <summary><span>02</span> Semi, numeri e carte speciali</summary>
+          <div class="details-body">${G.cardGuideMarkup({ compact: true, open: true, title: 'Il seme dice cosa accade; il valore dice come va' })}</div>
+        </details>
+        <details>
+          <summary><span>03</span> Preparazione</summary>
+          <div class="details-body numbered-list">
+            <p><i>1</i> Togliete i jolly e mescolate il mazzo.</p>
+            <p><i>2</i> Date <b>5 carte fisiche</b> a ogni giocatore.</p>
+            <p><i>3</i> Create l’incipit con <b>Protagonista, Situazione, Obiettivo della storia e Problema</b>.</p>
+            <p><i>4</i> Ogni giocatore legge il proprio <b>Obiettivo segreto</b> e lo tiene separato dalla mano.</p>
+          </div>
+        </details>
+        <details>
+          <summary><span>04</span> Il turno</summary>
+          <div class="details-body numbered-list">
+            <p><i>1</i> <b>Scarta 1 carta e ripesca 1 carta.</b> Se in mano ne avevi una sola, la scarti comunque: puoi riprendere quella stessa carta oppure pescarne una diversa.</p>
+            <p><i>2</i> Gioca <b>1 carta</b> oppure <b>2 carte compatibili</b>.</p>
+            <p><i>3</i> Racconta un solo fatto successivo: applica la carta e usa almeno un elemento già introdotto.</p>
+            <p><i>4</i> Pesca 1 carta oppure resta volontariamente con una carta in meno.</p>
+          </div>
+        </details>
+        <details>
+          <summary><span>05</span> Giocare due carte</summary>
+          <div class="details-body">
+            <p><b>Le due carte sono compatibili soltanto se hanno:</b></p>
+            <p>• lo stesso seme e parità diversa;</p>
+            <p>• la stessa parità e seme diverso.</p>
+            <p class="note">J, Q, K e A si giocano sempre da soli e non possono essere abbinati.</p>
+          </div>
+        </details>
+        <details>
+          <summary><span>06</span> Finale e opposizione</summary>
+          <div class="details-body">
+            <p>Puoi tentare il finale nel tuo turno quando, <b>dopo il ricambio iniziale obbligatorio</b>, hai 1 carta oppure 2 carte compatibili.</p>
+            <p class="note">Con una sola carta non salti lo scarto: la scarti e scegli liberamente se riprenderla o cambiarla.</p>
+            <div class="numbered-list">
+              <p><i>1</i> Gioca la carta rimasta oppure le due carte compatibili.</p>
+              <p><i>2</i> Mostra il tuo Obiettivo segreto.</p>
+              <p><i>3</i> Raggiungi il finale indicato dall’obiettivo.</p>
+              <p><i>4</i> Chiudi o trasforma il problema iniziale usando elementi già comparsi. Non inventare una soluzione scollegata soltanto nel finale.</p>
+            </div>
+            <div class="opposition-box"><b>OPPOSIZIONE</b><p>Un solo avversario può aggiungere un elemento al finale con una carta compatibile. Non può modificarlo né annullarlo.</p></div>
+          </div>
+        </details>
+        <details>
+          <summary><span>07</span> Parole chiave</summary>
+          <div class="details-body">${G.glossaryMarkup()}</div>
+        </details>
+      </div>
+      <p class="victory-line">VINCE CHI CONCLUDE LA STORIA CON IL PROPRIO OBIETTIVO SEGRETO.</p>
+    </div>`;
+  };
+
+  G.bindRulebook = root => {
+    if (!root) return;
+    const accordion = root.querySelector('.rules-accordion');
+    const details = accordion ? [...accordion.children].filter(item => item.tagName === 'DETAILS') : [];
+    root.querySelector('[data-rules-expand]')?.addEventListener('click', () => details.forEach(item => { item.open = true; }));
+    root.querySelector('[data-rules-collapse]')?.addEventListener('click', () => details.forEach(item => { item.open = false; }));
+  };
+
+  G.renderRulesPage = () => {
+    const page = document.querySelector('#rules');
+    if (!page) return;
+    page.innerHTML = G.rulebookMarkup();
+    G.bindRulebook(page);
+  };
+
+  G.openRulesModal = () => {
+    const modal = G.modal('Regole complete', G.rulebookMarkup({ embedded: true }), { wide: true });
+    G.bindRulebook(modal);
+  };
+
+  G.rulesMarkup = () => G.rulebookMarkup({ embedded: true });
 
   G.topbar = label => {
     let bar = document.querySelector('.session-topbar');
@@ -85,7 +199,7 @@
     }
     bar.innerHTML = `<button type="button" class="session-logo" aria-label="Torna alla schermata iniziale"><img src="icon.svg" alt="STORIA 52"></button><span class="session-label">${escapeHtml(label)}</span><button type="button" class="session-rules-button">Regole</button><button type="button" class="session-exit">Esci</button>`;
     bar.querySelector('.session-logo').addEventListener('click', G.home);
-    bar.querySelector('.session-rules-button').addEventListener('click', () => G.modal('Regole e parole chiave', G.rulesMarkup(), { wide: true }));
+    bar.querySelector('.session-rules-button').addEventListener('click', G.openRulesModal);
     bar.querySelector('.session-exit').addEventListener('click', G.home);
   };
 
@@ -104,11 +218,8 @@
     G.game.innerHTML = `<div class="screen-view screen-${direction}">${html}</div>`;
     const view = G.game.querySelector('.screen-view');
     requestAnimationFrame(() => view?.classList.add('is-visible'));
-    if (scroll) {
-      requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
-    } else {
-      requestAnimationFrame(() => window.scrollTo({ top: previousScroll, behavior: 'instant' }));
-    }
+    if (scroll) requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    else requestAnimationFrame(() => window.scrollTo({ top: previousScroll, behavior: 'instant' }));
   };
 
   G.pulse = (element, className = 'is-updating') => {
@@ -132,13 +243,13 @@
     const heading = G.play.querySelector('.section-heading');
     const modes = G.play.querySelector('.mode-grid');
     heading?.remove();
-    hero.innerHTML = `<div class="simple-hero"><p class="section-kicker">GIOCO NARRATIVO CON UN MAZZO DI CARTE</p><h2>Una storia. Cinquantadue possibilità.</h2><p>Scegli come vuoi iniziare.</p></div>`;
+    hero.innerHTML = `<div class="simple-hero"><p class="section-kicker">GIOCO NARRATIVO CON UN MAZZO DI CARTE</p><h2>Una storia. Cinquantadue possibilità.</h2><p>Scegli quanto deve fare l’app durante la partita.</p></div>`;
 
     const saved = G.load();
-    modes.innerHTML = `${saved ? `<button type="button" class="home-resume"><span>PARTITA SALVATA</span><b>Riprendi la partita guidata</b><small>Continua dal punto in cui eri rimasto.</small></button>` : ''}
-      <button type="button" class="home-choice primary" data-home="guided"><span class="home-choice-icon">1</span><span><b>Partita guidata per principianti</b><small>Aiuto per creare l’incipit e spiegazioni solo quando servono.</small></span><i>→</i></button>
-      <button type="button" class="home-choice" data-home="free"><span class="home-choice-icon">2</span><span><b>Gioca senza guida</b><small>Per chi conosce già il gioco e vuole soltanto generare la partita.</small></span><i>→</i></button>
-      <button type="button" class="home-choice" data-home="rules"><span class="home-choice-icon">3</span><span><b>Regole</b><small>Apri il regolamento completo.</small></span><i>→</i></button>`;
+    modes.innerHTML = `${saved ? `<button type="button" class="home-resume"><span>PARTITA SALVATA</span><b>Riprendi partita con assistente</b><small>Continua dal punto in cui eri rimasto.</small></button>` : ''}
+      <button type="button" class="home-choice primary" data-home="guided"><span class="home-choice-icon">1</span><span><b>Partita con assistente</b><small>L’app costruisce l’incipit, assegna gli obiettivi e accompagna ogni turno.</small></span><i>→</i></button>
+      <button type="button" class="home-choice" data-home="free"><span class="home-choice-icon">2</span><span><b>Partita autonoma</b><small>L’app prepara storia e obiettivi; il gruppo gestisce i turni al tavolo.</small></span><i>→</i></button>
+      <button type="button" class="home-choice" data-home="rules"><span class="home-choice-icon">3</span><span><b>Regolamento</b><small>Apri la stessa guida completa disponibile durante la partita.</small></span><i>→</i></button>`;
 
     modes.querySelector('.home-resume')?.addEventListener('click', () => G.flow.resume(saved));
     modes.querySelector('[data-home="guided"]').addEventListener('click', G.flow.setup);
@@ -151,6 +262,7 @@
   G.rules = () => {
     document.body.classList.remove('simple-home', 'session-active');
     document.body.classList.add('rules-active');
+    G.renderRulesPage();
     openPage('rules');
     let back = document.querySelector('.rules-back');
     if (!back) {
@@ -165,12 +277,13 @@
   };
 
   G.freeMenu = () => {
-    G.screen(`<div class="screen-heading"><p class="eyebrow">SENZA GUIDA</p><h2>Cosa vuoi usare?</h2><p>Il sito genera i contenuti, ma non accompagna i turni.</p></div>
-      <div class="free-mode-list">
-        <button type="button" data-free="single"><b>Un solo telefono</b><small>Passate il telefono per leggere gli obiettivi.</small><span>→</span></button>
-        <button type="button" data-free="multi"><b>Un telefono a testa</b><small>Create un invito privato per ogni giocatore.</small><span>→</span></button>
-        <button type="button" data-free="quick"><b>Generatore rapido</b><small>Genera incipit e un solo obiettivo.</small><span>→</span></button>
-      </div>`, 'Senza guida');
+    G.screen(`<div class="screen-heading"><p class="eyebrow">PARTITA AUTONOMA</p><h2>Stessa app, meno assistenza.</h2><p>Scegli come distribuire storia e obiettivi. Le regole restano sempre disponibili nella barra in alto.</p></div>
+      ${G.cardTypesMarkup({ compact: true })}
+      <div class="free-mode-list unified-free-menu">
+        <button type="button" data-free="single"><b>Un telefono al centro</b><small>Storia comune e obiettivi privati sullo stesso dispositivo.</small><span>→</span></button>
+        <button type="button" data-free="multi"><b>Inviti personali</b><small>Ogni giocatore riceve sul proprio telefono storia e obiettivo.</small><span>→</span></button>
+        <button type="button" data-free="quick"><b>Solo generatore</b><small>Crea immediatamente una storia e un obiettivo segreto.</small><span>→</span></button>
+      </div>`, 'Partita autonoma');
     G.game.querySelector('[data-free="single"]').addEventListener('click', () => G.oldSingle(G.game));
     G.game.querySelector('[data-free="multi"]').addEventListener('click', () => G.oldMulti(G.game));
     G.game.querySelector('[data-free="quick"]').addEventListener('click', () => G.oldQuick(G.game));
@@ -199,10 +312,11 @@
   };
 
   G.init = () => {
-    const params = new URLSearchParams(location.search);
-    if (params.get('room') && params.get('player')) {
-      document.body.classList.add('session-active');
-      G.topbar('Invito giocatore');
+    G.renderRulesPage();
+    const pendingInvite = window.__storia52DirectInvite;
+    if (pendingInvite) {
+      G.enter('Invito personale');
+      window.showMulti?.(G.game, pendingInvite);
       return;
     }
     G.home();

@@ -1,0 +1,109 @@
+/* Regolamento unico, tassonomia delle carte e modalità autonoma. */
+
+.card-types-guide,.card-rules-guide,.standalone-config-panel,.standalone-story-panel,.standalone-secret-panel,.autonomous-next-step,.standalone-code-row{color:var(--card-ink);background:var(--card-bg-2);border:1px solid var(--card-line-soft);border-radius:8px}
+.card-types-guide{margin:12px 0 14px;padding:14px}
+.card-types-head,.standalone-section-head{display:grid;gap:3px;margin-bottom:10px}
+.card-types-head>span,.standalone-section-head>span,.standalone-code-row>span,.autonomous-next-step>span{color:var(--amber-deep);font-size:.63rem;font-weight:950;letter-spacing:.1em}
+.card-types-head h3,.standalone-section-head h3{margin:0!important;color:var(--card-ink)!important;font:700 1.08rem Georgia,"Times New Roman",serif!important}
+.card-types-grid{display:grid;gap:8px}
+.card-types-grid article{display:grid;grid-template-columns:36px minmax(0,1fr);gap:10px;padding:10px;background:var(--card-bg);border:1px solid var(--card-line-soft);border-radius:6px}
+.card-types-grid article>span{display:grid;place-items:center;width:34px;height:42px;color:var(--amber-deep);background:var(--card-bg-2);border:1px solid var(--card-line);border-radius:4px;font-weight:950}
+.card-types-grid article div{display:grid;gap:4px}
+.card-types-grid article b{font-family:Georgia,"Times New Roman",serif}
+.card-types-grid article p{margin:0;color:var(--card-muted);font-size:.86rem;line-height:1.45}
+.card-types-grid article strong{color:var(--card-ink)}
+.card-types-guide.compact{padding:11px}.card-types-guide.compact .card-types-head{margin-bottom:8px}.card-types-guide.compact .card-types-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.card-types-guide.compact article{grid-template-columns:30px minmax(0,1fr);padding:8px}.card-types-guide.compact article>span{width:28px;height:36px}.card-types-guide.compact article p{font-size:.78rem}
+
+.card-rules-guide{margin:12px 0;overflow:hidden}
+.card-rules-guide summary{display:grid;grid-template-columns:1fr auto;gap:3px 12px;align-items:center;padding:13px 14px;cursor:pointer;list-style:none;background:var(--card-bg-2)}
+.card-rules-guide summary::-webkit-details-marker{display:none}
+.card-rules-guide summary>span{color:var(--amber-deep);font-size:.62rem;font-weight:950;letter-spacing:.1em}
+.card-rules-guide summary>b{grid-column:1;color:var(--card-ink);font:700 1rem Georgia,"Times New Roman",serif}
+.card-rules-guide summary>i{grid-column:2;grid-row:1/3;color:var(--amber-deep);font-style:normal;transition:transform .2s ease}
+.card-rules-guide[open] summary{border-bottom:1px solid var(--card-line-soft)}
+.card-rules-guide[open] summary>i{transform:rotate(180deg)}
+.card-rules-guide-body{display:grid;gap:9px;padding:12px}
+.card-rule-suits{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.card-rule-suits p,.card-rule-values p{display:grid;gap:3px;margin:0;padding:9px;background:var(--card-bg);border:1px solid var(--card-line-soft);border-radius:5px}
+.card-rule-suits b,.card-rule-values b{font-family:Georgia,"Times New Roman",serif}
+.card-rule-suits span,.card-rule-values span,.card-rule-note{color:var(--card-muted);font-size:.8rem;line-height:1.4}
+.card-rule-values{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.card-rule-figures{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.card-rule-figures p{display:grid;place-items:center;gap:3px;margin:0;padding:9px 5px;text-align:center;background:var(--card-bg-3);border:1px solid var(--card-line-soft);border-radius:5px}
+.card-rule-figures b{font:700 1.1rem Georgia,"Times New Roman",serif}.card-rule-figures span{color:var(--card-muted);font-size:.72rem}
+.card-rule-note{margin:0;padding:10px;background:var(--card-bg-3);border-left:4px solid var(--amber);border-radius:4px}.card-rule-note b{color:var(--card-ink)}
+.card-rules-guide.compact{margin:0}.card-rules-guide.compact summary{padding:11px 12px}.card-rules-guide.compact .card-rules-guide-body{padding:10px}
+
+.unified-rulebook{display:grid;gap:14px}
+.unified-rulebook.embedded{gap:11px}
+.unified-rulebook.embedded .rules-intro{margin-top:0}
+.rulebook-controls{display:flex;justify-content:flex-end;gap:7px}
+.rulebook-controls button{min-height:38px;padding:8px 11px;color:var(--card-ink);background:var(--card-bg-2);border:1px solid var(--card-line-soft);border-radius:5px;font-size:.76rem;font-weight:850}
+.rulebook-controls button:hover{border-color:var(--amber)}
+.unified-rulebook .rules-accordion{display:grid;gap:8px}
+.unified-rulebook .rules-accordion details{overflow:hidden;margin:0}
+.unified-rulebook .rules-accordion summary{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:10px;list-style:none}
+.unified-rulebook .rules-accordion summary::-webkit-details-marker{display:none}
+.unified-rulebook .rules-accordion summary::after{content:"+";color:var(--amber-deep);font:900 1.15rem/1 system-ui}
+.unified-rulebook .rules-accordion details[open] summary::after{content:"−"}
+.unified-rulebook .rules-accordion details[open] summary{border-bottom:1px solid var(--card-line-soft)}
+.unified-rulebook .rules-accordion .details-body{padding:13px}
+.unified-rulebook .rules-accordion .card-types-guide,.unified-rulebook .rules-accordion .card-rules-guide{margin:0;border:0;background:transparent}
+.unified-rulebook .rules-accordion .card-types-guide{padding:0}
+.unified-rulebook .rules-accordion .card-rules-guide summary{display:none}
+.unified-rulebook .rules-accordion .card-rules-guide-body{padding:0}
+.unified-rulebook .numbered-list p{align-items:start}
+.focus-modal .unified-rulebook .rulebook-cover,.focus-modal .unified-rulebook .amber-banner{display:none}
+.focus-modal .unified-rulebook .rules-step{padding:10px}
+.focus-modal .unified-rulebook .rules-step p{font-size:.82rem}
+
+.standalone-flow{display:grid;gap:14px}
+.standalone-heading{margin-bottom:0}
+.standalone-config-panel,.standalone-story-panel,.standalone-secret-panel{padding:14px}
+.standalone-config-panel .form-grid{margin:0}
+.standalone-config-panel>.field{margin:0}
+.standalone-config-panel .choice-toggle{margin:0 0 10px}
+.standalone-config-panel .card-choice-list{margin-top:10px}
+.standalone-story-panel .story-stack{margin:0}
+.standalone-story-panel .story-slip{box-shadow:none}
+.standalone-secret-panel .secret-card{margin:0}
+.standalone-code-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px}
+.standalone-code-row .game-code{margin:0}
+.standalone-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.standalone-actions .main-action,.standalone-actions .secondary-action{margin:0}
+.standalone-flow .text-action{margin-top:0}
+.autonomous-next-step{padding:14px;border-left:5px solid var(--amber)}
+.autonomous-next-step>b{display:block;margin-top:5px;font:700 1.03rem/1.35 Georgia,"Times New Roman",serif}
+.autonomous-next-step>p{margin:5px 0 0;color:var(--card-muted);line-height:1.45}
+.unified-resume{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;padding:12px}
+.unified-resume>div{display:grid;gap:3px}.unified-resume span{color:var(--amber-deep);font-size:.62rem;font-weight:950;letter-spacing:.1em}.unified-resume b{font-family:Georgia,"Times New Roman",serif}
+.unified-resume .secondary-action{width:auto;min-width:100px}
+.unified-free-menu{margin-top:0}
+.standalone-flow .player-list{margin-top:0}
+.standalone-flow .player-slot{grid-template-columns:42px minmax(0,1fr) auto!important}
+.standalone-flow .invite-panel{padding:14px}
+.standalone-flow .invite-ready{margin-top:12px;padding:12px}
+.standalone-flow .assigned-list{margin-top:10px}
+
+@media(min-width:850px){
+  .card-types-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .standalone-flow{max-width:860px;margin:0 auto}
+}
+
+@media(max-width:700px){
+  .card-types-guide.compact .card-types-grid{grid-template-columns:1fr}
+  .card-rule-suits,.card-rule-values{grid-template-columns:1fr}
+  .card-rule-figures{grid-template-columns:1fr 1fr}
+  .standalone-actions{grid-template-columns:1fr}
+  .rulebook-controls{display:grid;grid-template-columns:1fr 1fr}
+  .unified-rulebook .rules-intro{grid-template-columns:1fr}
+  .unified-resume{grid-template-columns:1fr}.unified-resume .secondary-action{width:100%}
+}
+
+@media(max-width:430px){
+  .card-types-guide{padding:11px}
+  .card-types-grid article{grid-template-columns:30px minmax(0,1fr);padding:8px}
+  .card-types-grid article>span{width:28px;height:36px}
+  .unified-rulebook .rules-accordion summary{grid-template-columns:34px minmax(0,1fr) auto;gap:7px;font-size:.9rem}
+  .standalone-config-panel,.standalone-story-panel,.standalone-secret-panel{padding:11px}
+}
