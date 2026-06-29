@@ -30,6 +30,14 @@
     return values[0] % max;
   };
 
+  G.rulesMarkup = () => `<div class="session-rules-content">
+    <section><span>IL TURNO</span><ol><li>Scarta 1 carta e pescane 1. Con una sola carta puoi tenerla.</li><li>Gioca 1 carta oppure 2 carte compatibili.</li><li>Racconta una scena breve usando qualcosa già introdotto.</li><li>Pesca 1 carta oppure resta con una carta in meno.</li></ol></section>
+    <section><span>SEMI</span><div class="rule-mini-grid"><p><b class="red">♥ Cuori</b>Cambia un rapporto.</p><p><b class="red">♦ Quadri</b>Rivela una verità o un indizio.</p><p><b>♣ Fiori</b>Tenta un’azione.</p><p><b>♠ Picche</b>Crea una conseguenza, un ostacolo o una perdita.</p></div></section>
+    <section><span>VALORI</span><p><b>Pari:</b> avvicina il protagonista al suo obiettivo. <b>Dispari:</b> lo allontana.</p><p><b>J, Q, K, A:</b> nuovo oggetto, personaggio, luogo o ribaltamento. Le figure si giocano da sole.</p></section>
+    <section><span>DUE CARTE</span><p>Sono compatibili con <b>stesso seme e parità diversa</b>, oppure <b>stessa parità e seme diverso</b>.</p></section>
+    <section><span>FINALE</span><p>Con 1 carta o 2 compatibili, mostra l’obiettivo segreto e chiudi o trasforma il problema usando elementi già comparsi.</p></section>
+  </div>`;
+
   G.topbar = label => {
     let bar = document.querySelector('.session-topbar');
     if (!bar) {
@@ -37,8 +45,9 @@
       bar.className = 'session-topbar';
       document.body.appendChild(bar);
     }
-    bar.innerHTML = `<button type="button" class="session-brand"><span>STORIA</span><b>52</b></button><span class="session-label">${escapeHtml(label)}</span><button type="button" class="session-exit">Esci</button>`;
-    bar.querySelector('.session-brand').addEventListener('click', G.home);
+    bar.innerHTML = `<button type="button" class="session-logo" aria-label="Torna alla schermata iniziale"><img src="icon.svg" alt="STORIA 52"></button><span class="session-label">${escapeHtml(label)}</span><button type="button" class="session-rules-button">Regole</button><button type="button" class="session-exit">Esci</button>`;
+    bar.querySelector('.session-logo').addEventListener('click', G.home);
+    bar.querySelector('.session-rules-button').addEventListener('click', () => G.modal('Regole', G.rulesMarkup(), { wide: true }));
     bar.querySelector('.session-exit').addEventListener('click', G.home);
   };
 
@@ -48,13 +57,28 @@
     G.topbar(label);
     openPage('play');
     G.game.classList.remove('hidden');
-    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
-  G.screen = (html, label) => {
+  G.screen = (html, label, options = {}) => {
+    const { scroll = true, direction = 'forward' } = options;
+    const previousScroll = window.scrollY;
     G.enter(label);
-    G.game.innerHTML = html;
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    G.game.innerHTML = `<div class="screen-view screen-${direction}">${html}</div>`;
+    const view = G.game.querySelector('.screen-view');
+    requestAnimationFrame(() => view?.classList.add('is-visible'));
+    if (scroll) {
+      requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    } else {
+      requestAnimationFrame(() => window.scrollTo({ top: previousScroll, behavior: 'instant' }));
+    }
+  };
+
+  G.pulse = (element, className = 'is-updating') => {
+    if (!element) return;
+    element.classList.remove(className);
+    void element.offsetWidth;
+    element.classList.add(className);
+    element.addEventListener('animationend', () => element.classList.remove(className), { once: true });
   };
 
   G.home = () => {
@@ -82,6 +106,7 @@
     modes.querySelector('[data-home="guided"]').addEventListener('click', G.flow.setup);
     modes.querySelector('[data-home="free"]').addEventListener('click', G.freeMenu);
     modes.querySelector('[data-home="rules"]').addEventListener('click', G.rules);
+    requestAnimationFrame(() => modes.classList.add('is-visible'));
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
@@ -98,7 +123,7 @@
       document.querySelector('#rules').prepend(back);
       back.addEventListener('click', G.home);
     }
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   G.freeMenu = () => {
@@ -113,14 +138,18 @@
     G.game.querySelector('[data-free="quick"]').addEventListener('click', () => G.oldQuick(G.game));
   };
 
-  G.modal = (title, body) => {
+  G.modal = (title, body, options = {}) => {
     const modal = document.createElement('div');
-    modal.className = 'focus-modal';
-    modal.innerHTML = `<div class="focus-modal-backdrop"></div><div class="focus-modal-card"><button type="button" class="modal-close">×</button><h2>${title}</h2>${body}</div>`;
-    const close = () => modal.remove();
+    modal.className = `focus-modal${options.wide ? ' wide' : ''}`;
+    modal.innerHTML = `<div class="focus-modal-backdrop"></div><div class="focus-modal-card"><button type="button" class="modal-close" aria-label="Chiudi">×</button><h2>${title}</h2>${body}</div>`;
+    const close = () => {
+      modal.classList.add('is-closing');
+      window.setTimeout(() => modal.remove(), 180);
+    };
     modal.querySelector('.focus-modal-backdrop').addEventListener('click', close);
     modal.querySelector('.modal-close').addEventListener('click', close);
     document.body.appendChild(modal);
+    requestAnimationFrame(() => modal.classList.add('is-visible'));
     return modal;
   };
 

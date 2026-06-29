@@ -1,6 +1,13 @@
 'use strict';
 
 (() => {
+  if (!document.querySelector('link[href="guided-polish.css"]')) {
+    const polish = document.createElement('link');
+    polish.rel = 'stylesheet';
+    polish.href = 'guided-polish.css';
+    document.head.appendChild(polish);
+  }
+
   const G = window.G52;
   const SUITS = {
     hearts: { symbol: '♥', name: 'Cuori', rule: 'Cambia un rapporto.', red: true },
@@ -74,6 +81,7 @@
       const sameSuit = suitA === suitB && numberA % 2 !== numberB % 2;
       const sameParity = suitA !== suitB && numberA % 2 === numberB % 2;
       answer.innerHTML = sameSuit || sameParity ? `<div class="pair-result yes"><b>Compatibili.</b><p>${sameSuit ? 'Stesso seme e parità diversa.' : 'Stessa parità e seme diverso.'}</p></div>` : '<div class="pair-result no"><b>Non compatibili.</b><p>Servono stesso seme e parità diversa, oppure stessa parità e seme diverso.</p></div>';
+      G.pulse(answer.firstElementChild);
     });
   }
 
