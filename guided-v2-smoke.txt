@@ -1,6 +1,0 @@
-Manual smoke-test checklist:
-- Home shows only Guided game, Play without guide, Rules.
-- Guided game builds the opening with suggestions, manual input, or skip.
-- Active game hides the old header/navigation and keeps a single exit bar.
-- Turn help stays collapsed and optional.
-- Direct multi-phone invites still open in focused mode.
