@@ -30,7 +30,45 @@
     return values[0] % max;
   };
 
+  G.copyText = async text => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      const copied = document.execCommand('copy');
+      area.remove();
+      return copied;
+    }
+  };
+
+  G.progressMarkup = active => {
+    const phases = [
+      { id: 'story', number: 1, label: 'Carte' },
+      { id: 'opening', number: 2, label: 'Incipit' },
+      { id: 'objectives', number: 3, label: 'Obiettivi' },
+      { id: 'play', number: 4, label: 'Gioco' }
+    ];
+    const current = Math.max(0, phases.findIndex(phase => phase.id === active));
+    return `<nav class="flow-progress" aria-label="Avanzamento della partita"><ol>${phases.map((phase, index) => `<li class="${index < current ? 'completed' : ''}${index === current ? ' current' : ''}"${index === current ? ' aria-current="step"' : ''}><span>${index < current ? '✓' : phase.number}</span><b>${phase.label}</b><small>${phase.number}/4</small></li>`).join('')}</ol></nav>`;
+  };
+
+  G.glossaryMarkup = () => `<div class="glossary-grid">
+    <p><b>Incipit</b><span>È la prima scena vera della storia: da lì parte il primo turno.</span></p>
+    <p><b>Scena breve</b><span>Un solo fatto importante, raccontato in poche frasi.</span></p>
+    <p><b>Obiettivo della storia</b><span>Ciò che il protagonista cerca di ottenere dall’inizio alla fine.</span></p>
+    <p><b>Obiettivo segreto</b><span>Il tipo di conclusione che ogni giocatore proverà a realizzare.</span></p>
+    <p><b>Finale</b><span>L’ultima scena: chiude o trasforma il problema iniziale.</span></p>
+  </div>`;
+
   G.rulesMarkup = () => `<div class="session-rules-content">
+    <section><span>PAROLE CHIAVE</span>${G.glossaryMarkup()}</section>
     <section><span>IL TURNO</span><ol><li>Scarta 1 carta e pescane 1. Con una sola carta puoi tenerla.</li><li>Gioca 1 carta oppure 2 carte compatibili.</li><li>Racconta una scena breve usando qualcosa già introdotto.</li><li>Pesca 1 carta oppure resta con una carta in meno.</li></ol></section>
     <section><span>SEMI</span><div class="rule-mini-grid"><p><b class="red">♥ Cuori</b>Cambia un rapporto.</p><p><b class="red">♦ Quadri</b>Rivela una verità o un indizio.</p><p><b>♣ Fiori</b>Tenta un’azione.</p><p><b>♠ Picche</b>Crea una conseguenza, un ostacolo o una perdita.</p></div></section>
     <section><span>VALORI</span><p><b>Pari:</b> avvicina il protagonista al suo obiettivo. <b>Dispari:</b> lo allontana.</p><p><b>J, Q, K, A:</b> nuovo oggetto, personaggio, luogo o ribaltamento. Le figure si giocano da sole.</p></section>
@@ -47,7 +85,7 @@
     }
     bar.innerHTML = `<button type="button" class="session-logo" aria-label="Torna alla schermata iniziale"><img src="icon.svg" alt="STORIA 52"></button><span class="session-label">${escapeHtml(label)}</span><button type="button" class="session-rules-button">Regole</button><button type="button" class="session-exit">Esci</button>`;
     bar.querySelector('.session-logo').addEventListener('click', G.home);
-    bar.querySelector('.session-rules-button').addEventListener('click', () => G.modal('Regole', G.rulesMarkup(), { wide: true }));
+    bar.querySelector('.session-rules-button').addEventListener('click', () => G.modal('Regole e parole chiave', G.rulesMarkup(), { wide: true }));
     bar.querySelector('.session-exit').addEventListener('click', G.home);
   };
 
@@ -141,6 +179,9 @@
   G.modal = (title, body, options = {}) => {
     const modal = document.createElement('div');
     modal.className = `focus-modal${options.wide ? ' wide' : ''}`;
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', title);
     modal.innerHTML = `<div class="focus-modal-backdrop"></div><div class="focus-modal-card"><button type="button" class="modal-close" aria-label="Chiudi">×</button><h2>${title}</h2>${body}</div>`;
     const close = () => {
       modal.classList.add('is-closing');
@@ -148,8 +189,12 @@
     };
     modal.querySelector('.focus-modal-backdrop').addEventListener('click', close);
     modal.querySelector('.modal-close').addEventListener('click', close);
+    modal.addEventListener('keydown', event => { if (event.key === 'Escape') close(); });
     document.body.appendChild(modal);
-    requestAnimationFrame(() => modal.classList.add('is-visible'));
+    requestAnimationFrame(() => {
+      modal.classList.add('is-visible');
+      modal.querySelector('.modal-close')?.focus({ preventScroll: true });
+    });
     return modal;
   };
 
