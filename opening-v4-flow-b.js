@@ -10,4 +10,6 @@
     G.screen(G.progressMarkup('opening')+heading+live+workspace,'2/4 · Creazione dell’incipit');
     V.bindRoot();V.drawStep(session);
   };
+  const saved=G.load();
+  if(saved&&saved.stage==='context')setTimeout(()=>G.flow.contextForm(saved),0);
 })();
