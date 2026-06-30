@@ -31,20 +31,30 @@
   const poolFor = (session, key) => {
     const world = WORLDS[chooseWorld(session)];
     const pool = [];
-    if (key === 'identity') world.roles.forEach(role => world.details.forEach(detail => pool.push(`${role} ${detail}`)));
-    if (key === 'place') world.places.forEach(place => world.events.forEach(event => pool.push(`${place}, ${event}`)));
-    if (key === 'opening') world.actions.forEach(action => world.methods.forEach(method => pool.push(`${action}, ${method}`)));
-    if (key === 'stakes') world.obstacles.forEach(obstacle => world.costs.forEach(cost => pool.push(`${obstacle}; ${cost}`)));
+    const add = (primary, secondary, separator) => primary.forEach(first => secondary.forEach(second => pool.push({ primary: first, secondary: second, text: `${first}${separator}${second}` })));
+    if (key === 'identity') add(world.roles, world.details, ' ');
+    if (key === 'place') add(world.places, world.events, ', ');
+    if (key === 'opening') add(world.actions, world.methods, ', ');
+    if (key === 'stakes') add(world.obstacles, world.costs, '; ');
     return pool;
   };
   const nextIdeas = (session, key) => {
     session.ideaHistory ||= {};
     let seen = new Set(session.ideaHistory[key] || []);
     const pool = poolFor(session, key);
-    let available = pool.filter(item => !seen.has(item));
+    let available = pool.filter(item => !seen.has(item.text));
     if (available.length < 3) { seen = new Set(); available = [...pool]; }
-    const result = [];
-    while (result.length < 3 && available.length) { const index = pickIndex(available.length); result.push(available.splice(index, 1)[0]); }
+    const result = [], usedPrimary = new Set(), usedSecondary = new Set();
+    while (result.length < 3 && available.length) {
+      let candidates = available.filter(item => !usedPrimary.has(item.primary) && !usedSecondary.has(item.secondary));
+      if (!candidates.length) candidates = available.filter(item => !usedPrimary.has(item.primary));
+      if (!candidates.length) candidates = available;
+      const chosen = candidates[pickIndex(candidates.length)];
+      result.push(chosen.text);
+      usedPrimary.add(chosen.primary);
+      usedSecondary.add(chosen.secondary);
+      available = available.filter(item => item.text !== chosen.text);
+    }
     session.ideaHistory[key] = [...seen, ...result];
     return result;
   };
