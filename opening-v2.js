@@ -8,5 +8,8 @@
     script.onerror = reject;
     document.body.appendChild(script);
   });
-  load('opening-v3-scenes.js').then(() => load('opening-v3.js')).catch(() => console.error('Impossibile caricare il nuovo incipit.'));
+  load('opening-v3-scenes.js')
+    .then(() => load('opening-v3.js'))
+    .then(() => load('opening-v3-events.js'))
+    .catch(() => console.error('Impossibile caricare il nuovo incipit.'));
 })();
