@@ -42,10 +42,24 @@
     }
 
     window.STORIA52_COHERENT_BANKS = banks;
-    const script = document.createElement('script');
-    script.src = 'opening-v4.js';
-    script.async = false;
-    document.body.appendChild(script);
+    const files = [
+      'opening-v4-core.js',
+      'opening-v4-markup-a.js',
+      'opening-v4-markup-b.js',
+      'opening-v4-input.js',
+      'opening-v4-events.js',
+      'opening-v4-flow-a.js',
+      'opening-v4-flow-b.js'
+    ];
+    for (const src of files) {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.body.appendChild(script);
+      });
+    }
   } catch (error) {
     console.error('Impossibile caricare le frasi dell’incipit.', error);
     const toast = document.querySelector('#toast');
