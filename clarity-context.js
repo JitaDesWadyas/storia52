@@ -11,6 +11,7 @@
   const previous = G.flow.contextForm;
   G.flow.contextForm = session => {
     previous(session);
+    if (session.openingBuilderVersion === 3) return;
     G.game.querySelector('.screen-heading p:last-child')?.remove();
     const workspace = G.game.querySelector('.context-workspace');
     const template = document.querySelector('#clarityLiveOpening');
