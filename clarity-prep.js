@@ -73,9 +73,10 @@
     cleanTurn();
   }
 
-  if (!document.querySelector('script[src="opening-loader.js"]')) {
+  ['opening-loader.js', 'opening-engine-stability-loader.js'].forEach(src => {
+    if (document.querySelector(`script[src="${src}"]`)) return;
     const loader = document.createElement('script');
-    loader.src = 'opening-loader.js';
+    loader.src = src;
     document.body.appendChild(loader);
-  }
+  });
 })();
