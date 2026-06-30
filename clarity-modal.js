@@ -1,11 +1,17 @@
 'use strict';
 (() => {
   const G = window.G52;
-  if (!G) return;
-  G.renderRulesPage = () => {};
+  const template = document.querySelector('#clarityRulesTemplate');
+  if (!G || !template) return;
+  G.renderRulesPage = () => {
+    const page = document.querySelector('#rules');
+    if (!page) return;
+    page.replaceChildren(template.content.cloneNode(true));
+    G.bindRulebook(page);
+  };
   G.openRulesModal = () => {
-    const source = document.querySelector('#rules');
-    const modal = G.modal('Regolamento', source.innerHTML, { wide: true });
+    const modal = G.modal('Regolamento', template.innerHTML, { wide: true });
     G.bindRulebook(modal);
   };
+  G.renderRulesPage();
 })();
