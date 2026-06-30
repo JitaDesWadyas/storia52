@@ -73,10 +73,12 @@
     cleanTurn();
   }
 
-  ['opening-loader.js', 'opening-engine-stability-loader.js'].forEach(src => {
-    if (document.querySelector(`script[src="${src}"]`)) return;
-    const loader = document.createElement('script');
-    loader.src = src;
-    document.body.appendChild(loader);
-  });
+  ['opening-v2-data.js', 'opening-v2.js'].reduce((chain, src) => chain.then(() => new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.body.appendChild(script);
+  })), Promise.resolve()).catch(() => console.error('Impossibile caricare il nuovo costruttore dell’incipit.'));
 })();
