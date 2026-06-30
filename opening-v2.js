@@ -11,5 +11,6 @@
   load('opening-v3-scenes.js')
     .then(() => load('opening-v3.js'))
     .then(() => load('opening-v3-events.js'))
+    .then(() => load('opening-v3-polish.js'))
     .catch(() => console.error('Impossibile caricare il nuovo incipit.'));
 })();
