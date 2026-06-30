@@ -73,7 +73,7 @@
     cleanTurn();
   }
 
-  ['opening-v2-data.js', 'opening-v2.js'].reduce((chain, src) => chain.then(() => new Promise((resolve, reject) => {
+  ['opening-v2-data.js', 'opening-v2-migration.js', 'opening-v2.js'].reduce((chain, src) => chain.then(() => new Promise((resolve, reject) => {
     if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
     const script = document.createElement('script');
     script.src = src;
