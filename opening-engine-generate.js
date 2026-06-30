@@ -6,7 +6,8 @@
     const kind=E.theme(key,E.cardText(session,key));
     if(key==='identity'){
       const roles=B.roles[kind]||B.roles.fallback;
-      return `${E.pick(roles)} ${E.pick(B.duties)}, ${E.pick(B.pressures)}`;
+      const duties=B.dutiesByTheme?.[kind]||B.dutiesByTheme?.fallback||B.duties;
+      return `${E.pick(roles)} ${E.pick(duties)}, ${E.pick(B.pressures)}`;
     }
     if(key==='place'){
       const events=B.events[kind]||B.events.fallback;
