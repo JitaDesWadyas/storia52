@@ -1,0 +1,355 @@
+/* Ripristino layout dopo il rework di chiarezza. Caricato per ultimo. */
+
+/* Nessun pannello deve allargare la pagina o la partita. */
+.screen-view,
+.game-stage,
+.context-workspace,
+.context-editor,
+#contextStepHost,
+.context-step-card,
+.context-field,
+.story-reference,
+.story-parts,
+.story-part,
+.opening-live,
+.focus-modal-card,
+.unified-rulebook {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.game-stage,
+.focus-modal-card,
+.context-step-card,
+.story-reference,
+.opening-live {
+  overflow-wrap: anywhere;
+}
+
+/* Creazione incipit: una colonna vera, non due mezze colonne. */
+.context-workspace {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 12px !important;
+}
+
+.context-workspace > .story-reference.sticky {
+  position: static !important;
+  top: auto !important;
+  width: 100%;
+  max-height: none !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  box-shadow: none;
+}
+
+.context-workspace .story-reference-head {
+  display: none;
+}
+
+.context-workspace .story-parts,
+.context-workspace .story-reference.compact .story-parts {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.context-workspace .story-part[hidden] {
+  display: none !important;
+}
+
+.context-workspace .story-part {
+  grid-template-columns: 48px minmax(0, 1fr) auto !important;
+  width: 100%;
+}
+
+.context-workspace .change-story-card {
+  grid-column: auto !important;
+  min-width: 72px;
+}
+
+.opening-live {
+  margin: 0 0 12px;
+  padding: 15px 17px;
+  border: 1px solid var(--card-line-soft);
+  border-left: 5px solid var(--amber);
+  border-radius: 7px;
+  background: var(--card-bg-2);
+  box-shadow: none;
+}
+
+.opening-live > span {
+  display: block;
+  color: var(--amber-deep);
+  font-size: .64rem;
+  font-weight: 950;
+  letter-spacing: .1em;
+}
+
+.opening-live blockquote {
+  margin: 7px 0 0;
+  color: var(--card-ink);
+  font: 700 1rem/1.52 Georgia, "Times New Roman", serif;
+}
+
+.context-step-card {
+  width: 100%;
+  padding: 15px;
+}
+
+.context-field textarea,
+.context-field input,
+.suggestion-chip,
+.refresh-suggestions {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.suggestion-row {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px !important;
+  overflow: visible !important;
+}
+
+.suggestion-chip {
+  width: 100%;
+  min-height: 0;
+  padding: 12px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}
+
+.refresh-suggestions {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+.context-field.has-selected-answer textarea {
+  display: block;
+}
+
+/* Regolamento: struttura lineare e leggibile. */
+.clarity-rulebook {
+  display: grid;
+  gap: 13px;
+}
+
+.clarity-rulebook .amber-banner {
+  display: none !important;
+}
+
+.rulebook-lead {
+  display: grid;
+  gap: 4px;
+  padding: 13px 15px;
+  color: var(--card-ink);
+  background: var(--card-bg-2);
+  border: 1px solid var(--card-line-soft);
+  border-left: 5px solid var(--amber);
+  border-radius: 6px;
+}
+
+.rulebook-lead > span {
+  color: var(--amber-deep);
+  font-size: .64rem;
+  font-weight: 950;
+  letter-spacing: .1em;
+}
+
+.rulebook-lead p {
+  margin: 0;
+  color: var(--card-muted);
+  line-height: 1.45;
+}
+
+.clarity-rulebook .rules-accordion,
+.focus-modal .clarity-rulebook .rules-accordion {
+  grid-template-columns: minmax(0, 1fr) !important;
+  align-items: stretch !important;
+}
+
+.clarity-rulebook .rules-accordion details,
+.focus-modal .clarity-rulebook .rules-accordion details {
+  grid-row: auto !important;
+  width: 100%;
+}
+
+.clarity-rulebook .numbered-list > p {
+  display: grid !important;
+  grid-template-columns: 32px minmax(0, 1fr) !important;
+  align-items: start !important;
+  gap: 10px !important;
+}
+
+.clarity-rulebook .numbered-list > p > i {
+  grid-column: 1;
+}
+
+.clarity-rulebook .numbered-list > p > .numbered-copy {
+  grid-column: 2;
+  min-width: 0;
+}
+
+.clarity-rulebook .simple-suit-rules {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.clarity-rulebook .simple-suit-rules p {
+  display: grid;
+  gap: 3px;
+  margin: 0;
+  padding: 10px 11px;
+  border: 1px solid var(--card-line-soft);
+  border-radius: 5px;
+  background: var(--card-bg-2);
+}
+
+.clarity-rulebook .simple-suit-rules span {
+  color: var(--card-muted);
+}
+
+.clarity-rulebook .parity-warning {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border-left: 4px solid var(--amber);
+  background: var(--card-bg-3);
+}
+
+/* Modale: header visibile, chiusura ferma, contenuto senza masonry. */
+.focus-modal.wide .focus-modal-card {
+  width: min(900px, calc(100vw - 32px));
+  max-height: min(880px, calc(100dvh - 32px));
+  padding: 18px;
+  overflow-x: hidden;
+}
+
+.focus-modal .focus-modal-card > h2 {
+  display: block !important;
+  margin: 0 48px 14px 0 !important;
+}
+
+.focus-modal .modal-close {
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+  float: none !important;
+  margin: 0 !important;
+}
+
+.focus-modal .clarity-rulebook .rulebook-cover {
+  display: none !important;
+}
+
+.focus-modal .clarity-rulebook .rules-intro {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+}
+
+.focus-modal .clarity-rulebook .rulebook-controls {
+  position: sticky;
+  top: -18px;
+  z-index: 4;
+  padding: 10px 0;
+  background: var(--card-bg);
+}
+
+.clarity-rulebook .victory-line {
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--card-line-soft);
+  color: var(--amber-deep);
+  line-height: 1.35;
+}
+
+@media (max-width: 900px) {
+  .suggestion-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .session-active .app-shell {
+    width: 100% !important;
+    padding-left: max(9px, env(safe-area-inset-left)) !important;
+    padding-right: max(9px, env(safe-area-inset-right)) !important;
+  }
+
+  .session-active #game {
+    padding: 12px !important;
+    overflow: hidden;
+  }
+
+  .context-workspace .story-part {
+    grid-template-columns: 42px minmax(0, 1fr) !important;
+  }
+
+  .context-workspace .change-story-card {
+    grid-column: 1 / -1 !important;
+    width: 100%;
+    min-height: 38px;
+  }
+
+  .suggestion-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .opening-live,
+  .context-step-card,
+  .story-reference {
+    padding: 12px;
+  }
+
+  .focus-modal {
+    padding: 0;
+  }
+
+  .focus-modal.wide .focus-modal-card,
+  .focus-modal .focus-modal-card {
+    width: 100vw;
+    max-height: 100dvh;
+    min-height: 100dvh;
+    padding: 14px;
+    border-radius: 0;
+  }
+
+  .focus-modal .clarity-rulebook .rules-intro,
+  .clarity-rulebook .simple-suit-rules {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .focus-modal .clarity-rulebook .rulebook-controls {
+    top: -14px;
+  }
+}
+
+@media (max-width: 430px) {
+  .session-topbar {
+    grid-template-columns: 42px minmax(0, 1fr) auto auto !important;
+    gap: 5px !important;
+  }
+
+  .session-label {
+    display: block !important;
+    min-width: 0;
+    font-size: .62rem !important;
+  }
+
+  .session-rules-button,
+  .session-exit {
+    padding: 0 7px !important;
+    font-size: .65rem !important;
+  }
+
+  .clarity-rulebook .rules-accordion summary {
+    grid-template-columns: 30px minmax(0, 1fr) auto !important;
+    gap: 7px !important;
+    padding: 13px 11px !important;
+  }
+
+  .clarity-rulebook .rules-accordion .details-body {
+    padding: 12px !important;
+  }
+}
