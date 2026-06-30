@@ -10,13 +10,7 @@
   const previous = G.flow.story;
   G.flow.story = session => {
     previous(session);
-    G.game.querySelectorAll('.story-connection,.inline-explainer').forEach(node => node.remove());
+    G.game.querySelectorAll('.story-connection,.inline-explainer,.story-draft').forEach(node => node.remove());
     G.game.querySelector('.screen-heading p:last-child')?.remove();
-    const reference = G.game.querySelector('.story-reference');
-    const template = document.querySelector('#clarityStoryDraft');
-    if (!reference || !template) return;
-    const fragment = template.content.cloneNode(true);
-    fragment.querySelector('p').textContent = G.flow.openingText(session);
-    reference.after(fragment);
   };
 })();
