@@ -1,2 +1,2 @@
 'use strict';
-window.testRules = 'ok';
+window.testRules = 'Ogni giocatore riceve cinque carte fisiche.';
