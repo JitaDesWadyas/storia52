@@ -72,4 +72,10 @@
     new MutationObserver(cleanTurn).observe(game, { childList: true, subtree: true });
     cleanTurn();
   }
+
+  if (!document.querySelector('script[src="opening-loader.js"]')) {
+    const loader = document.createElement('script');
+    loader.src = 'opening-loader.js';
+    document.body.appendChild(loader);
+  }
 })();
