@@ -4,6 +4,10 @@
   const G = window.G52;
   if (!G) return;
 
+  const style = document.createElement('style');
+  style.textContent = '.simple-hero h2{font-size:clamp(2.1rem,3.6vw,3.5rem)!important;max-width:760px!important}.simple-hero>p:not(.section-kicker){font-size:1rem!important}';
+  document.head.appendChild(style);
+
   const originalSave = G.save;
   G.save = session => {
     if (session?.readyStoryId && !session.stage) {
