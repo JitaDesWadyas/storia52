@@ -14,6 +14,7 @@
     .then(() => load('opening-v3-polish.js'))
     .then(() => load('ready-stories-data.js'))
     .then(() => load('ready-stories-ui.js'))
+    .then(() => load('ready-stories-rules.js'))
     .then(() => load('ready-stories-home-bind.js'))
     .catch(error => console.error('Impossibile caricare il sistema degli incipit.', error));
 })();
