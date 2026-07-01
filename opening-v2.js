@@ -17,5 +17,7 @@
     .then(() => load('ready-stories-rules.js'))
     .then(() => load('ready-stories-card-path.js'))
     .then(() => load('ready-stories-home-bind.js'))
+    .then(() => load('product-final.js'))
+    .then(() => load('product-final-patch.js'))
     .catch(error => console.error('Impossibile caricare il sistema degli incipit.', error));
 })();
