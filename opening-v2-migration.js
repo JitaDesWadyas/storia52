@@ -4,81 +4,42 @@
   const tagline = 'Un gioco creativo e imprevedibile da vivere in compagnia.';
   const description = 'Giocate le carte, continuate ciò che è successo e cercate di portare la storia verso il vostro finale.';
 
-  const applyBrand = () => {
-    document.title = 'STORIA 52';
-    const meta = document.querySelector('meta[name="description"]');
-    if (meta) meta.content = 'STORIA 52 — ' + tagline + ' ' + description;
+  document.title = 'STORIA 52';
+  const meta = document.querySelector('meta[name="description"]');
+  if (meta) meta.content = `STORIA 52 — ${tagline} ${description}`;
 
-    document.querySelectorAll('.brand-suits').forEach(node => node.remove());
+  document.querySelectorAll('.brand-suits').forEach(node => node.remove());
 
-    const lockup = document.querySelector('.brand-lockup');
-    if (lockup && !lockup.classList.contains('brand-lockup-v3')) {
-      const toggle = document.querySelector('#themeToggle');
-      const mark = document.createElement('img');
-      mark.src = logo;
-      mark.alt = '';
-      mark.className = 'brand-mark-v3';
-      const copy = document.createElement('div');
-      copy.className = 'brand-copy-v3';
-      const kicker = document.createElement('p');
-      kicker.className = 'brand-kicker';
-      kicker.textContent = 'GIOCO NARRATIVO CON UN MAZZO DI CARTE';
-      const line = document.createElement('div');
-      line.className = 'brand-line';
-      const title = document.createElement('h1');
-      title.textContent = 'STORIA 52';
-      line.appendChild(title);
-      if (toggle) line.appendChild(toggle);
-      copy.append(kicker, line);
-      lockup.replaceChildren(mark, copy);
-      lockup.classList.add('brand-lockup-v3');
-    }
+  const lockup = document.querySelector('.brand-lockup');
+  if (lockup) {
+    const toggle = document.querySelector('#themeToggle');
+    const mark = document.createElement('img');
+    mark.src = logo;
+    mark.alt = '';
+    mark.className = 'brand-mark-v3';
 
-    const hero = document.querySelector('.hero-copy');
-    if (hero) {
-      const kicker = hero.querySelector('.section-kicker');
-      const title = hero.querySelector('h2');
-      const copy = Array.from(hero.querySelectorAll('p')).find(node => !node.classList.contains('section-kicker'));
-      if (kicker) kicker.textContent = 'STORIA 52';
-      if (title) title.textContent = tagline;
-      if (copy) copy.textContent = description;
-    }
+    const copy = document.createElement('div');
+    copy.className = 'brand-copy-v3';
 
-    const deck = document.querySelector('.deck-scene');
-    if (deck && !deck.querySelector('.hero-brand-mark')) {
-      const image = document.createElement('img');
-      image.src = logo;
-      image.alt = 'Logo STORIA 52';
-      image.className = 'hero-brand-mark';
-      deck.replaceChildren(image);
-      deck.removeAttribute('aria-hidden');
-    }
+    const kicker = document.createElement('p');
+    kicker.className = 'brand-kicker';
+    kicker.textContent = 'UN GIOCO CREATIVO E IMPREVEDIBILE';
 
-    document.querySelectorAll('.rulebook-cover').forEach(cover => {
-      if (cover.querySelector('.rules-brand-mark')) return;
-      const image = document.createElement('img');
-      image.src = logo;
-      image.alt = '';
-      image.className = 'rules-brand-mark';
-      cover.prepend(image);
-    });
+    const line = document.createElement('div');
+    line.className = 'brand-line';
 
-    document.querySelectorAll('.session-logo img').forEach(image => {
-      image.src = logo;
-      image.alt = 'STORIA 52';
-    });
-  };
+    const title = document.createElement('h1');
+    title.textContent = 'STORIA 52';
+    line.appendChild(title);
+    if (toggle) line.appendChild(toggle);
 
-  let queued = false;
-  const schedule = () => {
-    if (queued) return;
-    queued = true;
-    requestAnimationFrame(() => {
-      queued = false;
-      applyBrand();
-    });
-  };
+    copy.append(kicker, line);
+    lockup.replaceChildren(mark, copy);
+    lockup.className = 'brand-lockup brand-lockup-v3';
+  }
 
-  applyBrand();
-  new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
+  document.querySelectorAll('.session-logo img').forEach(image => {
+    image.src = logo;
+    image.alt = 'STORIA 52';
+  });
 })();
