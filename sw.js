@@ -1,6 +1,6 @@
-const CACHE='storia52-clean-v13';
+const CACHE='storia52-clean-v14';
 const FILES=[
-  './','index.html','clean-app.css','app.js','ui-core.js','ready-stories-data.js',
+  './','index.html','clean-app.css','refine-flow.css','app.js','ui-core.js','ready-stories-data.js',
   'clean-core.js','clean-rules.js','clean-home.js','clean-config.js','clean-opening.js',
   'clean-stories-model.js','clean-stories-markup.js','clean-stories-view.js',
   'clean-objectives.js','clean-prep.js','clean-print.js','clean-invite-host.js',

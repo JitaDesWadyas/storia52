@@ -6,8 +6,8 @@
     stories: window.STORIA52_READY_STORIES || [],
     categories: window.STORIA52_READY_CATEGORIES || {},
     play: document.querySelector('#play'),
-    rules: document.querySelector('#rules'),
-    storyUi: { category: 'all', query: '', page: 0 }
+    storyUi: { category: 'all', query: '', page: 0 },
+    currentSession: null
   };
 
   S.esc = value => escapeHtml(String(value ?? ''));
@@ -27,24 +27,28 @@
     catch { return null; }
   };
   S.save = session => {
+    S.currentSession = session;
     try { localStorage.setItem(S.key, JSON.stringify(session)); }
     catch { /* Il gioco continua anche senza salvataggio. */ }
   };
   S.clear = () => {
+    S.currentSession = null;
     try { localStorage.removeItem(S.key); }
     catch { /* Nessuna azione richiesta. */ }
   };
 
-  S.sessionBar = label => `<div class="session-bar"><div class="session-title"><img src="storia52-cards-logo.svg" alt=""><span>${S.esc(label)}</span></div><div class="session-actions"><button type="button" data-session-rules>Regole</button><button type="button" data-session-exit>Esci</button></div></div>`;
-
-  S.mount = (html, { label = 'STORIA 52', session = false, scroll = true } = {}) => {
-    S.play.innerHTML = `<div class="screen">${session ? S.sessionBar(label) : ''}${html}</div>`;
-    openPage('play');
+  S.mount = (html, { session = false, scroll = true } = {}) => {
+    const previousY = window.scrollY;
+    S.play.innerHTML = `<div class="screen">${html}</div>`;
+    S.play.classList.add('active');
     document.body.classList.toggle('session-mode', session);
-    document.querySelector('.main-nav')?.classList.toggle('hidden', session);
-    S.play.querySelector('[data-session-rules]')?.addEventListener('click', () => S.openRulesModal());
-    S.play.querySelector('[data-session-exit]')?.addEventListener('click', () => S.openExitModal());
+    const exitButton = document.querySelector('#headerExit');
+    if (exitButton) exitButton.hidden = !session;
+    const url = new URL(location.href);
+    url.hash = 'play';
+    history.replaceState(null, '', url);
     if (scroll) window.scrollTo({ top: 0, behavior: 'auto' });
+    else requestAnimationFrame(() => window.scrollTo({ top: previousY, behavior: 'auto' }));
   };
 
   S.modal = (title, body, { wide = false, className = '' } = {}) => {
@@ -74,7 +78,7 @@
   S.newSession = mode => {
     const seed = createCode();
     const count = 4;
-    return {
+    const session = {
       version: 3,
       mode,
       delivery: 'single',
@@ -91,17 +95,30 @@
       objectives: Array.from({ length: count }, (_, index) => objectiveFromSeed(seed, index + 1)),
       confirmed: Array(count).fill(false)
     };
+    session.openingText = S.defaultOpening(session);
+    return session;
   };
 
-  S.storyCardsMarkup = session => {
+  S.stripPeriod = value => String(value || '').trim().replace(/[.!?]+$/, '');
+  S.lowerFirst = value => value ? value.charAt(0).toLowerCase() + value.slice(1) : '';
+  S.defaultOpening = session => {
+    const story = withStoryGoal(session.story, session.seed);
+    const protagonist = S.stripPeriod(cardText('protagonist', story.protagonist));
+    const situation = S.stripPeriod(cardText('situation', story.situation));
+    const objective = S.lowerFirst(S.stripPeriod(cardText('objective', story.goal)));
+    const problem = S.lowerFirst(S.stripPeriod(cardText('problem', story.problem)));
+    return `${protagonist}. ${situation}. Vuole ${objective}, ma ${problem}.`;
+  };
+
+  S.storyCardsMarkup = (session, { editable = false } = {}) => {
     const story = withStoryGoal(session.story, session.seed);
     const parts = [
-      ['PROTAGONISTA', 'protagonist', story.protagonist],
-      ['SITUAZIONE', 'situation', story.situation],
-      ['OBIETTIVO', 'objective', story.goal],
-      ['PROBLEMA', 'problem', story.problem]
+      ['protagonist', 'PROTAGONISTA', 'protagonist', story.protagonist],
+      ['situation', 'SITUAZIONE', 'situation', story.situation],
+      ['goal', 'OBIETTIVO', 'objective', story.goal],
+      ['problem', 'PROBLEMA', 'problem', story.problem]
     ];
-    return `<div class="story-reference">${parts.map(([label, type, card]) => `<article class="story-card"><span class="rank${SUITS[card.suit].red ? ' red' : ''}">${S.esc(cardLabel(card))}</span><div><span>${label}</span><p>${S.esc(cardText(type, card))}</p></div></article>`).join('')}</div>`;
+    return `<div class="story-reference">${parts.map(([key, label, type, card]) => `<article class="story-card${editable ? ' with-action' : ''}"><span class="rank${SUITS[card.suit].red ? ' red' : ''}">${S.esc(cardLabel(card))}</span><div><span>${label}</span><p>${S.esc(cardText(type, card))}</p></div>${editable ? `<button type="button" class="story-card-change" data-change-story-card="${key}">Cambia</button>` : ''}</article>`).join('')}</div>`;
   };
 
   S.storyContextMarkup = session => {
