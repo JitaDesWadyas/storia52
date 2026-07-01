@@ -3,147 +3,60 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#11100e">
-  <meta name="description" content="STORIA 52 - gioco narrativo competitivo con un mazzo di carte.">
+  <meta name="theme-color" content="#15120d">
+  <meta name="description" content="STORIA 52, gioco narrativo con un mazzo di carte.">
   <title>STORIA 52</title>
-  <script>
-    (()=>{try{document.documentElement.dataset.theme=localStorage.getItem('storia52_theme')==='dark'?'dark':'light'}catch(_){document.documentElement.dataset.theme='light'}})();
-  </script>
+  <script>(()=>{try{document.documentElement.dataset.theme=localStorage.getItem('storia52_theme')==='dark'?'dark':'light'}catch{}})();</script>
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="update.css">
-  <link rel="stylesheet" href="editorial-polish.css">
-  <style id="clarity-overrides">
-    .story-reference,.story-draft,.opening-live,.context-step-card{border:1px solid var(--card-line);background:var(--card-bg);box-shadow:0 12px 28px rgba(42,28,8,.08)}
-    .story-reference{padding:15px;border-radius:10px}.story-reference-head{margin-bottom:11px}.story-reference-head h3{margin-top:3px}.story-reference-head>small{max-width:230px}
-    .story-parts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.story-part{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;min-height:84px;padding:10px;border-radius:8px}.story-part-rank{width:44px;min-width:44px;height:54px}.story-part-copy p{margin:2px 0 0;font-size:16px;line-height:1.28}.story-part-copy em{display:none}.change-story-card{align-self:stretch;min-width:68px;padding:6px}
-    .story-draft,.opening-live{margin:14px 0;padding:17px 19px;border-radius:10px}.story-draft>span,.opening-live>span{color:var(--amber-deep);font:900 11px/1.2 system-ui,sans-serif;letter-spacing:.1em}.story-draft p{margin:8px 0 4px;font:700 clamp(19px,3vw,25px)/1.42 Georgia,serif}.story-draft small{color:var(--card-muted)}
-    .opening-live{position:relative;overflow:hidden}.opening-live:before{content:'';position:absolute;inset:0 auto 0 0;width:5px;background:var(--amber)}.opening-live blockquote{margin:9px 0 0;font:700 clamp(19px,2.7vw,25px)/1.5 Georgia,serif}
-    .context-workspace{display:block}.context-workspace>.story-reference{position:static;margin-bottom:10px}.context-workspace .story-reference-head{display:none}.context-workspace .story-parts{display:block}.context-workspace .story-part[hidden]{display:none!important}.context-workspace .story-part{min-height:70px}.context-editor{width:100%}.context-step-status{margin:0 0 10px}.context-step-card{padding:15px;border-radius:10px}.context-field{border:0;padding:0;background:transparent;box-shadow:none}.context-field h3{margin:5px 0 12px;font-size:clamp(25px,4vw,34px)}
-    .suggestion-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.suggestion-chip{min-height:88px;padding:13px;border-radius:9px;font-size:15px;line-height:1.38;text-align:left}.refresh-suggestions{grid-column:1/-1;min-height:42px}.context-field textarea{margin-top:12px;min-height:90px;border-radius:9px}.context-field.has-selected-answer textarea{display:none}
-    .name-field{display:grid;grid-template-columns:145px 1fr;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--card-line-soft)}.name-field>span,.name-field h3,.name-field p{display:none}.name-field input{width:100%;margin:0}.name-field:before{content:'Nome, facoltativo';font-weight:900}.context-step-actions{margin-top:12px}#changeContextMode{margin-top:8px}
-    .simple-suit-rules{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.simple-suit-rules p{display:grid;gap:3px;margin:0;padding:11px 12px;border:1px solid var(--card-line-soft);border-radius:7px}.simple-suit-rules span{color:var(--card-muted)}.parity-warning{margin:10px 0;padding:10px 12px;border-left:4px solid var(--amber);background:color-mix(in srgb,var(--amber) 10%,transparent)}
-    .clarity-rulebook .rules-accordion>details>.details-body>.card-rules-guide{border:0;box-shadow:none}.clarity-rulebook .rules-accordion>details>.details-body>.card-rules-guide>summary{display:none}.clarity-rulebook .rules-accordion>details>.details-body>.card-rules-guide .card-rules-guide-body{padding:0}.compact-rules-intro{margin-bottom:14px}
-    .focus-modal:has(.clarity-rulebook) .focus-modal-card{width:min(980px,calc(100vw - 24px));max-height:calc(100vh - 24px);padding:0;overflow:auto}.focus-modal:has(.clarity-rulebook) .focus-modal-card>h2{display:none}.focus-modal:has(.clarity-rulebook) .modal-close{position:sticky;top:10px;float:right;z-index:5;margin:10px 10px -54px 0}.focus-modal:has(.clarity-rulebook) .unified-rulebook{margin:0;border:0;border-radius:0;box-shadow:none}
-    .scene-example,.optional-help{display:none!important}
-    @media(max-width:760px){.story-reference{padding:10px}.story-reference-head{display:grid;gap:3px}.story-reference-head>small{max-width:none;text-align:left}.story-parts{grid-template-columns:1fr}.story-part{grid-template-columns:40px minmax(0,1fr) auto;min-height:72px;padding:9px}.story-part-rank{width:40px;min-width:40px;height:48px}.story-part-copy p{font-size:14px}.change-story-card{min-width:56px;font-size:11px}.story-draft,.opening-live,.context-step-card{padding:13px}.opening-live blockquote{font-size:18px}.suggestion-row{grid-template-columns:1fr}.suggestion-chip{min-height:0}.name-field{grid-template-columns:1fr;gap:6px}.simple-suit-rules{grid-template-columns:1fr}.focus-modal:has(.clarity-rulebook) .focus-modal-card{width:100vw;max-height:100vh;border-radius:0}}
-  </style>
+  <link rel="stylesheet" href="clean-app.css">
 </head>
 <body>
-  <div class="ambient ambient-one" aria-hidden="true"></div>
-  <div class="ambient ambient-two" aria-hidden="true"></div>
-
   <div class="app-shell">
-    <header class="masthead">
-      <div class="brand-lockup">
-        <p class="brand-kicker">GIOCO NARRATIVO CON UN MAZZO DI CARTE</p>
-        <div class="brand-line">
-          <h1>STORIA 52</h1>
-          <button type="button" id="themeToggle" class="theme-toggle" aria-label="Passa al tema scuro" aria-pressed="false"><span class="theme-toggle-icon" aria-hidden="true">◐</span><span class="theme-toggle-label">Tema scuro</span></button>
-        </div>
-      </div>
-      <div class="brand-suits" aria-hidden="true"><span>♥</span><span>♦</span><span>♣</span><span>♠</span></div>
+    <header class="site-header">
+      <div class="brand"><img src="storia52-cards-logo.svg" alt=""><h1>STORIA 52</h1></div>
+      <button type="button" id="themeToggle" class="theme-toggle" aria-label="Passa al tema scuro" aria-pressed="false"><span class="theme-toggle-icon">◐</span><span class="theme-toggle-label">Tema scuro</span></button>
     </header>
-
     <nav class="main-nav" aria-label="Navigazione principale">
-      <button type="button" data-page="play" class="active" aria-current="page">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4.75h8A3.25 3.25 0 0 1 19.25 8v8A3.25 3.25 0 0 1 16 19.25H8A3.25 3.25 0 0 1 4.75 16V8A3.25 3.25 0 0 1 8 4.75Z"/><path d="m10 9 5 3-5 3V9Z"/></svg>
-        <span>Gioca</span>
-      </button>
-      <button type="button" data-page="cards">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3.75" width="12" height="16.5" rx="2.25"/><path d="M9.25 8.25h5.5M9.25 12h5.5M9.25 15.75h3.5"/></svg>
-        <span>Archivio</span>
-      </button>
-      <button type="button" data-page="rules">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5.25A2.25 2.25 0 0 1 7.25 3H19v15.75H7.25A2.25 2.25 0 0 0 5 21V5.25Z"/><path d="M5 18.75A2.25 2.25 0 0 1 7.25 16.5H19M9 7.5h6M9 11h6"/></svg>
-        <span>Regole</span>
-      </button>
+      <button type="button" data-page="play" class="active" aria-current="page">Gioca</button>
+      <button type="button" data-page="cards">Archivio</button>
+      <button type="button" data-page="rules">Regole</button>
     </nav>
-
     <main>
-      <section id="play" class="page active" aria-labelledby="play-title">
-        <div class="hero-board">
-          <div class="hero-copy">
-            <p class="section-kicker">CREA LA STORIA. CHIUDILA CON IL TUO OBIETTIVO SEGRETO.</p>
-            <h2 id="play-title">Una storia diversa ogni volta.</h2>
-            <p>Il mazzo decide i vincoli. Voi decidete cosa succede.</p>
-            <div class="hero-pills"><span>2-10 giocatori</span><span>Un solo mazzo</span><span>Obiettivi segreti</span></div>
+      <section id="play" class="page active"></section>
+      <section id="cards" class="page">
+        <section class="surface">
+          <div class="screen-heading"><p class="eyebrow">ARCHIVIO DEL MAZZO</p><h2>Consulta ogni carta.</h2></div>
+          <div class="card-browser">
+            <div class="browser-step"><div class="step-label"><span>1</span><b>Categoria</b></div><div id="tabs" class="type-tabs"></div></div>
+            <div class="browser-step"><div class="step-label"><span>2</span><b>Seme</b></div><div id="suitPicker" class="suit-picker"></div></div>
+            <div class="browser-step"><div class="step-label"><span>3</span><b>Numero</b></div><div id="numberPicker" class="number-picker"></div></div>
+            <div class="browser-result"><div id="cardPreview" class="playing-card-preview"></div><div class="browser-actions"><button type="button" id="randomCard" class="button button-primary">Carta casuale</button><button type="button" id="copyCard" class="button button-ghost">Copia testo</button></div></div>
           </div>
-          <div class="deck-scene" aria-hidden="true">
-            <div class="display-card back-card back-left"><span>52</span></div>
-            <div class="display-card back-card back-right"><span>♠</span></div>
-            <div class="display-card front-card"><b>STORIA</b><strong>52</strong><small>♥ ♦ ♣ ♠</small></div>
-          </div>
-        </div>
-
-        <div class="section-heading">
-          <div><p class="eyebrow">SCEGLI LA MODALITÀ</p><h2>Inizia una partita</h2></div>
-          <span class="rule-line" aria-hidden="true"></span>
-        </div>
-
-        <div class="mode-grid">
-          <button type="button" class="mode-card" data-mode="single"><span class="mode-index">01</span><span class="mode-suit">♥</span><span class="mode-copy"><b>Un solo telefono</b><small>Passalo a turno: ogni giocatore vede solo il proprio obiettivo.</small></span><span class="mode-arrow">→</span></button>
-          <button type="button" class="mode-card" data-mode="multi"><span class="mode-index">02</span><span class="mode-suit">♦</span><span class="mode-copy"><b>Un telefono a testa</b><small>Gli inviti assegnano automaticamente il numero del giocatore.</small></span><span class="mode-arrow">→</span></button>
-          <button type="button" class="mode-card" data-mode="quick"><span class="mode-index">03</span><span class="mode-suit">♣</span><span class="mode-copy"><b>Generatore rapido</b><small>Crea un incipit e un obiettivo segreto in pochi secondi.</small></span><span class="mode-arrow">→</span></button>
-        </div>
-        <div id="game" class="game-stage hidden" aria-live="polite"></div>
+        </section>
       </section>
-
-      <section id="cards" class="page" aria-labelledby="cards-title">
-        <div class="page-banner"><p class="eyebrow">ARCHIVIO DEL MAZZO</p><h2 id="cards-title">Una carta alla volta.</h2><p>Scegli categoria, seme e numero. Niente liste infinite.</p></div>
-        <div class="card-browser">
-          <div class="browser-step"><div class="step-label"><span>1</span><b>Categoria</b></div><div id="tabs" class="type-tabs" role="tablist" aria-label="Categoria della carta"></div></div>
-          <div class="browser-step"><div class="step-label"><span>2</span><b>Seme</b></div><div id="suitPicker" class="suit-picker" aria-label="Seme"></div></div>
-          <div class="browser-step"><div class="step-label"><span>3</span><b>Numero</b></div><div id="numberPicker" class="number-picker" aria-label="Numero"></div></div>
-          <div class="browser-result"><div id="cardPreview" class="playing-card-preview"></div><div class="browser-actions"><button type="button" id="randomCard" class="button button-primary">Carta casuale</button><button type="button" id="copyCard" class="button button-ghost">Copia testo</button></div></div>
-        </div>
-      </section>
-
-      <section id="rules" class="page" aria-labelledby="rules-title"></section>
+      <section id="rules" class="page"></section>
     </main>
-
-    <footer><span>STORIA 52</span><span>PROTOTIPO WEB</span></footer>
+    <footer><span>STORIA 52</span><span>GIOCO NARRATIVO</span></footer>
   </div>
-
-  <template id="clarityStoryDraft"><section class="story-draft"><span>BOZZA AUTOMATICA</span><p></p><small>Ora rendetela più concreta e naturale.</small></section></template>
-  <template id="clarityLiveOpening"><section class="opening-live"><span>INCIPIT IN COSTRUZIONE</span><blockquote></blockquote></section></template>
-  <template id="clarityRulesTemplate">
-    <div class="unified-rulebook clarity-rulebook">
-      <div class="rulebook-cover"><p class="brand-kicker">GIOCO NARRATIVO CON UN MAZZO DI CARTE</p><div><h2 id="rules-title">STORIA 52</h2><span>REGOLAMENTO</span></div></div>
-      <div class="amber-banner">CREA LA STORIA. CHIUDILA CON IL TUO OBIETTIVO SEGRETO.</div>
-      <div class="rules-intro compact-rules-intro">
-        <div class="rules-step"><span>1</span><p><b>Create l’incipit</b> con le 4 carte comuni.</p></div>
-        <div class="rules-step"><span>2</span><p><b>Distribuite 5 carte</b> e gli obiettivi segreti.</p></div>
-        <div class="rules-step"><span>3</span><p><b>Giocate una carta a turno</b> fino al finale.</p></div>
-      </div>
-      <div class="rulebook-controls"><button type="button" data-rules-expand>Apri tutte</button><button type="button" data-rules-collapse>Chiudi tutte</button></div>
-      <div class="rules-accordion">
-        <details open><summary><span>01</span> Preparazione</summary><div class="details-body numbered-list"><p><i>1</i> Togliete i jolly e mescolate il mazzo.</p><p><i>2</i> Create l’incipit con <b>Protagonista, Situazione, Obiettivo e Problema</b>. Le 4 carte restano sul telefono.</p><p><i>3</i> Date <b>5 carte fisiche</b> a ogni giocatore.</p><p><i>4</i> Ogni giocatore legge il proprio <b>Obiettivo segreto</b> e lo tiene separato dalla mano.</p></div></details>
-        <details><summary><span>02</span> Significato delle carte</summary><div class="details-body"><div class="simple-suit-rules"><p><b class="red">♥ Cuori pari</b><span>Un rapporto migliora o aiuta.</span></p><p><b class="red">♥ Cuori dispari</b><span>Un rapporto peggiora o complica.</span></p><p><b class="red">♦ Quadri pari</b><span>Scoperta utile.</span></p><p><b class="red">♦ Quadri dispari</b><span>Scoperta pericolosa o negativa.</span></p><p><b>♣ Fiori</b><span>Qualcuno compie un’azione.</span></p><p><b>♠ Picche</b><span>Arriva un ostacolo, una perdita o una conseguenza.</span></p></div><p class="parity-warning"><b>Pari e dispari valgono solo per Cuori e Quadri.</b></p><div class="card-rule-figures"><p><b>J</b><span>Nuovo oggetto</span></p><p><b>Q</b><span>Nuovo personaggio</span></p><p><b>K</b><span>Nuovo luogo</span></p><p><b>A</b><span>Ribalta la situazione</span></p></div><p class="card-rule-note">Le figure non hanno parità. Rosse: entrano a favore del protagonista. Nere: entrano come complicazione.</p></div></details>
-        <details><summary><span>03</span> Il turno</summary><div class="details-body numbered-list"><p><i>1</i> <b>Scarta 1 carta e pescane 1.</b> Con una sola carta puoi riprendere la stessa oppure cambiarla.</p><p><i>2</i> <b>Gioca 1 carta.</b></p><p><i>3</i> Racconta <b>un solo fatto successivo</b>, applicando la carta e riprendendo almeno un elemento già comparso.</p><p><i>4</i> Pesca 1 carta oppure resta con una carta in meno.</p></div></details>
-        <details><summary><span>04</span> Il finale</summary><div class="details-body"><p>Puoi tentarlo quando, <b>dopo il ricambio iniziale</b>, ti resta una sola carta.</p><div class="numbered-list"><p><i>1</i> Gioca l’ultima carta.</p><p><i>2</i> Mostra il tuo Obiettivo segreto.</p><p><i>3</i> Raggiungi quel finale e chiudi o trasforma il problema iniziale.</p><p><i>4</i> Usa almeno un elemento già comparso. Non inventare una soluzione scollegata all’ultimo momento.</p></div></div></details>
-        <details><summary><span>05</span> Regola facoltativa: opposizione</summary><div class="details-body"><p>Prima che il finale venga chiuso, un solo avversario può giocare una carta e aggiungere una complicazione coerente. Non può annullare il finale né cambiarne l’obiettivo.</p></div></details>
-      </div>
-      <p class="victory-line">VINCE CHI CONCLUDE LA STORIA CON IL PROPRIO OBIETTIVO SEGRETO.</p>
-    </div>
-  </template>
-
-  <div id="toast" role="status" aria-live="polite"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="app.js"></script>
   <script src="ui-core.js"></script>
-  <script src="ui-modes.js"></script>
-  <link rel="stylesheet" href="mobile-fix.css">
-  <script src="mobile-fix.js"></script>
-  <link rel="stylesheet" href="guided-v2.css">
-  <script src="guided-core.js"></script>
-  <script src="guided-flow.js"></script>
-  <script src="guided-play.js"></script>
-  <script src="clarity-rules-a.js"></script>
-  <script src="clarity-modal.js"></script>
-  <script src="clarity-context.js"></script>
-  <script src="small.js"></script>
-  <script src="x2.js"></script>
-  <script src="clarity-prep.js"></script>
+  <script src="ready-stories-data.js"></script>
+  <script src="clean-core.js"></script>
+  <script src="clean-rules.js"></script>
+  <script src="clean-home.js"></script>
+  <script src="clean-config.js"></script>
+  <script src="clean-opening.js"></script>
+  <script src="clean-stories-model.js"></script>
+  <script src="clean-stories-markup.js"></script>
+  <script src="clean-stories-view.js"></script>
+  <script src="clean-objectives.js"></script>
+  <script src="clean-prep.js"></script>
+  <script src="clean-print.js"></script>
+  <script src="clean-invite-host.js"></script>
+  <script src="clean-invite-data.js"></script>
+  <script src="clean-exit.js"></script>
+  <script src="clean-init.js"></script>
 </body>
 </html>
