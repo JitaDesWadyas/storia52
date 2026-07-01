@@ -2,6 +2,14 @@
 (() => {
   const G = window.G52;
   if (!G?.flow) return;
+
+  if (!document.querySelector('#ready-card-path-style')) {
+    const style = document.createElement('style');
+    style.id = 'ready-card-path-style';
+    style.textContent = '.card-builder-intro{display:grid;gap:5px;margin:12px 0 14px;padding:14px 15px;color:var(--card-ink);background:var(--card-bg-2);border:1px solid var(--card-line-soft);border-left:5px solid var(--amber);border-radius:8px}.card-builder-intro>span{color:var(--amber-deep);font-size:.63rem;font-weight:950;letter-spacing:.1em}.card-builder-intro>b{font:700 1.05rem Georgia,serif}.card-builder-intro>p{margin:0;color:var(--card-muted);line-height:1.45}';
+    document.head.appendChild(style);
+  }
+
   const previous = G.flow.story;
   G.flow.story = session => {
     previous(session);
