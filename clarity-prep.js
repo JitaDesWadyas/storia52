@@ -66,8 +66,14 @@
     const cleanTurn = () => {
       const title = game.querySelector('.turn-core > div:nth-child(2) b');
       const note = game.querySelector('.turn-core > div:nth-child(2) small');
-      if (title) title.textContent = title.textContent.split(' oppure')[0];
-      if (note) note.textContent = note.textContent.replace(/ Puoi giocare.+$/, '');
+      if (title) {
+        const nextTitle = title.textContent.split(' oppure')[0];
+        if (title.textContent !== nextTitle) title.textContent = nextTitle;
+      }
+      if (note) {
+        const nextNote = note.textContent.replace(/ Puoi giocare.+$/, '');
+        if (note.textContent !== nextNote) note.textContent = nextNote;
+      }
     };
     new MutationObserver(cleanTurn).observe(game, { childList: true, subtree: true });
     cleanTurn();
