@@ -12,5 +12,7 @@
     .then(() => load('opening-v3.js'))
     .then(() => load('opening-v3-events.js'))
     .then(() => load('opening-v3-polish.js'))
-    .catch(() => console.error('Impossibile caricare il nuovo incipit.'));
+    .then(() => load('ready-stories-data.js'))
+    .then(() => load('ready-stories-ui.js'))
+    .catch(error => console.error('Impossibile caricare il sistema degli incipit.', error));
 })();
