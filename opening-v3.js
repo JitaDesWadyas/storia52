@@ -34,6 +34,8 @@
     ? escapeHtml(String(value))
     : String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
 
+  const usesCardBuilder = session => session?.openingSource === 'cards-manual';
+  const usesReadyStory = session => session?.openingSource === 'ready-story';
   const currentStory = session => withStoryGoal(session.story, session.seed);
 
   const cardInfo = session => {
@@ -154,7 +156,7 @@
     </section>`;
 
   const migrate = session => {
-    if (!session) return session;
+    if (!session || usesCardBuilder(session) || usesReadyStory(session)) return session;
     session.context ||= {};
     if (session.openingBuilderVersion !== 3) {
       const generatedByOldBuilder = Boolean(session.openingWorld || session.openingBuilderVersion === 2 || /Il protagonista è|All’inizio,|Vuole .+, ma|Confronta il registro|Nella biblioteca del museo/i.test(session.context.finalOpening || ''));
@@ -173,10 +175,16 @@
   };
 
   const previousStory = G.flow.story;
+  const previousContextChoice = G.flow.contextChoice;
   const previousContextForm = G.flow.contextForm;
+  const previousOpeningText = G.flow.openingText;
   const previousOpening = G.flow.opening;
 
   G.flow.story = rawSession => {
+    if (usesCardBuilder(rawSession)) {
+      previousStory(rawSession);
+      return;
+    }
     const session = migrate(rawSession);
     previousStory(session);
     const heading = G.game.querySelector('.screen-heading');
@@ -283,6 +291,10 @@
   };
 
   G.flow.contextChoice = rawSession => {
+    if (usesCardBuilder(rawSession)) {
+      previousContextChoice(rawSession);
+      return;
+    }
     const session = migrate(rawSession);
     session.contextMode = 'complete-scenes';
     G.save(session);
@@ -290,6 +302,10 @@
   };
 
   G.flow.contextForm = rawSession => {
+    if (usesCardBuilder(rawSession)) {
+      previousContextForm(rawSession);
+      return;
+    }
     const session = migrate(rawSession);
     session.contextMode = 'complete-scenes';
     previousContextForm(session);
@@ -297,11 +313,16 @@
   };
 
   G.flow.openingText = rawSession => {
+    if (usesCardBuilder(rawSession)) return previousOpeningText(rawSession);
     const session = migrate(rawSession);
     return String(session.context?.finalOpening || '').trim() || 'Incipit non ancora scritto.';
   };
 
   G.flow.opening = rawSession => {
+    if (usesCardBuilder(rawSession)) {
+      previousOpening(rawSession);
+      return;
+    }
     const session = migrate(rawSession);
     const manual = session.openingV3Manual && !String(session.context.finalOpening || '').trim();
     if (manual) session.context.finalOpening = '\u200B';
