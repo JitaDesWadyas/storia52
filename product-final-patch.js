@@ -32,6 +32,17 @@
     G.game.querySelector('[data-final-free-back]').addEventListener('click', G.freeMenu);
   };
 
+  document.addEventListener('input', event => {
+    if (!event.target.matches('[data-story-search]')) return;
+    requestAnimationFrame(() => {
+      const field = document.querySelector('[data-story-search]');
+      if (!field) return;
+      field.focus({ preventScroll: true });
+      const end = field.value.length;
+      field.setSelectionRange(end, end);
+    });
+  }, true);
+
   document.addEventListener('click', event => {
     const button = event.target.closest('[data-origin="cards"]');
     if (!button) return;
