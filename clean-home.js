@@ -9,14 +9,11 @@
   };
 
   S.renderHome = () => {
-    document.body.classList.remove('session-mode');
-    document.querySelector('.main-nav')?.classList.remove('hidden');
-    S.play.innerHTML = S.homeMarkup();
-    openPage('play');
+    S.currentSession = null;
+    S.mount(S.homeMarkup(), { session: false });
     S.play.querySelector('[data-home-mode="guided"]').addEventListener('click', () => S.renderSetup('guided'));
     S.play.querySelector('[data-home-mode="autonomous"]').addEventListener('click', () => S.renderSetup('autonomous'));
     S.play.querySelector('[data-home-resume]')?.addEventListener('click', () => S.resume(S.load()));
-    window.scrollTo({ top: 0, behavior: 'auto' });
   };
 
 })();
