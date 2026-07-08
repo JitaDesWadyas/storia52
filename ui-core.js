@@ -119,7 +119,12 @@ function storySlip(title,type,card){
   return `<div class="story-slip"><span class="slip-card${red}">${cardLabel(card)}</span><small>${title.toUpperCase()}</small>${cardText(type,card)}</div>`;
 }
 function storyStack(story,seed){const complete=withStoryGoal(story,seed);return `<div class="story-stack">${storySlip('Protagonista','protagonist',complete.protagonist)}${storySlip('Situazione','situation',complete.situation)}${storySlip('Obiettivo della storia','objective',complete.goal)}${storySlip('Problema','problem',complete.problem)}</div>`}
-function secretContent(card){return `<div class="secret-content"><div class="secret-rank">${cardLabel(card)}</div><div class="secret-type">OBIETTIVO SEGRETO</div><p>${cardText('objective',card)}</p><small class="secret-final"><b>FINALE DA RAGGIUNGERE</b><br>${cardText('finale',card)}</small></div>`}
+function secretContent(card){
+  if(card?.custom){
+    return `<div class="secret-content"><div class="secret-rank">${escapeHtml(card.title||'Obiettivo')}</div><div class="secret-type">OBIETTIVO SEGRETO</div><p>${escapeHtml(card.text)}</p><small class="secret-final"><b>FINALE DA RAGGIUNGERE</b><br>${escapeHtml(card.finale)}</small></div>`;
+  }
+  return `<div class="secret-content"><div class="secret-rank">${cardLabel(card)}</div><div class="secret-type">OBIETTIVO SEGRETO</div><p>${cardText('objective',card)}</p><small class="secret-final"><b>FINALE DA RAGGIUNGERE</b><br>${cardText('finale',card)}</small></div>`
+}
 function secretClosed(label='Obiettivo nascosto',sub='Assicurati che nessuno guardi.'){
   return `<div class="secret-closed"><span class="secret-lock" aria-hidden="true">♠</span><b>${label}</b><p>${sub}</p><small>PREMI “RIVELA” QUANDO SEI PRONTO</small></div>`;
 }
