@@ -7,7 +7,14 @@
     url.hash = 'play';
     url.searchParams.set('invite', '1');
     url.searchParams.set('name', session.names[index]);
-    url.searchParams.set('objective', serializeCard(objective));
+    if (objective?.custom) {
+      url.searchParams.set('objectiveType', 'custom');
+      url.searchParams.set('objectiveTitle', objective.title || 'Obiettivo');
+      url.searchParams.set('objectiveText', objective.text || '');
+      url.searchParams.set('objectiveFinale', objective.finale || '');
+    } else {
+      url.searchParams.set('objective', serializeCard(objective));
+    }
     url.searchParams.set('source', session.source);
     if (session.source === 'ready') url.searchParams.set('ready', session.readyStoryId);
     else url.searchParams.set('story', serializeStory(session.story));
