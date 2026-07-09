@@ -37,9 +37,9 @@
     catch { /* Nessuna azione richiesta. */ }
   };
 
-  S.mount = (html, { session = false, scroll = true } = {}) => {
+  S.mount = (html, { session = false, scroll = true, animate = scroll } = {}) => {
     const previousY = window.scrollY;
-    S.play.innerHTML = `<div class="screen screen-enter">${html}</div>`;
+    S.play.innerHTML = `<div class="screen${animate ? ' screen-enter' : ''}">${html}</div>`;
     S.play.classList.add('active');
     document.body.classList.toggle('session-mode', session);
     const exitButton = document.querySelector('#headerExit');
@@ -47,7 +47,7 @@
     const url = new URL(location.href);
     url.hash = 'play';
     history.replaceState(null, '', url);
-    requestAnimationFrame(() => S.play.querySelector('.screen')?.classList.remove('screen-enter'));
+    if (animate) requestAnimationFrame(() => S.play.querySelector('.screen')?.classList.remove('screen-enter'));
     if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
     else requestAnimationFrame(() => window.scrollTo({ top: previousY, behavior: 'auto' }));
   };
