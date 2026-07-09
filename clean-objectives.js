@@ -3,7 +3,8 @@
   const S = window.S52;
   S.continueAfterSource = session => {
     S.save(session);
-    S.renderObjectives(session);
+    if (session.delivery === 'multi') S.renderInvites(session);
+    else S.renderObjectives(session);
   };
 
   S.renderObjectives = (session, scroll = true) => {
