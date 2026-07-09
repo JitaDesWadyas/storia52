@@ -128,9 +128,9 @@
 
   S.storyContextMarkup = session => {
     const story = S.readyStory(session);
-    if (story) return `<div class="story-summary"><p class="eyebrow">${S.esc(story.title)}</p><div class="opening-box">${S.highlightStoryOpening ? S.highlightStoryOpening(story) : S.esc(story.opening)}</div></div>`;
+    if (story) return `<div class="story-summary"><article class="ready-story context-story-preview"><div class="meta"><span>${S.esc(S.categories[story.category]?.symbol || '')} ${S.esc(S.categories[story.category]?.label || 'STORIA PRONTA')}</span><span>${String(S.stories.indexOf(story) + 1).padStart(2, '0')}/52</span></div><h3>${S.esc(story.title)}</h3><p>${S.highlightStoryOpening ? S.highlightStoryOpening(story) : S.esc(story.opening)}</p></article></div>`;
     const opening = session.openingText
-      ? `<p class="eyebrow">INCIPIT</p><div class="opening-box">${S.highlightOpeningText ? S.highlightOpeningText(session.openingText, session) : S.esc(session.openingText)}</div>`
+      ? `<article class="ready-story context-story-preview"><div class="meta"><span>INCIPIT INVENTATO</span><span>4 CARTE</span></div><h3>Incipit</h3><p>${S.highlightOpeningText ? S.highlightOpeningText(session.openingText, session) : S.esc(session.openingText)}</p></article>`
       : `<div class="hint"><b>La storia viene inventata a voce.</b> Usate le quattro informazioni qui sotto come punto di partenza.</div>`;
     return `<div class="story-summary">${opening}${S.storyCardsMarkup(session)}</div>`;
   };

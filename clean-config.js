@@ -12,8 +12,9 @@
     session.mode = 'play';
     session.stage = 'setup';
     session.source ||= 'ready';
+    session.delivery ||= 'single';
     S.save(session);
-    S.mount(`<section class="surface"><div class="screen-heading"><p class="eyebrow">NUOVA PARTITA</p><h2>Preparate la partita.</h2><p>Di base partite da una storia pronta. Se volete, potete ancora inventare l’incipit con le carte.</p></div>${namesMarkup(session)}<div class="section-title"><span>INCIPIT</span><h3>Da dove parte la storia?</h3></div><div class="option-grid">${option('ready', session.source === 'ready', '52', 'Scegliamo una storia pronta', 'È il modo più chiaro e veloce per iniziare.', 'data-source')}${option('cards', session.source === 'cards', '4', 'Inventiamo noi l’incipit', 'L’app pesca quattro informazioni. Voi costruite la scena iniziale.', 'data-source')}</div><div class="actions one"><button type="button" class="primary" data-setup-continue>Continua</button></div></section>`, { session: true, scroll });
+    S.mount(`<section class="surface"><div class="screen-heading"><p class="eyebrow">NUOVA PARTITA</p><h2>Preparate la partita.</h2><p>Di base partite da una storia pronta. Potete usare <strong>un solo telefono</strong> oppure mandare un link/QR personale a ogni giocatore.</p></div>${namesMarkup(session)}<div class="section-title"><span>INCIPIT</span><h3>Da dove parte la storia?</h3></div><div class="option-grid">${option('ready', session.source === 'ready', '52', 'Scegliamo una storia pronta', 'È il modo più chiaro e veloce per iniziare.', 'data-source')}${option('cards', session.source === 'cards', '4', 'Inventiamo noi l’incipit', 'L’app pesca quattro informazioni. Voi costruite la scena iniziale.', 'data-source')}</div><div class="section-title"><span>OBIETTIVI SEGRETI</span><h3>Come li leggono i giocatori?</h3></div><div class="option-grid">${option('single', session.delivery === 'single', '1', 'Un telefono', 'Si passa lo stesso telefono: ognuno apre solo il proprio obiettivo.', 'data-delivery')}${option('multi', session.delivery === 'multi', 'QR', 'Telefoni separati', 'Ogni giocatore riceve link e QR personale con storia e obiettivo.', 'data-delivery')}</div><div class="actions one"><button type="button" class="primary" data-setup-continue>Continua</button></div></section>`, { session: true, scroll });
 
     const sync = () => {
       S.play.querySelectorAll('[data-player-name]').forEach(input => { session.names[Number(input.dataset.playerName)] = input.value; });
@@ -34,6 +35,13 @@
       sync();
       session.source = button.dataset.source;
       S.play.querySelectorAll('[data-source]').forEach(item => item.classList.toggle('selected', item === button));
+      S.save(session);
+    }));
+
+    S.play.querySelectorAll('[data-delivery]').forEach(button => button.addEventListener('click', () => {
+      sync();
+      session.delivery = button.dataset.delivery;
+      S.play.querySelectorAll('[data-delivery]').forEach(item => item.classList.toggle('selected', item === button));
       S.save(session);
     }));
 
