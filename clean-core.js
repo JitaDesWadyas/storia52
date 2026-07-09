@@ -130,7 +130,7 @@
     const story = S.readyStory(session);
     if (story) return `<div class="story-summary"><p class="eyebrow">${S.esc(story.title)}</p><div class="opening-box">${S.highlightStoryOpening ? S.highlightStoryOpening(story) : S.esc(story.opening)}</div></div>`;
     const opening = session.openingText
-      ? `<div class="opening-box">${S.esc(session.openingText)}</div>`
+      ? `<p class="eyebrow">INCIPIT</p><div class="opening-box">${S.highlightOpeningText ? S.highlightOpeningText(session.openingText, session) : S.esc(session.openingText)}</div>`
       : `<div class="hint"><b>La storia viene inventata a voce.</b> Usate le quattro informazioni qui sotto come punto di partenza.</div>`;
     return `<div class="story-summary">${opening}${S.storyCardsMarkup(session)}</div>`;
   };
