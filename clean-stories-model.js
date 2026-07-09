@@ -13,9 +13,20 @@
   };
   S.chooseReadyStory = (session, story) => {
     if (!story) return;
+    session.source = 'ready';
     session.readyStoryId = story.id;
     session.openingText = story.opening;
     session.spokenOpening = false;
     S.continueAfterSource(session);
+  };
+  S.changeReadyStory = session => {
+    session.source = 'ready';
+    session.stage = 'stories';
+    session.readyStoryId = '';
+    session.openingText = '';
+    session.spokenOpening = false;
+    session.confirmed = Array(session.count).fill(false);
+    S.save(session);
+    S.renderStories(session);
   };
 })();

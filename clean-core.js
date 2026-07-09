@@ -39,7 +39,7 @@
 
   S.mount = (html, { session = false, scroll = true } = {}) => {
     const previousY = window.scrollY;
-    S.play.innerHTML = `<div class="screen">${html}</div>`;
+    S.play.innerHTML = `<div class="screen screen-enter">${html}</div>`;
     S.play.classList.add('active');
     document.body.classList.toggle('session-mode', session);
     const exitButton = document.querySelector('#headerExit');
@@ -47,7 +47,8 @@
     const url = new URL(location.href);
     url.hash = 'play';
     history.replaceState(null, '', url);
-    if (scroll) window.scrollTo({ top: 0, behavior: 'auto' });
+    requestAnimationFrame(() => S.play.querySelector('.screen')?.classList.remove('screen-enter'));
+    if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
     else requestAnimationFrame(() => window.scrollTo({ top: previousY, behavior: 'auto' }));
   };
 
@@ -55,10 +56,14 @@
     const host = document.createElement('div');
     host.className = `modal ${className}`;
     host.innerHTML = `<div class="modal-card${wide ? ' wide' : ''}"><button type="button" class="modal-close" aria-label="Chiudi">×</button><h2>${S.esc(title)}</h2>${body}</div>`;
-    const close = () => host.remove();
+    const close = () => {
+      host.classList.add('closing');
+      setTimeout(() => host.remove(), 140);
+    };
     host.addEventListener('click', event => { if (event.target === host) close(); });
     host.querySelector('.modal-close').addEventListener('click', close);
     document.body.appendChild(host);
+    requestAnimationFrame(() => host.classList.add('open'));
     return { host, close };
   };
 
@@ -80,12 +85,12 @@
     const count = 4;
     const session = {
       version: 3,
-      mode,
+      mode: mode || 'play',
       delivery: 'single',
       stage: 'setup',
       count,
       names: Array(count).fill(''),
-      source: 'cards',
+      source: 'ready',
       seed,
       story: storyFromSeed(seed),
       readyStoryId: '',
@@ -123,7 +128,7 @@
 
   S.storyContextMarkup = session => {
     const story = S.readyStory(session);
-    if (story) return `<div class="story-summary"><p class="eyebrow">${S.esc(story.title)}</p><div class="opening-box">${S.esc(story.opening)}</div></div>`;
+    if (story) return `<div class="story-summary"><p class="eyebrow">${S.esc(story.title)}</p><div class="opening-box">${S.highlightStoryOpening ? S.highlightStoryOpening(story) : S.esc(story.opening)}</div></div>`;
     const opening = session.openingText
       ? `<div class="opening-box">${S.esc(session.openingText)}</div>`
       : `<div class="hint"><b>La storia viene inventata a voce.</b> Usate le quattro informazioni qui sotto come punto di partenza.</div>`;

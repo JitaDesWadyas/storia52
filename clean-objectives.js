@@ -3,8 +3,7 @@
   const S = window.S52;
   S.continueAfterSource = session => {
     S.save(session);
-    if (session.mode === 'autonomous' && session.delivery === 'multi') S.renderInvites(session);
-    else S.renderObjectives(session);
+    S.renderObjectives(session);
   };
 
   S.renderObjectives = (session, scroll = true) => {
