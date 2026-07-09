@@ -8,14 +8,14 @@
     .map(word => word.trim())
     .filter(word => word.length >= 5 && !/^(della|delle|degli|dallo|dalla|dalle|quell|quando|prima|dopo|mentre|senza|nella|nelle|nell|alla|allo|agli|come|sono|stato|stata|vuole|deve|trova|scopre)$/i.test(word));
 
-  const highlight = (text, terms) => {
+  const boldTerms = (text, terms) => {
     const unique = [...new Set(terms)].slice(0, 9);
     if (!unique.length) return S.esc(text);
     const pattern = new RegExp(`\\b(${unique.map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\b`, 'gi');
-    return S.esc(text).replace(pattern, '<mark>$1</mark>');
+    return S.esc(text).replace(pattern, '<strong>$1</strong>');
   };
 
-  S.highlightStoryOpening = story => highlight(story.opening, [
+  S.highlightStoryOpening = story => boldTerms(story.opening, [
     ...wordsFrom(story.title),
     ...wordsFrom(story.protagonist).slice(0, 2),
     ...wordsFrom(story.objective).slice(0, 3),
