@@ -1,4 +1,4 @@
-const CACHE='storia52-clean-v16';
+const CACHE='epoi-clean-v1';
 const FILES=[
   './','index.html','clean-app.css','refine-flow.css','home-product.css','app.js','ui-core.js','ready-stories-data.js',
   'clean-core.js','clean-rules.js','creator-photo.js','creator-jita.svg','clean-home.js','clean-config.js','clean-opening.js',
