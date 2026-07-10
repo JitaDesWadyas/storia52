@@ -40,7 +40,7 @@
       const index = Number(button.dataset.inviteIndex);
       const url = links[index];
       if (navigator.share) {
-        try { await navigator.share({ title: 'STORIA 52', text: `Invito per ${session.names[index]}`, url }); }
+        try { await navigator.share({ title: 'E POI?', text: `Invito per ${session.names[index]}`, url }); }
         catch { /* Condivisione annullata. */ }
       } else S.copy(url, 'Link copiato');
     }));
