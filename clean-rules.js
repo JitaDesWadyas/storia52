@@ -3,13 +3,38 @@
 (() => {
   const S = window.S52;
 
-  S.cardRulesMarkup = () => `<div class="suit-rules"><p><b class="red">♥ Cuori pari</b><span>Un legame aiuta, migliora o salva la situazione.</span></p><p><b class="red">♥ Cuori dispari</b><span>Un legame peggiora, tradisce o crea tensione.</span></p><p><b class="red">♦ Quadri pari</b><span>Compare un indizio, una risorsa o una scoperta utile.</span></p><p><b class="red">♦ Quadri dispari</b><span>La scoperta è pericolosa, falsa o costa qualcosa.</span></p><p><b>♣ Fiori</b><span>Qualcuno agisce: scelta, movimento, piano, intervento.</span></p><p><b>♠ Picche</b><span>Arriva un ostacolo: perdita, limite, danno, conseguenza.</span></p></div><div class="figure-grid"><p><b>J</b><span>Nuovo oggetto</span></p><p><b>Q</b><span>Nuovo personaggio</span></p><p><b>K</b><span>Nuovo luogo</span></p><p><b>A</b><span>Ribalta la situazione</span></p></div><div class="figure-tone"><p><b class="red">Figure rosse</b><span>L’elemento entra a favore di chi racconta.</span></p><p><b>Figure nere</b><span>L’elemento entra come problema o costo.</span></p></div>`;
+  S.cardRulesMarkup = () => `<div class="card-rules-compact">
+    <section class="rule-group rule-group-suits">
+      <h4>Semi</h4>
+      <div class="suit-rules">
+        <article class="rule-card"><b class="red">♥ Cuori pari</b><strong>Legame positivo</strong><span>Un rapporto aiuta o migliora la situazione.</span><em>La guardia riconosce il protagonista e lo lascia passare.</em></article>
+        <article class="rule-card"><b class="red">♥ Cuori dispari</b><strong>Legame negativo</strong><span>Un rapporto crea tensione o peggiora la situazione.</span><em>L’amico tradisce il protagonista e rivela il suo nascondiglio.</em></article>
+        <article class="rule-card"><b class="red">♦ Quadri pari</b><strong>Scoperta positiva</strong><span>Viene scoperto qualcosa di utile.</span><em>Il protagonista trova la chiave che apre la cassaforte.</em></article>
+        <article class="rule-card"><b class="red">♦ Quadri dispari</b><strong>Scoperta negativa</strong><span>Viene scoperto qualcosa che complica la situazione.</span><em>Il protagonista scopre che la macchina è guasta.</em></article>
+        <article class="rule-card"><b>♣ Fiori</b><strong>Azione</strong><span>Un personaggio agisce e manda avanti la storia.</span><em>Il protagonista prova a far partire la macchina.</em></article>
+        <article class="rule-card"><b>♠ Picche</b><strong>Ostacolo</strong><span>Accade qualcosa che rende tutto più difficile.</span><em>La strada viene bloccata prima che il gruppo possa fuggire.</em></article>
+      </div>
+    </section>
+    <section class="rule-group rule-group-figures">
+      <h4>Figure e assi</h4>
+      <div class="figure-grid">
+        <article class="figure-card"><b>J</b><strong>Nuovo oggetto</strong><em>Il protagonista trova una pistola nel cassetto.</em></article>
+        <article class="figure-card"><b>Q</b><strong>Nuovo personaggio</strong><em>Una detective entra nella stanza e inizia a fare domande.</em></article>
+        <article class="figure-card"><b>K</b><strong>Nuovo luogo</strong><em>Il gruppo scopre un bunker nascosto sotto la casa.</em></article>
+        <article class="figure-card"><b>A</b><strong>Colpo di scena</strong><em>La persona che sembrava una vittima rivela di aver organizzato tutto.</em></article>
+      </div>
+      <div class="figure-tone">
+        <article class="tone-card"><b class="red">Figura rossa</b><strong>Entra a favore</strong><em>La detective decide di aiutare il protagonista.</em></article>
+        <article class="tone-card"><b>Figura nera</b><strong>Entra come problema</strong><em>La detective capisce che il protagonista sta mentendo.</em></article>
+      </div>
+    </section>
+  </div>`;
 
   S.turnGuideMarkup = () => `<section class="game-card"><h3>Turno veloce</h3><div class="turn-grid"><article class="turn-step"><span>1</span><div><b>Pesca o sistema la mano</b><p>All’inizio del turno devi avere una carta giocabile. Se vuoi, scarta una carta e pescane una.</p></div></article><article class="turn-step"><span>2</span><div><b>Gioca una carta</b><p>Usa seme e valore per decidere cosa cambia nella scena.</p></div></article><article class="turn-step"><span>3</span><div><b>Aggiungi un fatto</b><p>Non cancellare ciò che esiste già. Aggiungi un fatto chiaro, collegato alla storia.</p></div></article><article class="turn-step"><span>4</span><div><b>Punta al tuo finale</b><p>Puoi spingere la storia verso il tuo obiettivo, ma deve restare credibile per tutti.</p></div></article></div></section>`;
 
   S.finalRulesMarkup = () => `<div class="numbered"><p><i>1</i><span>Puoi provare a chiudere solo quando giochi l’ultima carta che hai in mano.</span></p><p><i>2</i><span>Rivela il tuo obiettivo segreto.</span></p><p><i>3</i><span>Racconta un finale che lo raggiunge usando elementi già comparsi.</span></p><p><i>4</i><span>Gli altri accettano il finale se è coerente. Se non regge, si continua.</span></p></div>`;
 
-  S.rulesMarkup = () => `<div class="rules-menu"><p class="rules-menu-intro">Regole rapide: aprite solo la parte che serve. Nessuna sezione resta aperta da sola.</p><div class="rulebook"><details><summary>1. Preparazione</summary><div class="body numbered"><p><i>1</i><span>Scegliete una storia pronta oppure inventate l’incipit con le carte.</span></p><p><i>2</i><span>Togliete i jolly, mescolate e date 5 carte a testa.</span></p><p><i>3</i><span>Ogni giocatore legge il proprio obiettivo segreto senza mostrarlo.</span></p></div></details><details><summary>2. Significato delle carte</summary><div class="body">${S.cardRulesMarkup()}</div></details><details><summary>3. Turno</summary><div class="body">${S.turnGuideMarkup()}</div></details><details><summary>4. Finale</summary><div class="body">${S.finalRulesMarkup()}</div></details></div></div>`;
+  S.rulesMarkup = () => `<div class="rules-menu"><p class="rules-menu-intro">Apri solo la parte che serve. Il principio è semplice: ogni carta aggiunge un fatto alla storia.</p><div class="rulebook"><details><summary>1. Preparazione</summary><div class="body numbered"><p><i>1</i><span>Scegliete una storia pronta oppure inventate l’incipit con le carte.</span></p><p><i>2</i><span>Togliete i jolly, mescolate e date 5 carte a testa.</span></p><p><i>3</i><span>Ogni giocatore legge il proprio obiettivo segreto senza mostrarlo.</span></p></div></details><details><summary>2. Significato delle carte</summary><div class="body">${S.cardRulesMarkup()}</div></details><details><summary>3. Turno</summary><div class="body">${S.turnGuideMarkup()}</div></details><details><summary>4. Finale</summary><div class="body">${S.finalRulesMarkup()}</div></details></div></div>`;
 
   S.openRulesModal = () => S.modal('Regole di STORIA 52', S.rulesMarkup(), { wide: true, className: 'rules-modal' });
 })();
