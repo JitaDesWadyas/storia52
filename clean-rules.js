@@ -36,5 +36,5 @@
 
   S.rulesMarkup = () => `<div class="rules-menu"><p class="rules-menu-intro">Apri solo la parte che serve. Il principio è semplice: ogni carta aggiunge un fatto alla storia.</p><div class="rulebook"><details><summary>1. Preparazione</summary><div class="body numbered"><p><i>1</i><span>Scegliete una storia pronta oppure inventate l’incipit con le carte.</span></p><p><i>2</i><span>Togliete i jolly, mescolate e date 5 carte a testa.</span></p><p><i>3</i><span>Ogni giocatore legge il proprio obiettivo segreto senza mostrarlo.</span></p></div></details><details><summary>2. Significato delle carte</summary><div class="body">${S.cardRulesMarkup()}</div></details><details><summary>3. Turno</summary><div class="body">${S.turnGuideMarkup()}</div></details><details><summary>4. Finale</summary><div class="body">${S.finalRulesMarkup()}</div></details></div></div>`;
 
-  S.openRulesModal = () => S.modal('Regole di STORIA 52', S.rulesMarkup(), { wide: true, className: 'rules-modal' });
+  S.openRulesModal = () => S.modal('Regole di E POI?', S.rulesMarkup(), { wide: true, className: 'rules-modal' });
 })();
