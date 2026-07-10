@@ -70,21 +70,28 @@
     const saved = S.load();
     return `<section class="surface hero product-hero">
       <div class="hero-copy">
-        <p class="eyebrow">GIOCO NARRATIVO · CARTE · OBIETTIVI SEGRETI</p>
-        <h2>Un gioco che mette alla prova creatività, immaginazione e capacità di improvvisare.</h2>
-        <p>Ogni giocatore aggiunge una scena alla storia seguendo le carte che gioca. Mentre la trama prende forma, ognuno cerca di guidarla verso il proprio obiettivo segreto... senza far capire agli altri quale sia.</p>
+        <div class="hero-kicker"><p class="eyebrow">GIOCO NARRATIVO · CARTE · OBIETTIVI SEGRETI</p></div>
+        <h2 class="hero-title">
+          <span class="line">Un gioco che mette alla prova</span>
+          <span class="line line-accent">creatività e immaginazione,</span>
+          <span class="line line-final">improvvisando.</span>
+        </h2>
+        <p class="hero-intro">Aggiungi una scena seguendo le carte. Mentre la storia prende forma, prova a guidarla verso il tuo <strong>obiettivo segreto</strong> senza farti scoprire.</p>
+        <div class="hero-divider" aria-hidden="true"><span>Una storia · più piani</span></div>
       </div>
       <div class="hero-actions">
-        <button type="button" class="primary" data-home-play>Gioca ora</button>
-        <button type="button" class="secondary" data-open-panel="tutorial">Guarda il tutorial</button>
+        <button type="button" class="primary" data-home-play><span class="button-icon" aria-hidden="true">52</span><span>Gioca ora</span><span class="button-arrow" aria-hidden="true">→</span></button>
+        <button type="button" class="secondary" data-open-panel="tutorial"><span class="button-icon" aria-hidden="true">▶</span><span>Guarda il tutorial</span><span class="button-arrow" aria-hidden="true">↗</span></button>
       </div>
     </section>
 
+    <div class="home-divider" aria-hidden="true"><span>✦</span></div>
+
     <div class="home-grid product-menu compact-product-menu">
       ${saved ? `<button type="button" class="resume-card" data-home-resume><span class="index">↻</span><span><b>Riprendi la partita</b><small>${S.esc(S.sourceLabel(saved))} · ${saved.count || 0} giocatori</small></span><i>→</i></button>` : ''}
-      <button type="button" class="choice-card" data-open-panel="how"><span class="index">?</span><span><b>Come si gioca</b><small>Versione breve: carte, scene, obiettivi segreti e finale.</small></span><i>↗</i></button>
-      <button type="button" class="choice-card" data-open-panel="rules"><span class="index">📖</span><span><b>Regole</b><small>Regolamento completo in popup, senza appesantire la home.</small></span><i>↗</i></button>
-      <button type="button" class="choice-card" data-open-panel="info"><span class="index">ℹ</span><span><b>Info e creatore</b><small>Curriculum del progetto, roadmap, social e supporto.</small></span><i>↗</i></button>
+      <button type="button" class="choice-card" data-open-panel="how"><span class="index">?</span><span><b>Inizia da qui</b><small>Il gioco spiegato in 2 minuti.</small></span><i>→</i></button>
+      <button type="button" class="choice-card" data-open-panel="rules"><span class="index">📖</span><span><b>Le regole complete</b><small>Tutte le meccaniche, quando ti servono.</small></span><i>→</i></button>
+      <button type="button" class="choice-card" data-open-panel="info"><span class="index">ℹ</span><span><b>Dietro STORIA 52</b><small>Il progetto, il creatore e cosa arriverà.</small></span><i>→</i></button>
     </div>`;
   };
 
