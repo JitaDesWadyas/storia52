@@ -11,7 +11,7 @@
       badge: 'INIZIO',
       player: 'La storia',
       suit: 'start',
-      card: '52',
+      card: '?',
       label: 'Un solo incipit',
       title: 'Tutti partono dalla stessa scena.',
       instruction: 'Ogni giocatore riceve un obiettivo segreto. Nessuno sa cosa vogliono ottenere gli altri.',
@@ -120,8 +120,8 @@
   const tutorialMarkup = () => `<div class="screen-heading modal-heading tutorial-heading"><p class="eyebrow">TUTORIAL INTERATTIVO</p><h2>Una partita in meno di un minuto.</h2><p>Segui tre giocatori mentre costruiscono <strong>la stessa storia</strong> e provano, di nascosto, a piegarla verso tre finali diversi.</p></div><div data-tutorial-host>${stepMarkup(0)}</div><div class="tutorial-actions"><button type="button" class="secondary" data-tutorial-prev disabled>Indietro</button><button type="button" class="primary" data-tutorial-next>Inizia la partita <span aria-hidden="true">→</span></button></div>`;
 
   const infoMarkup = () => `<div class="screen-heading modal-heading"><p class="eyebrow">INFO · CREDITI · ROADMAP</p><h2>Un progetto pensato per diventare un gioco completo.</h2><p>La web app è il primo passo: <strong>testare il ritmo</strong>, sistemare le storie, rifinire le regole e arrivare a una versione fisica con carte, scatola e regolamento.</p></div><div class="creator-resume">
-    <article class="creator-hero-card"><img src="${CREATOR_PHOTO}" alt="Foto del creatore Jita DesWadyas"><div><p class="eyebrow">CREATORE</p><h3>Jita DesWadyas <span>/ JitaDiSwadya (IT)</span></h3><p>Creatore di <strong>STORIA 52</strong>. L'obiettivo è creare un gioco immediato, sociale e mentale: <span class="amber-text">poche regole</span>, molta improvvisazione, finali diversi ogni volta.</p></div></article>
-    <div class="resume-timeline"><article><span>01</span><div><b>Concept</b><p>Gioco narrativo competitivo: tutti costruiscono la stessa storia, ma ognuno prova a guidarla verso un obiettivo segreto.</p></div></article><article><span>02</span><div><b>Web app</b><p>Versione rapida per provare partite, regole, tutorial e 52 storie pronte.</p></div></article><article><span>03</span><div><b>Roadmap</b><p>Più storie, account opzionale, modalità extra, mazzo personalizzato e possibile versione fisica.</p></div></article></div>
+    <article class="creator-hero-card"><img src="${CREATOR_PHOTO}" alt="Foto del creatore Jita DesWadyas"><div><p class="eyebrow">CREATORE</p><h3>Jita DesWadyas <span>/ JitaDiSwadya (IT)</span></h3><p>Creatore di <strong>E POI?</strong>. L'obiettivo è creare un gioco immediato, sociale e mentale: <span class="amber-text">poche regole</span>, molta improvvisazione, finali diversi ogni volta.</p></div></article>
+    <div class="resume-timeline"><article><span>01</span><div><b>Concept</b><p>Gioco narrativo competitivo: tutti costruiscono la stessa storia, ma ognuno prova a guidarla verso un obiettivo segreto.</p></div></article><article><span>02</span><div><b>Web app</b><p>Versione rapida per provare partite, regole, tutorial e storie pronte.</p></div></article><article><span>03</span><div><b>Roadmap</b><p>Più storie, account opzionale, modalità extra, mazzo personalizzato e possibile versione fisica.</p></div></article></div>
     <div class="creator-tags"><span>Game design</span><span>Narrazione</span><span>Web app</span><span>Carte</span><span>Social in arrivo</span><span>Donazioni in arrivo</span></div>
   </div>`;
 
@@ -139,7 +139,7 @@
         <div class="hero-divider" aria-hidden="true"><span>Una storia · più piani</span></div>
       </div>
       <div class="hero-actions">
-        <button type="button" class="primary" data-home-play><span class="button-icon" aria-hidden="true">52</span><span>Gioca ora</span><span class="button-arrow" aria-hidden="true">→</span></button>
+        <button type="button" class="primary" data-home-play><span class="button-icon" aria-hidden="true">?</span><span>Gioca ora</span><span class="button-arrow" aria-hidden="true">→</span></button>
         <button type="button" class="secondary" data-open-panel="tutorial"><span class="button-icon" aria-hidden="true">▶</span><span>Guarda il tutorial</span><span class="button-arrow" aria-hidden="true">↗</span></button>
       </div>
     </section>
@@ -150,7 +150,7 @@
       ${saved ? `<button type="button" class="resume-card" data-home-resume><span class="index">↻</span><span><b>Riprendi la partita</b><small>${S.esc(S.sourceLabel(saved))} · ${saved.count || 0} giocatori</small></span><i>→</i></button>` : ''}
       <button type="button" class="choice-card" data-open-panel="how"><span class="index">?</span><span><b>Inizia da qui</b><small>Il gioco spiegato in 2 minuti.</small></span><i>→</i></button>
       <button type="button" class="choice-card" data-open-panel="rules"><span class="index">📖</span><span><b>Le regole complete</b><small>Tutte le meccaniche, quando ti servono.</small></span><i>→</i></button>
-      <button type="button" class="choice-card creator-menu-card" data-open-panel="info"><span class="creator-menu-image" aria-hidden="true"><img src="storia52-cards-logo.svg" alt=""></span><span><b>Dietro STORIA 52</b><small>Come nasce il gioco, chi lo crea e dove vuole arrivare.</small></span><i>→</i></button>
+      <button type="button" class="choice-card creator-menu-card" data-open-panel="info"><span class="creator-menu-image" aria-hidden="true"><img src="storia52-cards-logo.svg" alt=""></span><span><b>Dietro E POI?</b><small>Come nasce il gioco, chi lo crea e dove vuole arrivare.</small></span><i>→</i></button>
     </div>`;
   };
 
