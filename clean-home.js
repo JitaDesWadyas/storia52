@@ -91,7 +91,7 @@
       ${saved ? `<button type="button" class="resume-card" data-home-resume><span class="index">↻</span><span><b>Riprendi la partita</b><small>${S.esc(S.sourceLabel(saved))} · ${saved.count || 0} giocatori</small></span><i>→</i></button>` : ''}
       <button type="button" class="choice-card" data-open-panel="how"><span class="index">?</span><span><b>Inizia da qui</b><small>Il gioco spiegato in 2 minuti.</small></span><i>→</i></button>
       <button type="button" class="choice-card" data-open-panel="rules"><span class="index">📖</span><span><b>Le regole complete</b><small>Tutte le meccaniche, quando ti servono.</small></span><i>→</i></button>
-      <button type="button" class="choice-card" data-open-panel="info"><span class="index">ℹ</span><span><b>Dietro STORIA 52</b><small>Il progetto, il creatore e cosa arriverà.</small></span><i>→</i></button>
+      <button type="button" class="choice-card creator-menu-card" data-open-panel="info"><span class="creator-menu-image" aria-hidden="true"><img src="storia52-cards-logo.svg" alt=""></span><span><b>Dietro STORIA 52</b><small>Come nasce il gioco, chi lo crea e dove vuole arrivare.</small></span><i>→</i></button>
     </div>`;
   };
 
