@@ -1,0 +1,15 @@
+/* Shared premium polish: decorative only, no layout-flow changes */
+:where(button,input,select,textarea,.surface,.game-card,.setup-panel,.option-card,.ready-story,.story-card,.accordion,.opening-box,.player-button){-webkit-tap-highlight-color:transparent}
+:where(button,input,select,textarea):focus-visible{outline:3px solid color-mix(in srgb,var(--amber) 42%,transparent);outline-offset:2px}
+.surface,.site-header,.game-card,.setup-panel,.option-card,.ready-story,.story-card,.accordion,.opening-box,.player-button,.question-card{background-image:linear-gradient(145deg,rgba(255,255,255,.055),transparent 34%)}
+.section-title{position:relative;padding-left:13px}.section-title::before{content:"";position:absolute;left:0;top:2px;bottom:2px;width:3px;border-radius:999px;background:linear-gradient(var(--amber),color-mix(in srgb,var(--amber) 12%,transparent))}
+.primary,.secondary,.danger,.header-button,.theme-toggle,.category-grid button,.pagination button,.ready-story button,.story-card-change{position:relative;overflow:hidden;box-shadow:inset 0 1px rgba(255,255,255,.18)}
+.primary:hover,.secondary:hover,.header-button:hover,.theme-toggle:hover,.category-grid button:hover,.pagination button:hover,.ready-story button:hover,.story-card-change:hover{box-shadow:0 8px 20px rgba(0,0,0,.11),inset 0 1px rgba(255,255,255,.2)}
+.field input,.field textarea,.field select,.story-toolbar input,.question-card textarea{transition:border-color .18s ease,box-shadow .18s ease,background-color .18s ease}.field input:focus,.field textarea:focus,.field select:focus,.story-toolbar input:focus,.question-card textarea:focus{border-color:var(--amber);box-shadow:0 0 0 3px color-mix(in srgb,var(--amber) 14%,transparent)}
+.choice-card,.resume-card,.option-card,.ready-story,.player-button,.story-card{backface-visibility:hidden}.choice-card:active,.resume-card:active,.option-card:active,.ready-story:active,.player-button:active{transform:scale(.99)}
+.accordion summary::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--amber);transform:scaleY(0);transition:transform .2s ease}.accordion[open] summary::before{transform:scaleY(1)}
+.hint,.tutorial-story{box-shadow:inset 0 1px rgba(255,255,255,.16)}
+.modal-card{box-shadow:0 24px 70px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.14)}
+html[data-theme="dark"] .surface,html[data-theme="dark"] .site-header,html[data-theme="dark"] .game-card,html[data-theme="dark"] .setup-panel,html[data-theme="dark"] .option-card,html[data-theme="dark"] .ready-story,html[data-theme="dark"] .story-card,html[data-theme="dark"] .accordion,html[data-theme="dark"] .opening-box,html[data-theme="dark"] .player-button{background-image:linear-gradient(145deg,rgba(255,209,102,.035),transparent 36%)}
+@media(max-width:620px){.section-title{padding-left:11px}.modal-card{border-radius:16px}.primary,.secondary,.danger{border-radius:11px}}
+@media(prefers-reduced-motion:reduce){.field input,.field textarea,.field select,.story-toolbar input,.question-card textarea,.accordion summary::before{transition:none}}
