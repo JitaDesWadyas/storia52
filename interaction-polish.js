@@ -8,7 +8,7 @@
 
   const animateRuleBody = (detail, opening) => {
     const body = detail.querySelector(':scope > .body');
-    if (!body) return;
+    if (!body) return Promise.resolve();
     body.getAnimations().forEach(animation => animation.cancel());
 
     if (opening) {
@@ -18,18 +18,22 @@
         body.style.height = 'auto';
         body.style.opacity = '1';
         detail.classList.add('is-open');
-        return;
+        return Promise.resolve();
       }
-      const animation = body.animate([
-        { height: '0px', opacity: 0, transform: 'translateY(-5px)' },
-        { height: `${targetHeight}px`, opacity: 1, transform: 'translateY(0)' }
-      ], { duration: 250, easing: 'cubic-bezier(.2,.8,.2,1)' });
-      animation.onfinish = () => {
-        body.style.height = 'auto';
-        body.style.opacity = '1';
-        detail.classList.add('is-open');
-      };
-      return;
+      return new Promise(resolve => {
+        const duration = Math.min(320, 180 + targetHeight * .035);
+        const animation = body.animate([
+          { height: '0px', opacity: 0, transform: 'translateY(-4px)' },
+          { height: `${targetHeight}px`, opacity: 1, transform: 'translateY(0)' }
+        ], { duration, easing: 'cubic-bezier(.2,.8,.2,1)' });
+        animation.onfinish = () => {
+          body.style.height = 'auto';
+          body.style.opacity = '1';
+          detail.classList.add('is-open');
+          resolve();
+        };
+        animation.oncancel = resolve;
+      });
     }
 
     const startHeight = body.getBoundingClientRect().height;
@@ -38,17 +42,21 @@
       body.style.height = '0px';
       body.style.opacity = '0';
       detail.open = false;
-      return;
+      return Promise.resolve();
     }
-    const animation = body.animate([
-      { height: `${startHeight}px`, opacity: 1, transform: 'translateY(0)' },
-      { height: '0px', opacity: 0, transform: 'translateY(-5px)' }
-    ], { duration: 190, easing: 'cubic-bezier(.4,0,.2,1)' });
-    animation.onfinish = () => {
-      body.style.height = '0px';
-      body.style.opacity = '0';
-      detail.open = false;
-    };
+    return new Promise(resolve => {
+      const animation = body.animate([
+        { height: `${startHeight}px`, opacity: 1, transform: 'translateY(0)' },
+        { height: '0px', opacity: 0, transform: 'translateY(-4px)' }
+      ], { duration: 170, easing: 'cubic-bezier(.4,0,.2,1)' });
+      animation.onfinish = () => {
+        body.style.height = '0px';
+        body.style.opacity = '0';
+        detail.open = false;
+        resolve();
+      };
+      animation.oncancel = resolve;
+    });
   };
 
   S.bindRulebook = root => {
@@ -65,15 +73,27 @@
         body.style.height = '0px';
         body.style.opacity = '0';
         summary.setAttribute('aria-expanded', 'false');
-        summary.addEventListener('click', event => {
+        summary.addEventListener('click', async event => {
           event.preventDefault();
+          if (rulebook.dataset.animating === 'true') return;
+          rulebook.dataset.animating = 'true';
+          const scroller = rulebook.closest('.modal-card') || rulebook;
+          const anchorTop = summary.getBoundingClientRect().top;
           const willOpen = !detail.open;
-          details.filter(other => other !== detail && other.open).forEach(other => {
+          const closings = details.filter(other => other !== detail && other.open).map(other => {
             other.querySelector(':scope > summary')?.setAttribute('aria-expanded', 'false');
-            animateRuleBody(other, false);
+            return animateRuleBody(other, false);
           });
+          await Promise.all(closings);
+          const shiftedTop = summary.getBoundingClientRect().top;
+          if ('scrollTop' in scroller) scroller.scrollTop += shiftedTop - anchorTop;
           summary.setAttribute('aria-expanded', String(willOpen));
-          animateRuleBody(detail, willOpen);
+          await animateRuleBody(detail, willOpen);
+          requestAnimationFrame(() => {
+            const finalTop = summary.getBoundingClientRect().top;
+            if ('scrollTop' in scroller) scroller.scrollTop += finalTop - anchorTop;
+            rulebook.dataset.animating = 'false';
+          });
         });
       });
     });
@@ -95,11 +115,7 @@
     }
     requestAnimationFrame(() => close?.focus({ preventScroll: true }));
     host.addEventListener('keydown', event => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        close?.click();
-        return;
-      }
+      if (event.key === 'Escape') { event.preventDefault(); close?.click(); return; }
       if (event.key !== 'Tab' || !card) return;
       const focusable = [...card.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(element => element.offsetParent !== null);
       if (!focusable.length) return;
@@ -121,7 +137,6 @@
     }));
     syncModalState();
   });
-
   observer.observe(document.body, { childList: true, subtree: true });
   document.querySelectorAll('.modal').forEach(enhanceModal);
 
