@@ -1,11 +1,10 @@
-const CACHE='epoi-clean-v1';
+const CACHE='epoi-interaction-v2';
 const FILES=[
-  './','index.html','clean-app.css','refine-flow.css','home-product.css','app.js','ui-core.js','ready-stories-data.js',
-  'clean-core.js','clean-rules.js','creator-photo.js','creator-jita.svg','clean-home.js','clean-config.js','clean-opening.js',
-  'clean-stories-model.js','clean-stories-markup.js','clean-stories-view.js',
-  'clean-objectives.js','clean-prep.js','clean-print.js','clean-invite-host.js',
-  'clean-invite-data.js','clean-exit.js','clean-init.js','icon.svg',
-  'storia52-cards-logo.svg','manifest.webmanifest'
+  './','index.html','clean-app.css','refine-flow.css','home-product.css','app-polish.css','home-fixes.css','tutorial-game.css','interaction-polish.css',
+  'app.js','ui-core.js','ready-stories-data.js','clean-core.js','clean-rules.js','creator-photo.js','creator-jita.svg','clean-home.js',
+  'clean-config.js','clean-opening.js','clean-stories-model.js','ready-story-objectives.js','clean-stories-markup.js','clean-stories-view.js',
+  'clean-objectives.js','clean-prep.js','clean-print.js','clean-invite-host.js','clean-invite-data.js','clean-exit.js','interaction-polish.js','clean-init.js',
+  'icon.svg','storia52-cards-logo.svg','manifest.webmanifest'
 ];
 self.addEventListener('install',event=>{
   self.skipWaiting();
