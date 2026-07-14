@@ -6,16 +6,6 @@
 
   const motionAllowed = () => !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  S.bindCreatorMedia = root => {
-    root.querySelectorAll('[data-creator-photo]').forEach(image => {
-      if (image.dataset.fallbackBound) return;
-      image.dataset.fallbackBound = 'true';
-      const revealFallback = () => image.closest('.creator-photo-frame')?.classList.add('is-fallback');
-      image.addEventListener('error', revealFallback, { once: true });
-      if (image.complete && image.naturalWidth === 0) revealFallback();
-    });
-  };
-
   const animateRuleBody = (detail, opening) => {
     const body = detail.querySelector(':scope > .body');
     if (!body) return;
@@ -23,23 +13,20 @@
 
     if (opening) {
       detail.open = true;
-      detail.classList.add('is-opening');
       const targetHeight = body.scrollHeight;
       if (!motionAllowed()) {
         body.style.height = 'auto';
         body.style.opacity = '1';
-        detail.classList.remove('is-opening');
         detail.classList.add('is-open');
         return;
       }
       const animation = body.animate([
         { height: '0px', opacity: 0, transform: 'translateY(-5px)' },
         { height: `${targetHeight}px`, opacity: 1, transform: 'translateY(0)' }
-      ], { duration: 260, easing: 'cubic-bezier(.2,.8,.2,1)' });
+      ], { duration: 250, easing: 'cubic-bezier(.2,.8,.2,1)' });
       animation.onfinish = () => {
         body.style.height = 'auto';
         body.style.opacity = '1';
-        detail.classList.remove('is-opening');
         detail.classList.add('is-open');
       };
       return;
@@ -56,7 +43,7 @@
     const animation = body.animate([
       { height: `${startHeight}px`, opacity: 1, transform: 'translateY(0)' },
       { height: '0px', opacity: 0, transform: 'translateY(-5px)' }
-    ], { duration: 210, easing: 'cubic-bezier(.4,0,.2,1)' });
+    ], { duration: 190, easing: 'cubic-bezier(.4,0,.2,1)' });
     animation.onfinish = () => {
       body.style.height = '0px';
       body.style.opacity = '0';
@@ -74,7 +61,7 @@
         const body = detail.querySelector(':scope > .body');
         if (!summary || !body) return;
         detail.open = false;
-        detail.classList.remove('is-open', 'is-opening');
+        detail.classList.remove('is-open');
         body.style.height = '0px';
         body.style.opacity = '0';
         summary.setAttribute('aria-expanded', 'false');
@@ -122,7 +109,6 @@
       if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     });
     S.bindRulebook(host);
-    S.bindCreatorMedia(host);
     syncModalState();
   };
 
@@ -132,10 +118,10 @@
       if (node.matches('.modal')) enhanceModal(node);
       node.querySelectorAll?.('.modal').forEach(enhanceModal);
       S.bindRulebook(node);
-      S.bindCreatorMedia(node);
     }));
     syncModalState();
   });
+
   observer.observe(document.body, { childList: true, subtree: true });
   document.querySelectorAll('.modal').forEach(enhanceModal);
 
