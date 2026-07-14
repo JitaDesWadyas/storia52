@@ -1,4 +1,4 @@
-const CACHE='epoi-interaction-v2';
+const CACHE='epoi-interface-v3';
 const FILES=[
   './','index.html','clean-app.css','refine-flow.css','home-product.css','app-polish.css','home-fixes.css','tutorial-game.css','interaction-polish.css',
   'app.js','ui-core.js','ready-stories-data.js','clean-core.js','clean-rules.js','creator-photo.js','creator-jita.svg','clean-home.js',
