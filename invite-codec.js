@@ -16,7 +16,8 @@
   };
 
   const base64UrlToBytes = value => {
-    const padded = String(value || '').replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(value.length / 4) * 4, '=');
+    const normalized = String(value || '');
+    const padded = normalized.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(normalized.length / 4) * 4, '=');
     const binary = atob(padded);
     return Uint8Array.from(binary, character => character.charCodeAt(0));
   };
@@ -25,7 +26,7 @@
     const raw = textEncoder.encode(text);
     if (!('CompressionStream' in window)) return `j${bytesToBase64Url(raw)}`;
     try {
-      const stream = new Blob([raw]).stream().pipeThrough(new CompressionStream('deflate-raw'));
+      const stream = new Blob([raw]).stream().pipeThrough(new CompressionStream('deflate'));
       const compressed = new Uint8Array(await new Response(stream).arrayBuffer());
       return compressed.length < raw.length ? `z${bytesToBase64Url(compressed)}` : `j${bytesToBase64Url(raw)}`;
     } catch {
@@ -38,7 +39,7 @@
     const bytes = base64UrlToBytes(code.slice(1));
     if (mode === 'j') return textDecoder.decode(bytes);
     if (mode !== 'z' || !('DecompressionStream' in window)) throw new Error('Formato invito non supportato');
-    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate'));
     return textDecoder.decode(await new Response(stream).arrayBuffer());
   };
 
