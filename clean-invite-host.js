@@ -12,22 +12,22 @@
     return url.toString();
   };
 
+  const brandMark = () => `<svg class="epoi-qr-brand" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect x="8" y="11" width="29" height="39" rx="7" fill="#fff9ee" stroke="#d69820" stroke-width="4" transform="rotate(-8 22.5 30.5)"/><rect x="26" y="14" width="29" height="39" rx="7" fill="#fff9ee" stroke="#2d2418" stroke-width="4" transform="rotate(8 40.5 33.5)"/><circle cx="35" cy="29" r="2.3" fill="#d69820"/><circle cx="46" cy="30.5" r="2.3" fill="#2d2418"/><path d="M35 40c4 3 8 3 12 0" fill="none" stroke="#2d2418" stroke-width="3" stroke-linecap="round"/></svg>`;
+
   const qrMarkup = (label, url, compact = false) => {
     let svg;
     try { svg = window.EpoiQr.toSvg(url, { dark: '#2d2418', light: '#fff9ee', margin: 4, label: `QR della partita ${label}` }); }
-    catch { svg = '<span class="qr-error">QR non disponibile. Usa il pulsante “Copia link”.</span>'; }
-    return `<span class="epoi-qr${compact ? ' is-compact' : ''}" data-qr-visual aria-label="QR della partita: ${S.esc(label)}">${svg}<span class="epoi-qr-logo" aria-hidden="true"><img src="storia52-cards-logo.svg" alt="" draggable="false"></span><i aria-hidden="true"></i></span>`;
+    catch { svg = '<span class="qr-error">QR non disponibile. Usa “Copia link”.</span>'; }
+    return `<span class="epoi-qr${compact ? ' is-compact' : ''}" data-qr-visual aria-label="QR della partita: ${S.esc(label)}">${svg}<span class="epoi-qr-logo" aria-hidden="true">${brandMark()}</span><i aria-hidden="true"></i></span>`;
   };
 
   S.openInviteQr = (label, url) => {
-    const body = `<div class="qr-modal-content"><p class="eyebrow">INVITO UNICO</p>${qrMarkup(label, url)}<h3>Scansiona, scegli il tuo nome, gioca.</h3><p>Il QR viene generato direttamente su questo dispositivo. Non passa da servizi esterni.</p><div class="modal-actions"><button type="button" class="primary" data-copy-qr-link>Copia link</button></div></div>`;
+    const body = `<div class="qr-modal-content"><p class="eyebrow">SCANSIONA PER ENTRARE</p>${qrMarkup(label, url)}<h3>Apri il link e scegli il tuo nome.</h3><p>Gli altri possono inquadrare direttamente questo schermo.</p><div class="modal-actions"><button type="button" class="primary" data-copy-qr-link>Copia link</button></div></div>`;
     const modal = S.modal('QR della partita', body, { className: 'qr-modal' });
     modal.host.querySelector('[data-copy-qr-link]')?.addEventListener('click', () => S.copy(url, 'Link copiato'));
   };
 
-  const playerListMarkup = session => `<div class="shared-invite-players"><p class="eyebrow">GIOCATORI</p><div>${session.names.map((name, index) => `<span><b>${index + 1}</b>${S.esc(S.cleanName(name, index))}</span>`).join('')}</div></div>`;
-
-  const loadingMarkup = () => `<section class="surface app-skeleton invite-skeleton" aria-busy="true" aria-label="Preparazione dell’invito"><div class="skeleton-heading"><span class="skeleton-line skeleton-kicker"></span><span class="skeleton-line skeleton-title"></span><span class="skeleton-line skeleton-copy"></span><span class="skeleton-line skeleton-copy short"></span></div><div class="skeleton-story"><span class="skeleton-line skeleton-meta"></span><span class="skeleton-line skeleton-subtitle"></span><span class="skeleton-line skeleton-copy"></span><span class="skeleton-line skeleton-copy medium"></span></div><div class="skeleton-invite-card"><span class="skeleton-qr"></span><div><span class="skeleton-line skeleton-kicker"></span><span class="skeleton-line skeleton-subtitle"></span><span class="skeleton-line skeleton-copy"></span><span class="skeleton-button-row"><i></i><i></i></span></div></div></section>`;
+  const loadingMarkup = () => `<section class="surface app-skeleton invite-skeleton" aria-busy="true" aria-label="Preparazione dell’invito"><div class="skeleton-heading"><span class="skeleton-line skeleton-kicker"></span><span class="skeleton-line skeleton-title"></span><span class="skeleton-line skeleton-copy"></span></div><div class="skeleton-invite-card"><span class="skeleton-qr"></span><div><span class="skeleton-line skeleton-subtitle"></span><span class="skeleton-line skeleton-copy"></span><span class="skeleton-button-row"><i></i><i></i></span></div></div></section>`;
 
   const renderInviteError = (session, error) => {
     S.mount(`<section class="surface invite-error"><div class="screen-heading"><p class="eyebrow">INVITO NON CREATO</p><h2>Il contenuto è troppo lungo.</h2><p>${S.esc(error?.message || 'Riducete il testo dell’incipit e riprovate.')}</p></div><div class="hint"><b>Nessun dato è stato perso.</b> Tornate indietro, accorciate il riassunto e ricreate l’invito.</div><div class="actions"><button type="button" class="secondary" data-back-source>Modifica incipit</button><button type="button" class="primary" data-retry-invite>Riprova</button></div></section>`, { label: 'Invito', session: true });
@@ -48,15 +48,14 @@
     catch (error) { renderInviteError(session, error); return; }
     await qrPromise.catch(() => null);
 
-    const linkSize = new TextEncoder().encode(url).length;
     const qrAvailable = Boolean(window.EpoiQr);
-    S.mount(`<section class="surface"><div class="screen-heading"><p class="eyebrow">TELEFONI SEPARATI</p><h2>Un solo invito per tutta la partita.</h2><p>Condividete questo link o QR nel gruppo. Ogni persona seleziona il proprio nome e apre soltanto il proprio obiettivo.</p></div>${S.storyContextMarkup(session)}<div class="shared-invite-card"><button type="button" class="shared-qr-button" data-open-shared-qr aria-label="Ingrandisci il QR della partita"${qrAvailable ? '' : ' disabled'}>${qrMarkup('E POI?', url, true)}</button><div class="shared-invite-copy"><p class="eyebrow">INVITO DELLA PARTITA</p><h3>Un link. ${session.count} giocatori.</h3><p>Niente inviti duplicati e nessun nome chilometrico nel messaggio. Il codice pesa <strong>${linkSize} byte</strong>.</p><div class="invite-actions"><button type="button" class="primary" data-share-game>Condividi</button><button type="button" class="secondary" data-copy-game>Copia link</button></div></div></div>${playerListMarkup(session)}<div class="privacy-inline"><span aria-hidden="true">${qrAvailable ? '✓' : 'i'}</span><p>${qrAvailable ? '<b>QR locale.</b> L’immagine viene costruita nel browser; il contenuto dell’invito non viene inviato a un generatore QR esterno.' : '<b>Link pronto.</b> Questo browser non supporta il QR locale, ma condivisione e copia del link funzionano normalmente.'}</p></div><div class="actions one"><button type="button" class="primary" data-open-host-guide>Apri la guida di gioco</button></div></section>`, { label: 'Partita autonoma', session: true });
+    S.mount(`<section class="surface invite-ready-screen"><div class="screen-heading invite-ready-heading"><p class="eyebrow">INVITA GLI ALTRI</p><h2>Un QR per tutta la partita.</h2><p>Mostralo agli altri oppure condividi il link. Ognuno sceglie il proprio nome e vede solo il suo obiettivo.</p></div><div class="invite-ready-card"><button type="button" class="shared-qr-button" data-open-shared-qr aria-label="Ingrandisci il QR della partita"${qrAvailable ? '' : ' disabled'}>${qrMarkup('E POI?', url, true)}</button><div class="invite-ready-copy"><p class="eyebrow">ENTRA NELLA PARTITA</p><h3>Scansiona o condividi.</h3><p>${session.count} giocatori useranno lo stesso invito.</p><div class="invite-actions"><button type="button" class="primary" data-share-game>Condividi link</button><button type="button" class="secondary" data-copy-game>Copia link</button></div></div></div><button type="button" class="primary invite-continue" data-open-host-guide>Apri la guida e inizia</button><details class="invite-story-details"><summary>Rivedi l’incipit</summary><div>${S.storyContextMarkup(session)}</div></details></section>`, { label: 'Partita autonoma', session: true });
 
     S.play.querySelector('[data-open-shared-qr]')?.addEventListener('click', () => S.openInviteQr('E POI?', url));
     S.play.querySelector('[data-copy-game]').addEventListener('click', () => S.copy(url, 'Link copiato'));
     S.play.querySelector('[data-share-game]').addEventListener('click', async () => {
       if (!navigator.share) { S.copy(url, 'Link copiato'); return; }
-      try { await navigator.share({ title: 'E POI?', text: 'Questo è l’invito alla nostra partita di E POI?. Aprilo e scegli il tuo giocatore.', url }); }
+      try { await navigator.share({ title: 'E POI?', text: 'Apri l’invito alla nostra partita di E POI? e scegli il tuo giocatore.', url }); }
       catch { /* Condivisione annullata. */ }
     });
     S.play.querySelector('[data-open-host-guide]').addEventListener('click', () => S.renderHostGame(session));
