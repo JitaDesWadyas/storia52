@@ -42,8 +42,12 @@ for (const cssFile of fs.readdirSync(root).filter(name => name.endsWith('.css'))
 
 const index = read('index.html');
 const scriptOrder = [...index.matchAll(/<script src="([^"]+)"/g)].map(match => match[1]);
-check(scriptOrder.indexOf('qr-local.js') >= 0, 'index.html: qr-local.js non caricato');
-check(scriptOrder.indexOf('qr-local.js') < scriptOrder.indexOf('clean-invite-host.js'), 'index.html: il QR locale deve caricarsi prima del flusso inviti');
+const qrBootstrapIndex = scriptOrder.indexOf('qr-base64.js');
+const qrIndex = scriptOrder.indexOf('qr-local.js');
+const qrRestoreIndex = scriptOrder.indexOf('qr-base64-restore.js');
+const inviteHostIndex = scriptOrder.indexOf('clean-invite-host.js');
+check(qrBootstrapIndex >= 0 && qrIndex >= 0 && qrRestoreIndex >= 0, 'index.html: bootstrap QR locale incompleto');
+check(qrBootstrapIndex < qrIndex && qrIndex < qrRestoreIndex && qrRestoreIndex < inviteHostIndex, 'index.html: ordine degli script QR non valido');
 check(index.includes('initial-skeleton'), 'index.html: skeleton iniziale mancante');
 
 const allText = fs.readdirSync(root)
@@ -62,9 +66,11 @@ for (const match of coreBlock.matchAll(/['"]\.\/([^'"]*)['"]/g)) {
 check(sw.includes('cache.addAll(requests)'), 'sw.js: installazione della cache non atomica');
 check(sw.includes('staleWhileRevalidate'), 'sw.js: strategia rete instabile mancante');
 
-// Execute the local QR bundle in Node 22 and generate a dense test code.
+// Execute the exact local QR bootstrap used by the browser and generate a dense test code.
 globalThis.window = globalThis;
+(0, eval)(read('qr-base64.js'));
 (0, eval)(read('qr-local.js'));
+(0, eval)(read('qr-base64-restore.js'));
 await globalThis.EpoiQrReady;
 const qrSvg = globalThis.EpoiQr.toSvg(`https://example.test/storia52/#g=${'A'.repeat(900)}`);
 assert.match(qrSvg, /^<svg class="epoi-qr-svg"/);
