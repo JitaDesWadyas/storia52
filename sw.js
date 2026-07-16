@@ -1,38 +1,117 @@
-const CACHE='epoi-invites-v4';
-const FILES=[
-  './','index.html','clean-app.css','refine-flow.css','home-product.css','app-polish.css','home-fixes.css','tutorial-game.css','interaction-polish.css','invite-polish.css',
-  'app.js','ui-core.js','ready-stories-data.js','clean-core.js','clean-rules.js','clean-home.js',
-  'clean-config.js','clean-opening.js','clean-stories-model.js','ready-story-objectives.js','clean-stories-markup.js','clean-stories-view.js',
-  'clean-objectives.js','clean-prep.js','clean-print.js','invite-codec.js','clean-invite-host.js','clean-invite-data.js','clean-exit.js','interaction-polish.js','clean-init.js',
-  'icon.svg','storia52-cards-logo.svg','manifest.webmanifest'
+'use strict';
+
+const CACHE_PREFIX = 'epoi-';
+const SHELL_CACHE = `${CACHE_PREFIX}shell-v7`;
+const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v7`;
+const CORE_FILES = [
+  './', './index.html', './privacy.html', './copyright.html',
+  './clean-app.css', './refine-flow.css', './home-product.css', './app-polish.css', './home-fixes.css',
+  './tutorial-game.css', './interaction-polish.css', './invite-polish.css', './release-ready.css', './loading-skeleton.css',
+  './app.js', './ui-core.js', './ready-stories-data.js', './clean-core.js', './clean-rules.js', './clean-home.js',
+  './clean-config.js', './clean-opening.js', './clean-stories-model.js', './ready-story-objectives.js',
+  './clean-stories-markup.js', './clean-stories-view.js', './clean-objectives.js', './clean-prep.js', './clean-print.js',
+  './qr-local.js', './invite-codec.js', './clean-invite-host.js', './clean-invite-data.js', './clean-exit.js',
+  './interaction-polish.js', './clean-init.js', './icon.svg', './storia52-cards-logo.svg', './creator-jita.svg',
+  './manifest.webmanifest'
 ];
-self.addEventListener('install',event=>{
-  self.skipWaiting();
-  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)));
+
+const scopedUrl = path => new URL(path, self.registration.scope).toString();
+const cacheable = response => response && response.ok && (response.type === 'basic' || response.type === 'cors');
+
+const putSafely = async (cacheName, request, response) => {
+  if (!cacheable(response)) return;
+  try {
+    const cache = await caches.open(cacheName);
+    await cache.put(request, response.clone());
+  } catch { /* La risposta resta comunque utilizzabile. */ }
+};
+
+const fetchWithTimeout = (request, timeoutMs = 3500) => new Promise((resolve, reject) => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => {
+    controller.abort();
+    reject(new Error('timeout'));
+  }, timeoutMs);
+  fetch(request, { signal: controller.signal, cache: 'no-cache' }).then(response => {
+    clearTimeout(timer);
+    resolve(response);
+  }, error => {
+    clearTimeout(timer);
+    reject(error);
+  });
 });
-self.addEventListener('activate',event=>{
-  event.waitUntil((async()=>{
-    const keys=await caches.keys();
-    await Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)));
+
+self.addEventListener('install', event => {
+  event.waitUntil((async () => {
+    const cache = await caches.open(SHELL_CACHE);
+    await Promise.allSettled(CORE_FILES.map(async path => {
+      const request = new Request(scopedUrl(path), { cache: 'reload' });
+      const response = await fetch(request);
+      if (cacheable(response)) await cache.put(request, response);
+    }));
+    await self.skipWaiting();
+  })());
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(key => key.startsWith(CACHE_PREFIX) && key !== SHELL_CACHE && key !== RUNTIME_CACHE).map(key => caches.delete(key)));
+    if (self.registration.navigationPreload) await self.registration.navigationPreload.enable().catch(() => {});
     await self.clients.claim();
   })());
 });
-self.addEventListener('fetch',event=>{
-  if(event.request.method!=='GET')return;
-  const url=new URL(event.request.url);
-  const core=url.origin===self.location.origin&&(event.request.mode==='navigate'||/\.(?:html|css|js|svg|webmanifest)$/.test(url.pathname));
-  if(core){
-    event.respondWith((async()=>{
-      try{
-        const response=await fetch(event.request,{cache:'no-store'});
-        const cache=await caches.open(CACHE);
-        cache.put(event.request,response.clone());
-        return response;
-      }catch{
-        return (await caches.match(event.request))||(await caches.match('index.html'));
-      }
-    })());
+
+const navigationResponse = async event => {
+  const request = event.request;
+  try {
+    const preload = await event.preloadResponse;
+    if (preload) {
+      event.waitUntil(putSafely(RUNTIME_CACHE, request, preload));
+      return preload;
+    }
+    const network = await fetchWithTimeout(request);
+    if (cacheable(network)) event.waitUntil(putSafely(RUNTIME_CACHE, request, network));
+    return network;
+  } catch {
+    return (await caches.match(request, { ignoreSearch: true }))
+      || (await caches.match(scopedUrl('./index.html')))
+      || (await caches.match(scopedUrl('./')))
+      || new Response('<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>E POI?</title><body><h1>E POI?</h1><p>La rete non è disponibile e la pagina non è ancora nella cache.</p></body></html>', { headers: { 'Content-Type': 'text/html; charset=utf-8' }, status: 503 });
+  }
+};
+
+const staleWhileRevalidate = async event => {
+  const request = event.request;
+  const cached = await caches.match(request);
+  const refresh = fetch(request, { cache: 'no-cache' }).then(async response => {
+    await putSafely(RUNTIME_CACHE, request, response);
+    return response;
+  });
+  if (cached) {
+    event.waitUntil(refresh.catch(() => {}));
+    return cached;
+  }
+  try { return await refresh; }
+  catch { return new Response('', { status: 504, statusText: 'Offline' }); }
+};
+
+self.addEventListener('fetch', event => {
+  const request = event.request;
+  if (request.method !== 'GET') return;
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+  if (request.mode === 'navigate') {
+    event.respondWith(navigationResponse(event));
     return;
   }
-  event.respondWith(caches.match(event.request).then(hit=>hit||fetch(event.request)));
+
+  if (/\.(?:css|js|svg|png|jpg|jpeg|webp|ico|webmanifest)$/i.test(url.pathname)) {
+    event.respondWith(staleWhileRevalidate(event));
+  }
+});
+
+self.addEventListener('message', event => {
+  if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
