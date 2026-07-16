@@ -11,13 +11,11 @@ const check = (condition, message) => {
   if (!condition) failures.push(message);
 };
 
-// Parse every shipped JavaScript file without executing browser-only code.
 for (const file of fs.readdirSync(root).filter(name => name.endsWith('.js'))) {
   try { new Function(read(file)); }
   catch (error) { failures.push(`${file}: sintassi non valida (${error.message})`); }
 }
 
-// Verify local assets referenced by public HTML pages.
 for (const htmlFile of ['index.html', 'privacy.html', 'copyright.html']) {
   const html = read(htmlFile);
   const references = [...html.matchAll(/(?:src|href)="([^"]+)"/g)].map(match => match[1]);
@@ -29,7 +27,6 @@ for (const htmlFile of ['index.html', 'privacy.html', 'copyright.html']) {
   }
 }
 
-// Verify local assets referenced by CSS files.
 for (const cssFile of fs.readdirSync(root).filter(name => name.endsWith('.css'))) {
   const css = read(cssFile);
   const references = [...css.matchAll(/url\((?:"|')?([^"')]+)(?:"|')?\)/g)].map(match => match[1].trim());
@@ -42,12 +39,10 @@ for (const cssFile of fs.readdirSync(root).filter(name => name.endsWith('.css'))
 
 const index = read('index.html');
 const scriptOrder = [...index.matchAll(/<script src="([^"]+)"/g)].map(match => match[1]);
-const qrBootstrapIndex = scriptOrder.indexOf('qr-base64.js');
 const qrIndex = scriptOrder.indexOf('qr-local.js');
-const qrRestoreIndex = scriptOrder.indexOf('qr-base64-restore.js');
 const inviteHostIndex = scriptOrder.indexOf('clean-invite-host.js');
-check(qrBootstrapIndex >= 0 && qrIndex >= 0 && qrRestoreIndex >= 0, 'index.html: bootstrap QR locale incompleto');
-check(qrBootstrapIndex < qrIndex && qrIndex < qrRestoreIndex && qrRestoreIndex < inviteHostIndex, 'index.html: ordine degli script QR non valido');
+check(qrIndex >= 0, 'index.html: qr-local.js non caricato');
+check(qrIndex < inviteHostIndex, 'index.html: il QR locale deve caricarsi prima del flusso inviti');
 check(index.includes('initial-skeleton'), 'index.html: skeleton iniziale mancante');
 
 const allText = fs.readdirSync(root)
@@ -56,6 +51,7 @@ const allText = fs.readdirSync(root)
   .join('\n');
 check(!allText.includes('api.qrserver.com'), 'È ancora presente il generatore QR esterno');
 check(!allText.includes('creator-jita.png'), 'È ancora presente un riferimento all’immagine PNG mancante');
+check(!allText.includes('const encoded='), 'Il QR locale contiene ancora un payload compresso');
 
 const sw = read('sw.js');
 const coreBlock = sw.match(/const CORE_FILES = \[([\s\S]*?)\];/)?.[1] || '';
@@ -66,17 +62,13 @@ for (const match of coreBlock.matchAll(/['"]\.\/([^'"]*)['"]/g)) {
 check(sw.includes('cache.addAll(requests)'), 'sw.js: installazione della cache non atomica');
 check(sw.includes('staleWhileRevalidate'), 'sw.js: strategia rete instabile mancante');
 
-// Execute the exact local QR bootstrap used by the browser and generate a dense test code.
 globalThis.window = globalThis;
-(0, eval)(read('qr-base64.js'));
 (0, eval)(read('qr-local.js'));
-(0, eval)(read('qr-base64-restore.js'));
 await globalThis.EpoiQrReady;
 const qrSvg = globalThis.EpoiQr.toSvg(`https://example.test/storia52/#g=${'A'.repeat(900)}`);
 assert.match(qrSvg, /^<svg class="epoi-qr-svg"/);
 assert.ok(qrSvg.includes('<path'));
 
-// Exercise compact ready-story invites, custom invites and legacy compatibility.
 const cleanText = (value, max = 500, multiline = false) => {
   let text = String(value ?? '').normalize('NFKC').replace(multiline ? /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g : /[\u0000-\u001F\u007F]/g, '');
   text = multiline ? text.replace(/\r\n?/g, '\n').replace(/[\t ]+/g, ' ').replace(/\n{3,}/g, '\n\n') : text.replace(/\s+/g, ' ');
