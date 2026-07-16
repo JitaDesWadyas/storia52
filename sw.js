@@ -1,17 +1,17 @@
 'use strict';
 
 const CACHE_PREFIX = 'epoi-';
-const SHELL_CACHE = `${CACHE_PREFIX}shell-v10`;
-const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v10`;
+const SHELL_CACHE = `${CACHE_PREFIX}shell-v11`;
+const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v11`;
 const CORE_FILES = [
   './', './index.html', './privacy.html', './copyright.html',
   './clean-app.css', './refine-flow.css', './home-product.css', './app-polish.css', './home-fixes.css',
-  './tutorial-game.css', './interaction-polish.css', './invite-polish.css', './release-ready.css', './loading-skeleton.css', './ux-rework.css',
+  './tutorial-game.css', './interaction-polish.css', './invite-polish.css', './release-ready.css', './loading-skeleton.css', './ux-rework.css', './scroll-fix.css',
   './app.js', './ui-core.js', './ready-stories-data.js', './clean-core.js', './clean-rules.js', './clean-home.js',
   './clean-config.js', './clean-opening.js', './clean-stories-model.js', './ready-story-objectives.js',
   './clean-stories-markup.js', './clean-stories-view.js', './clean-objectives.js', './clean-prep.js', './clean-print.js',
   './qr-local.js', './invite-codec.js', './clean-invite-host.js', './clean-invite-data.js', './clean-exit.js',
-  './interaction-polish.js', './clean-init.js', './icon.svg', './storia52-cards-logo.svg', './creator-jita.svg',
+  './interaction-polish.js', './scroll-safety.js', './clean-init.js', './icon.svg', './storia52-cards-logo.svg', './creator-jita.svg',
   './manifest.webmanifest'
 ];
 
