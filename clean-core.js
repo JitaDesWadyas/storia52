@@ -7,18 +7,27 @@
     categories: window.STORIA52_READY_CATEGORIES || {},
     play: document.querySelector('#play'),
     storyUi: { category: 'all', query: '', page: 0 },
-    currentSession: null
+    currentSession: null,
+    limits: Object.freeze({ name: 28, opening: 700, note: 240, inviteCode: 6000, inviteQr: 1900, inviteDecoded: 18000 })
   };
 
   S.esc = value => escapeHtml(String(value ?? ''));
+  S.cleanText = (value, max = 500, multiline = false) => {
+    let text = String(value ?? '').normalize('NFKC').replace(multiline ? /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g : /[\u0000-\u001F\u007F]/g, '');
+    text = multiline
+      ? text.replace(/\r\n?/g, '\n').replace(/[\t ]+/g, ' ').replace(/\n{3,}/g, '\n\n')
+      : text.replace(/\s+/g, ' ');
+    return text.trim().slice(0, Math.max(0, max));
+  };
+  S.cleanName = (value, index = 0) => S.cleanText(value, S.limits.name) || `Giocatore ${index + 1}`;
   S.randomIndex = max => {
     if (max <= 0) return 0;
     const values = new Uint32Array(1);
     crypto.getRandomValues(values);
     return values[0] % max;
   };
-  S.playerName = (session, index) => session.names?.[index]?.trim() || `Giocatore ${index + 1}`;
-  S.normalizeNames = (count, names = []) => Array.from({ length: count }, (_, index) => names[index]?.trim() || `Giocatore ${index + 1}`);
+  S.playerName = (session, index) => S.cleanName(session.names?.[index], index);
+  S.normalizeNames = (count, names = []) => Array.from({ length: count }, (_, index) => S.cleanName(names[index], index));
   S.readyStory = session => S.stories.find(story => story.id === session.readyStoryId) || null;
   S.sourceLabel = session => session.source === 'ready' ? 'Storia pronta' : 'Incipit inventato';
 
@@ -37,16 +46,18 @@
     catch { /* Nessuna azione richiesta. */ }
   };
 
-  S.mount = (html, { session = false, scroll = true, animate = scroll } = {}) => {
+  S.mount = (html, { session = false, scroll = true, animate = scroll, preserveHash = false } = {}) => {
     const previousY = window.scrollY;
     S.play.innerHTML = `<div class="screen${animate ? ' screen-enter' : ''}">${html}</div>`;
     S.play.classList.add('active');
     document.body.classList.toggle('session-mode', session);
     const exitButton = document.querySelector('#headerExit');
     if (exitButton) exitButton.hidden = !session;
-    const url = new URL(location.href);
-    url.hash = 'play';
-    history.replaceState(null, '', url);
+    if (!preserveHash) {
+      const url = new URL(location.href);
+      url.hash = 'play';
+      history.replaceState(null, '', url);
+    }
     if (animate) requestAnimationFrame(() => S.play.querySelector('.screen')?.classList.remove('screen-enter'));
     if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
     else requestAnimationFrame(() => window.scrollTo({ top: previousY, behavior: 'auto' }));
@@ -75,9 +86,22 @@
     S.toast.timer = setTimeout(() => toast.classList.remove('show'), 1800);
   };
 
-  S.copy = (value, message = 'Copiato') => {
-    if (!navigator.clipboard) { S.toast('Copia non disponibile'); return; }
-    navigator.clipboard.writeText(value).then(() => S.toast(message)).catch(() => S.toast('Copia non disponibile'));
+  S.copy = async (value, message = 'Copiato') => {
+    try {
+      if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(String(value));
+      else {
+        const field = document.createElement('textarea');
+        field.value = String(value);
+        field.setAttribute('readonly', '');
+        field.style.position = 'fixed';
+        field.style.opacity = '0';
+        document.body.appendChild(field);
+        field.select();
+        if (!document.execCommand('copy')) throw new Error('Copia non disponibile');
+        field.remove();
+      }
+      S.toast(message);
+    } catch { S.toast('Copia non disponibile'); }
   };
 
   S.newSession = mode => {
