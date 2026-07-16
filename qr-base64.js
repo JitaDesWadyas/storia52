@@ -8,6 +8,13 @@
     restored = true;
     window.atob = nativeAtob;
   };
-  window.atob = value => nativeAtob(String(value || '').replace(/-/g, '+').replace(/_/g, '/').replace(/[^A-Za-z0-9+/=]/g, ''));
+  window.atob = value => {
+    const clean = String(value || '')
+      .replace(/-/g, '+')
+      .replace(/_/g, '/')
+      .replace(/[^A-Za-z0-9+/=]/g, '')
+      .replace(/=+$/g, '');
+    return nativeAtob(clean.padEnd(Math.ceil(clean.length / 4) * 4, '='));
+  };
   window.__restoreEpoiAtob = restore;
 })();
