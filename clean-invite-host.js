@@ -1,11 +1,14 @@
 'use strict';
 (() => {
   const S = window.S52;
+  const SAFE_QR_CODE_LENGTH = 1500;
 
   S.createGameInviteUrl = async session => {
+    const code = await S.encodeGameInvite(session);
+    if (code.length > SAFE_QR_CODE_LENGTH) throw new Error('L’invito è troppo lungo per un QR affidabile: accorciate l’incipit.');
     const url = new URL(location.href);
     url.search = '';
-    url.hash = `g=${await S.encodeGameInvite(session)}`;
+    url.hash = `g=${code}`;
     return url.toString();
   };
 
@@ -38,18 +41,18 @@
     session.openingText = S.cleanText(session.openingText || '', S.limits.opening, true);
     S.save(session);
     S.mount(loadingMarkup(), { label: 'Invito', session: true });
+
+    const qrPromise = window.EpoiQrReady || Promise.resolve(window.EpoiQr);
     let url;
-    try {
-      [url] = await Promise.all([
-        S.createGameInviteUrl(session),
-        window.EpoiQrReady || Promise.resolve(window.EpoiQr)
-      ]);
-    } catch (error) { renderInviteError(session, error); return; }
+    try { url = await S.createGameInviteUrl(session); }
+    catch (error) { renderInviteError(session, error); return; }
+    await qrPromise.catch(() => null);
 
     const linkSize = new TextEncoder().encode(url).length;
-    S.mount(`<section class="surface"><div class="screen-heading"><p class="eyebrow">TELEFONI SEPARATI</p><h2>Un solo invito per tutta la partita.</h2><p>Condividete questo link o QR nel gruppo. Ogni persona seleziona il proprio nome e apre soltanto il proprio obiettivo.</p></div>${S.storyContextMarkup(session)}<div class="shared-invite-card"><button type="button" class="shared-qr-button" data-open-shared-qr aria-label="Ingrandisci il QR della partita">${qrMarkup('E POI?', url, true)}</button><div class="shared-invite-copy"><p class="eyebrow">INVITO DELLA PARTITA</p><h3>Un link. ${session.count} giocatori.</h3><p>Niente inviti duplicati e nessun nome chilometrico nel messaggio. Il codice pesa <strong>${linkSize} byte</strong>.</p><div class="invite-actions"><button type="button" class="primary" data-share-game>Condividi</button><button type="button" class="secondary" data-copy-game>Copia link</button></div></div></div>${playerListMarkup(session)}<div class="privacy-inline"><span aria-hidden="true">✓</span><p><b>QR locale.</b> L’immagine viene costruita nel browser; il contenuto dell’invito non viene inviato a un generatore QR esterno.</p></div><div class="actions one"><button type="button" class="primary" data-open-host-guide>Apri la guida di gioco</button></div></section>`, { label: 'Partita autonoma', session: true });
+    const qrAvailable = Boolean(window.EpoiQr);
+    S.mount(`<section class="surface"><div class="screen-heading"><p class="eyebrow">TELEFONI SEPARATI</p><h2>Un solo invito per tutta la partita.</h2><p>Condividete questo link o QR nel gruppo. Ogni persona seleziona il proprio nome e apre soltanto il proprio obiettivo.</p></div>${S.storyContextMarkup(session)}<div class="shared-invite-card"><button type="button" class="shared-qr-button" data-open-shared-qr aria-label="Ingrandisci il QR della partita"${qrAvailable ? '' : ' disabled'}>${qrMarkup('E POI?', url, true)}</button><div class="shared-invite-copy"><p class="eyebrow">INVITO DELLA PARTITA</p><h3>Un link. ${session.count} giocatori.</h3><p>Niente inviti duplicati e nessun nome chilometrico nel messaggio. Il codice pesa <strong>${linkSize} byte</strong>.</p><div class="invite-actions"><button type="button" class="primary" data-share-game>Condividi</button><button type="button" class="secondary" data-copy-game>Copia link</button></div></div></div>${playerListMarkup(session)}<div class="privacy-inline"><span aria-hidden="true">${qrAvailable ? '✓' : 'i'}</span><p>${qrAvailable ? '<b>QR locale.</b> L’immagine viene costruita nel browser; il contenuto dell’invito non viene inviato a un generatore QR esterno.' : '<b>Link pronto.</b> Questo browser non supporta il QR locale, ma condivisione e copia del link funzionano normalmente.'}</p></div><div class="actions one"><button type="button" class="primary" data-open-host-guide>Apri la guida di gioco</button></div></section>`, { label: 'Partita autonoma', session: true });
 
-    S.play.querySelector('[data-open-shared-qr]').addEventListener('click', () => S.openInviteQr('E POI?', url));
+    S.play.querySelector('[data-open-shared-qr]')?.addEventListener('click', () => S.openInviteQr('E POI?', url));
     S.play.querySelector('[data-copy-game]').addEventListener('click', () => S.copy(url, 'Link copiato'));
     S.play.querySelector('[data-share-game]').addEventListener('click', async () => {
       if (!navigator.share) { S.copy(url, 'Link copiato'); return; }
