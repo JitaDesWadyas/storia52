@@ -1,0 +1,39 @@
+name: Vendor local QR source
+
+on:
+  push:
+    branches: [agent/release-ready-shared-invite]
+
+permissions:
+  contents: write
+
+jobs:
+  vendor:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/release-ready-shared-invite
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fetch MIT QR source
+        run: npm install --no-save --package-lock=false --ignore-scripts qrcode-terminal@0.12.0
+      - name: Build local browser bundle
+        run: node scripts/build-qr-local.mjs
+      - name: Commit generated source
+        run: |
+          rm -rf node_modules
+          if git diff --quiet -- qr-local.js; then
+            echo "qr-local.js already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add qr-local.js
+          git commit -m "Vendor clean local QR source"
+          git push origin HEAD:agent/release-ready-shared-invite
