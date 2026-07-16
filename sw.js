@@ -27,7 +27,7 @@ const putSafely = async (cacheName, request, response) => {
   } catch { /* La risposta resta comunque utilizzabile. */ }
 };
 
-const fetchWithTimeout = (request, timeoutMs = 3500) => new Promise((resolve, reject) => {
+const fetchWithTimeout = (request, timeoutMs = 5000) => new Promise((resolve, reject) => {
   const controller = new AbortController();
   const timer = setTimeout(() => {
     controller.abort();
@@ -45,11 +45,8 @@ const fetchWithTimeout = (request, timeoutMs = 3500) => new Promise((resolve, re
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(SHELL_CACHE);
-    await Promise.allSettled(CORE_FILES.map(async path => {
-      const request = new Request(scopedUrl(path), { cache: 'reload' });
-      const response = await fetch(request);
-      if (cacheable(response)) await cache.put(request, response);
-    }));
+    const requests = CORE_FILES.map(path => new Request(scopedUrl(path), { cache: 'reload' }));
+    await cache.addAll(requests);
     await self.skipWaiting();
   })());
 });
