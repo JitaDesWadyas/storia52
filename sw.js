@@ -20,9 +20,10 @@ const cacheable = response => response && response.ok && (response.type === 'bas
 
 const putSafely = async (cacheName, request, response) => {
   if (!cacheable(response)) return;
+  const copy = response.clone();
   try {
     const cache = await caches.open(cacheName);
-    await cache.put(request, response.clone());
+    await cache.put(request, copy);
   } catch { /* La risposta resta comunque utilizzabile. */ }
 };
 
