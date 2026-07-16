@@ -22,7 +22,9 @@ jobs:
       - name: Validate static app
         id: validate
         continue-on-error: true
-        run: node scripts/release-check.mjs > release-check-report.txt 2>&1
+        run: |
+          node scripts/qr-diagnose.mjs > release-check-report.txt 2>&1
+          node scripts/release-check.mjs >> release-check-report.txt 2>&1
       - name: Upload validation report
         if: always()
         uses: actions/upload-artifact@v4
