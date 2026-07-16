@@ -1,12 +1,12 @@
 'use strict';
 
 const CACHE_PREFIX = 'epoi-';
-const SHELL_CACHE = `${CACHE_PREFIX}shell-v9`;
-const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v9`;
+const SHELL_CACHE = `${CACHE_PREFIX}shell-v10`;
+const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v10`;
 const CORE_FILES = [
   './', './index.html', './privacy.html', './copyright.html',
   './clean-app.css', './refine-flow.css', './home-product.css', './app-polish.css', './home-fixes.css',
-  './tutorial-game.css', './interaction-polish.css', './invite-polish.css', './release-ready.css', './loading-skeleton.css',
+  './tutorial-game.css', './interaction-polish.css', './invite-polish.css', './release-ready.css', './loading-skeleton.css', './ux-rework.css',
   './app.js', './ui-core.js', './ready-stories-data.js', './clean-core.js', './clean-rules.js', './clean-home.js',
   './clean-config.js', './clean-opening.js', './clean-stories-model.js', './ready-story-objectives.js',
   './clean-stories-markup.js', './clean-stories-view.js', './clean-objectives.js', './clean-prep.js', './clean-print.js',
