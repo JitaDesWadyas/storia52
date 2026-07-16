@@ -1,0 +1,37 @@
+name: Validate web release
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  release-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate static app
+        id: validate
+        continue-on-error: true
+        run: node scripts/release-check.mjs > release-check-report.txt 2>&1
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-check-report
+          path: release-check-report.txt
+          retention-days: 3
+      - name: Enforce validation result
+        if: steps.validate.outcome == 'failure'
+        run: |
+          cat release-check-report.txt
+          exit 1
