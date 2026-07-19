@@ -1,0 +1,102 @@
+/* Public release polish: mobile tutorial, creator portrait, home hierarchy and color. */
+
+/* Home hero: one clear CTA, reliable line breaks and a hand-drawn creativity accent. */
+.hero-actions.hero-actions-single{grid-template-columns:1fr!important;min-width:210px}
+.hero-title .line{min-width:0}
+.hero-title .line-accent,.hero-title .line-final{width:fit-content;max-width:100%}
+.hero-title .line-final{white-space:nowrap}
+.hero-creativity{position:relative;display:inline-block;z-index:0}
+.hero-creativity::after{
+  content:"";position:absolute;left:-.08em;right:-.1em;bottom:.01em;z-index:-1;height:.25em;
+  background:color-mix(in srgb,var(--amber) 45%,transparent);border-radius:58% 42% 52% 48%;
+  transform:rotate(-1.4deg) skewX(-8deg);clip-path:polygon(0 48%,8% 25%,20% 39%,34% 18%,49% 36%,62% 12%,76% 34%,90% 20%,100% 45%,98% 82%,82% 70%,67% 90%,50% 72%,31% 91%,14% 72%,2% 84%);
+}
+
+/* Give the main cards distinct identity without turning them into loud UI tiles. */
+.compact-product-menu .choice-card,.compact-product-menu .resume-card{background:var(--panel-2)}
+.compact-product-menu .menu-card-tutorial{background:color-mix(in srgb,var(--panel-2) 85%,#e0a631 15%);border-color:color-mix(in srgb,var(--line-soft) 62%,#d69820 38%)}
+.compact-product-menu .menu-card-rules{background:color-mix(in srgb,var(--panel-2) 88%,#6d86b8 12%);border-color:color-mix(in srgb,var(--line-soft) 68%,#6d86b8 32%)}
+.compact-product-menu .menu-card-info{background:color-mix(in srgb,var(--panel-2) 88%,#b96f62 12%);border-color:color-mix(in srgb,var(--line-soft) 68%,#b96f62 32%)}
+.compact-product-menu .menu-card-resume{background:color-mix(in srgb,var(--panel-2) 88%,#6d9870 12%);border-color:color-mix(in srgb,var(--line-soft) 68%,#6d9870 32%)}
+.compact-product-menu .menu-card-tutorial .index{background:color-mix(in srgb,var(--panel) 78%,#e0a631 22%)}
+.compact-product-menu .menu-card-rules .index{background:color-mix(in srgb,var(--panel) 82%,#6d86b8 18%)}
+.compact-product-menu .menu-card-info .creator-menu-image{background:color-mix(in srgb,var(--panel) 82%,#b96f62 18%)}
+
+/* Footer/copyright needs its own readable surface instead of floating on the dark page. */
+.site-footer{
+  margin-top:16px;padding:15px 17px 17px!important;color:var(--muted)!important;
+  background:color-mix(in srgb,var(--panel) 94%,transparent);border:1px solid var(--line-soft);border-radius:14px;
+  box-shadow:0 8px 22px rgba(0,0,0,.1)
+}
+.site-footer-brand{flex-wrap:wrap}
+.site-footer-brand b{color:var(--ink)!important}
+.site-footer-brand span{color:var(--ink)!important;opacity:.72;letter-spacing:.025em}
+.site-footer a{color:var(--ink)!important;opacity:.78}
+.site-footer a:hover,.site-footer a:focus-visible{opacity:1;color:var(--amber-dark)!important}
+
+/* Tutorial cards are always full-width. Flex prevents the body copy from falling under the number badge. */
+.tutorial-setup,.tutorial-turn{display:grid!important;grid-template-columns:minmax(0,1fr)!important;width:100%;gap:10px!important}
+.tutorial-setup article,.tutorial-turn article{
+  display:flex!important;align-items:flex-start!important;width:100%!important;min-width:0!important;gap:12px!important;
+  padding:15px 16px!important
+}
+.tutorial-setup article>span,.tutorial-turn article>span{flex:0 0 42px!important;width:42px!important;height:42px!important}
+.tutorial-step-copy,.tutorial-setup article>div,.tutorial-turn article>div{display:block!important;flex:1 1 auto!important;width:auto!important;min-width:0!important}
+.tutorial-step-copy b,.tutorial-setup b,.tutorial-turn b{display:block!important;width:100%;font-size:1rem;line-height:1.25}
+.tutorial-step-copy p,.tutorial-setup p,.tutorial-turn p{
+  display:block!important;width:100%!important;max-width:none!important;margin:6px 0 0!important;
+  word-break:normal!important;overflow-wrap:normal!important;white-space:normal!important;line-height:1.48!important
+}
+
+/* Clear positive/negative outcomes inside one relation card and one discovery card. */
+.tutorial-suits{grid-template-columns:1fr!important}
+.tutorial-suit-split{display:grid!important;grid-template-columns:58px minmax(0,1fr)!important;align-items:start!important;width:100%}
+.tutorial-suit-split>div{min-width:0;width:100%}
+.tutorial-outcomes{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.tutorial-outcomes>span:first-child{background:color-mix(in srgb,var(--panel) 88%,#6d9870 12%);border-color:color-mix(in srgb,var(--line-soft) 68%,#6d9870 32%)}
+.tutorial-outcomes>span:last-child{background:color-mix(in srgb,var(--panel) 88%,#b96f62 12%);border-color:color-mix(in srgb,var(--line-soft) 68%,#b96f62 32%)}
+.tutorial-outcomes i{font-size:.64rem;line-height:1.3}
+
+.tutorial-turn-reminder{
+  display:flex;align-items:flex-start;gap:8px;padding:12px 14px;background:color-mix(in srgb,var(--panel) 86%,var(--amber) 14%);
+  border:1px solid var(--amber);border-radius:11px
+}
+.tutorial-turn-reminder span{color:var(--muted);line-height:1.4}
+
+/* Navigation stays fixed and conventional: Indietro left, Avanti right. */
+.tutorial-actions{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr)!important;gap:9px!important}
+.tutorial-actions [data-tutorial-prev]{order:1!important}
+.tutorial-actions [data-tutorial-next]{order:2!important}
+
+/* Creator page: the portrait is an editorial thumbnail, never a full-height poster. */
+.product-modal-info .creator-editorial-hero{
+  grid-template-columns:minmax(0,1fr) 220px!important;gap:30px!important;align-items:center!important;padding:42px 48px!important
+}
+.product-modal-info .creator-editorial-hero>div{order:1}
+.product-modal-info .creator-portrait{order:2!important;width:220px!important;max-width:220px!important;justify-self:end!important}
+.product-modal-info .creator-portrait img{
+  display:block!important;width:220px!important;height:220px!important;aspect-ratio:1!important;object-fit:cover!important;
+  object-position:center 42%!important;border-radius:22px!important
+}
+.creator-profile-pro>img{object-position:center 42%!important}
+
+@media(max-width:700px){
+  .hero-actions.hero-actions-single{min-width:0;width:100%}
+  .hero-title .line-accent{width:auto}
+  .hero-title .line-final{font-size:.95em}
+  .tutorial-outcomes{grid-template-columns:1fr}
+  .product-modal-info .creator-editorial-hero{grid-template-columns:1fr!important;gap:18px!important;padding:72px 20px 28px!important}
+  .product-modal-info .creator-editorial-hero>div{order:2}
+  .product-modal-info .creator-portrait{order:1!important;width:156px!important;max-width:156px!important;justify-self:start!important;margin:0!important}
+  .product-modal-info .creator-portrait img{width:156px!important;height:156px!important;border-radius:20px!important}
+  .product-modal-info .creator-editorial-hero h2{font-size:clamp(2.05rem,11vw,3.2rem)!important;line-height:.94!important}
+}
+
+@media(max-width:470px){
+  .tutorial-actions{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)!important}
+  .tutorial-actions .secondary{order:1!important}
+  .tutorial-actions .primary{order:2!important}
+  .tutorial-setup article,.tutorial-turn article{padding:13px!important}
+  .tutorial-setup article>span,.tutorial-turn article>span{flex-basis:40px!important;width:40px!important;height:40px!important}
+  .site-footer{margin-inline:0}
+}
