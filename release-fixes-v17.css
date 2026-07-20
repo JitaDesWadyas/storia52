@@ -1,16 +1,41 @@
-/* v17: targeted fixes after mobile review. */
+/* v18: restore reliable document scrolling and correct suit colors. */
 
-/* Keep normal page scrolling, but remove Android/PWA pull-to-refresh. */
-html,body{overscroll-behavior-y:none!important}
-
-/* Hearts and diamonds are shown in black like the other suits. */
-.card-meaning-board .polarity-suit,
-.card-meaning-board .polarity-suit.red,
-.tutorial-suits .red{color:var(--ink)!important}
-.tutorial-tone-diamonds .tutorial-card-demo{
-  color:var(--ink)!important;
-  border-color:color-mix(in srgb,var(--ink) 72%,var(--line))!important
+/* The document must remain the vertical scroller on mobile. */
+html{
+  height:auto!important;
+  min-height:100%!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior-y:auto!important;
+  touch-action:pan-y pinch-zoom!important;
+  -webkit-overflow-scrolling:touch
 }
+body:not(.modal-open){
+  position:static!important;
+  height:auto!important;
+  min-height:100%!important;
+  overflow-x:hidden!important;
+  overflow-y:visible!important;
+  overscroll-behavior-y:auto!important;
+  touch-action:pan-y pinch-zoom!important
+}
+body:not(.modal-open) .app-shell,
+body:not(.modal-open) main,
+body:not(.modal-open) .page.active{
+  height:auto!important;
+  max-height:none!important;
+  overflow:visible!important;
+  touch-action:pan-y pinch-zoom!important
+}
+
+/* Hearts and diamonds are red. Clubs and spades remain black. */
+.card-meaning-board .polarity-suit.red,
+.tutorial-suits .red{color:var(--red)!important}
+.tutorial-tone-diamonds .tutorial-card-demo{
+  color:var(--red)!important;
+  border-color:color-mix(in srgb,var(--red) 72%,var(--line))!important
+}
+.special-color-rule .red{color:var(--red)!important}
 .special-rank-grid article small{display:block;color:var(--amber-dark);font-size:.52rem;font-weight:950;letter-spacing:.08em;line-height:1.2}
 
 /* Home: reserve a real column for the logo so it never sits under the text. */
