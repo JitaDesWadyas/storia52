@@ -5,7 +5,12 @@ html,body{overscroll-behavior-y:none!important}
 
 /* Hearts and diamonds are shown in black like the other suits. */
 .card-meaning-board .polarity-suit,
-.card-meaning-board .polarity-suit.red{color:var(--ink)!important}
+.card-meaning-board .polarity-suit.red,
+.tutorial-suits .red{color:var(--ink)!important}
+.tutorial-tone-diamonds .tutorial-card-demo{
+  color:var(--ink)!important;
+  border-color:color-mix(in srgb,var(--ink) 72%,var(--line))!important
+}
 .special-rank-grid article small{display:block;color:var(--amber-dark);font-size:.52rem;font-weight:950;letter-spacing:.08em;line-height:1.2}
 
 /* Home: reserve a real column for the logo so it never sits under the text. */
