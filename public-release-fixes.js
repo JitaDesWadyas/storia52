@@ -4,13 +4,28 @@
   const S = window.S52;
   if (!S) return;
 
-  const CREATOR_SRC = 'creator-jita.svg?v=14';
+  const CREATOR_SRC = 'creator-jita.svg?v=15';
 
   const replaceCreatorImages = root => {
     const scope = root?.querySelectorAll ? root : document;
     scope.querySelectorAll('img[src*="creator-jita.svg"]').forEach(image => {
       if (image.getAttribute('src') !== CREATOR_SRC) image.setAttribute('src', CREATOR_SRC);
       image.setAttribute('decoding', 'async');
+    });
+  };
+
+  const simplifyCreatorPage = root => {
+    const scope = root?.querySelectorAll ? root : document;
+    scope.querySelectorAll('.creator-editorial').forEach(editorial => {
+      const profile = editorial.querySelector('.creator-profile-pro');
+      if (profile) {
+        profile.querySelector(':scope > img')?.remove();
+        profile.classList.add('creator-profile-single');
+      }
+      const images = editorial.querySelectorAll('img');
+      images.forEach((image, index) => {
+        if (index > 0) image.remove();
+      });
     });
   };
 
@@ -33,10 +48,6 @@
       heroActions?.querySelector('[data-open-panel="tutorial"]')?.remove();
       heroActions?.classList.add('hero-actions-single');
 
-      fragment.querySelector('[data-open-panel="tutorial"]')?.classList.add('menu-card-tutorial');
-      fragment.querySelector('[data-open-panel="rules"]')?.classList.add('menu-card-rules');
-      fragment.querySelector('[data-open-panel="info"]')?.classList.add('menu-card-info');
-      fragment.querySelector('[data-home-resume]')?.classList.add('menu-card-resume');
       replaceCreatorImages(fragment);
       return template.innerHTML;
     };
@@ -63,7 +74,7 @@
     if (!turn || turn.dataset.releasePolished === 'true') return;
     turn.innerHTML = `
       <article><span>1</span><div class="tutorial-step-copy"><b>Scarta e ripesca</b><p>Se hai più di 1 carta in mano, devi scartarne una e pescarne subito una nuova. Con una sola carta salti questo passaggio.</p></div></article>
-      <article><span>2</span><div class="tutorial-step-copy"><b>Gioca 1 o 2 carte</b><p>Metti sul tavolo una carta, oppure due carte compatibili. Dichiara seme e valore prima di raccontare.</p></div></article>
+      <article><span>2</span><div class="tutorial-step-copy"><b>Gioca 1 o 2 carte</b><p>Metti sul tavolo una carta oppure due carte. Se ne giochi due, la stessa scena deve rispettare il significato di entrambe.</p></div></article>
       <article><span>3</span><div class="tutorial-step-copy"><b>Dì una sola scena</b><p>Aggiungi un fatto chiaro che rispetta le carte e continua ciò che è già successo, senza decidere anche la reazione successiva.</p></div></article>
       <article><span>4</span><div class="tutorial-step-copy"><b>Pesca, se vuoi, e chiudi</b><p>Dopo aver detto la scena puoi pescare una carta. Poi il turno è finito e gioca la persona successiva.</p></div></article>`;
     turn.dataset.releasePolished = 'true';
@@ -73,7 +84,7 @@
       const title = heading.querySelector('h3');
       const body = heading.querySelector('p');
       if (title) title.textContent = 'Scarta, gioca, racconta e chiudi il turno.';
-      if (body) body.textContent = 'Il cambio iniziale è obbligatorio quando hai più di una carta. La pesca dopo la scena è facoltativa.';
+      if (body) body.textContent = 'Il cambio iniziale è obbligatorio quando hai più di una carta. Puoi giocare una o due carte; la pesca dopo la scena è facoltativa.';
     }
   };
 
@@ -107,7 +118,7 @@
   const patchReadyCycle = host => {
     const cycle = host.querySelector('.tutorial-cycle');
     if (!cycle || cycle.dataset.releasePolished === 'true') return;
-    cycle.innerHTML = '<span>Scarta</span><i>→</i><span>Ripesca</span><i>→</i><span>Gioca</span><i>→</i><span>Racconta</span><i>→</i><span>Pesca se vuoi</span><i>→</i><span>Passa</span>';
+    cycle.innerHTML = '<span>Scarta</span><i>→</i><span>Ripesca</span><i>→</i><span>Gioca 1 o 2 carte</span><i>→</i><span>Racconta</span><i>→</i><span>Pesca se vuoi</span><i>→</i><span>Passa</span>';
     cycle.dataset.releasePolished = 'true';
   };
 
@@ -155,11 +166,16 @@
     };
   }
 
-  replaceCreatorImages(document);
+  const polish = root => {
+    replaceCreatorImages(root);
+    simplifyCreatorPage(root);
+  };
+
+  polish(document);
   new MutationObserver(records => {
     for (const record of records) {
       for (const node of record.addedNodes) {
-        if (node.nodeType === Node.ELEMENT_NODE) replaceCreatorImages(node);
+        if (node.nodeType === Node.ELEMENT_NODE) polish(node);
       }
     }
   }).observe(document.body, { childList: true, subtree: true });
