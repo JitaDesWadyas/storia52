@@ -5,58 +5,68 @@
   if (!S) return;
 
   const motionAllowed = () => !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const nextFrame = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-  const animateRuleBody = (detail, opening) => {
+  const animateRuleBody = async (detail, opening) => {
     const body = detail.querySelector(':scope > .body');
-    if (!body) return Promise.resolve();
+    const summary = detail.querySelector(':scope > summary');
+    if (!body || !summary || detail.dataset.animating === 'true') return;
+
+    detail.dataset.animating = 'true';
     body.getAnimations().forEach(animation => animation.cancel());
+
+    if (!motionAllowed()) {
+      detail.open = opening;
+      detail.classList.toggle('is-open', opening);
+      body.style.height = opening ? 'auto' : '0px';
+      body.style.opacity = opening ? '1' : '0';
+      summary.setAttribute('aria-expanded', String(opening));
+      detail.dataset.animating = 'false';
+      return;
+    }
 
     if (opening) {
       detail.open = true;
-      const targetHeight = body.scrollHeight;
-      if (!motionAllowed()) {
-        body.style.height = 'auto';
-        body.style.opacity = '1';
-        detail.classList.add('is-open');
-        return Promise.resolve();
-      }
-      return new Promise(resolve => {
-        const duration = Math.min(320, 180 + targetHeight * .035);
-        const animation = body.animate([
-          { height: '0px', opacity: 0, transform: 'translateY(-4px)' },
-          { height: `${targetHeight}px`, opacity: 1, transform: 'translateY(0)' }
-        ], { duration, easing: 'cubic-bezier(.2,.8,.2,1)' });
-        animation.onfinish = () => {
-          body.style.height = 'auto';
-          body.style.opacity = '1';
-          detail.classList.add('is-open');
-          resolve();
-        };
-        animation.oncancel = resolve;
-      });
-    }
-
-    const startHeight = body.getBoundingClientRect().height;
-    detail.classList.remove('is-open');
-    if (!motionAllowed()) {
+      detail.classList.add('is-opening');
       body.style.height = '0px';
       body.style.opacity = '0';
-      detail.open = false;
-      return Promise.resolve();
-    }
-    return new Promise(resolve => {
+      await nextFrame();
+      const targetHeight = body.scrollHeight;
+      const duration = Math.max(360, Math.min(560, 300 + targetHeight * .08));
       const animation = body.animate([
-        { height: `${startHeight}px`, opacity: 1, transform: 'translateY(0)' },
-        { height: '0px', opacity: 0, transform: 'translateY(-4px)' }
-      ], { duration: 170, easing: 'cubic-bezier(.4,0,.2,1)' });
-      animation.onfinish = () => {
-        body.style.height = '0px';
-        body.style.opacity = '0';
-        detail.open = false;
-        resolve();
-      };
-      animation.oncancel = resolve;
-    });
+        { height: '0px', opacity: 0, transform: 'translateY(-8px)' },
+        { height: `${targetHeight}px`, opacity: 1, transform: 'translateY(0)' }
+      ], { duration, easing: 'cubic-bezier(.22,.72,.2,1)', fill: 'both' });
+      await animation.finished.catch(() => {});
+      body.style.height = 'auto';
+      body.style.opacity = '1';
+      body.style.transform = '';
+      detail.classList.remove('is-opening');
+      detail.classList.add('is-open');
+      summary.setAttribute('aria-expanded', 'true');
+      detail.dataset.animating = 'false';
+      return;
+    }
+
+    const startHeight = body.getBoundingClientRect().height || body.scrollHeight;
+    body.style.height = `${startHeight}px`;
+    body.style.opacity = '1';
+    detail.classList.remove('is-open');
+    detail.classList.add('is-closing');
+    await nextFrame();
+    const duration = Math.max(300, Math.min(460, 250 + startHeight * .06));
+    const animation = body.animate([
+      { height: `${startHeight}px`, opacity: 1, transform: 'translateY(0)' },
+      { height: '0px', opacity: 0, transform: 'translateY(-6px)' }
+    ], { duration, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'both' });
+    await animation.finished.catch(() => {});
+    body.style.height = '0px';
+    body.style.opacity = '0';
+    body.style.transform = '';
+    detail.open = false;
+    detail.classList.remove('is-closing');
+    summary.setAttribute('aria-expanded', 'false');
+    detail.dataset.animating = 'false';
   };
 
   S.bindRulebook = root => {
@@ -64,36 +74,21 @@
       if (rulebook.dataset.animatedRulebook) return;
       rulebook.dataset.animatedRulebook = 'true';
       const details = [...rulebook.querySelectorAll(':scope > details')];
+
       details.forEach(detail => {
         const summary = detail.querySelector(':scope > summary');
         const body = detail.querySelector(':scope > .body');
         if (!summary || !body) return;
-        detail.open = false;
-        detail.classList.remove('is-open');
-        body.style.height = '0px';
-        body.style.opacity = '0';
-        summary.setAttribute('aria-expanded', 'false');
-        summary.addEventListener('click', async event => {
+
+        const initiallyOpen = detail.open;
+        detail.classList.toggle('is-open', initiallyOpen);
+        body.style.height = initiallyOpen ? 'auto' : '0px';
+        body.style.opacity = initiallyOpen ? '1' : '0';
+        summary.setAttribute('aria-expanded', String(initiallyOpen));
+
+        summary.addEventListener('click', event => {
           event.preventDefault();
-          if (rulebook.dataset.animating === 'true') return;
-          rulebook.dataset.animating = 'true';
-          const scroller = rulebook.closest('.modal-card') || rulebook;
-          const anchorTop = summary.getBoundingClientRect().top;
-          const willOpen = !detail.open;
-          const closings = details.filter(other => other !== detail && other.open).map(other => {
-            other.querySelector(':scope > summary')?.setAttribute('aria-expanded', 'false');
-            return animateRuleBody(other, false);
-          });
-          await Promise.all(closings);
-          const shiftedTop = summary.getBoundingClientRect().top;
-          if ('scrollTop' in scroller) scroller.scrollTop += shiftedTop - anchorTop;
-          summary.setAttribute('aria-expanded', String(willOpen));
-          await animateRuleBody(detail, willOpen);
-          requestAnimationFrame(() => {
-            const finalTop = summary.getBoundingClientRect().top;
-            if ('scrollTop' in scroller) scroller.scrollTop += finalTop - anchorTop;
-            rulebook.dataset.animating = 'false';
-          });
+          animateRuleBody(detail, !detail.open);
         });
       });
     });
@@ -115,14 +110,24 @@
     }
     requestAnimationFrame(() => close?.focus({ preventScroll: true }));
     host.addEventListener('keydown', event => {
-      if (event.key === 'Escape') { event.preventDefault(); close?.click(); return; }
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        close?.click();
+        return;
+      }
       if (event.key !== 'Tab' || !card) return;
       const focusable = [...card.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(element => element.offsetParent !== null);
       if (!focusable.length) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
-      if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      }
+      if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     });
     S.bindRulebook(host);
     syncModalState();
