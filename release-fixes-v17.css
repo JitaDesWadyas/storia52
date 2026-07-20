@@ -1,0 +1,131 @@
+/* v17: targeted fixes after mobile review. */
+
+/* Keep normal page scrolling, but remove Android/PWA pull-to-refresh. */
+html,body{overscroll-behavior-y:none!important}
+
+/* Hearts and diamonds are shown in black like the other suits. */
+.card-meaning-board .polarity-suit,
+.card-meaning-board .polarity-suit.red,
+.tutorial-suits .red{color:var(--ink)!important}
+.tutorial-tone-diamonds .tutorial-card-demo{
+  color:var(--ink)!important;
+  border-color:color-mix(in srgb,var(--ink) 72%,var(--line))!important
+}
+.special-rank-grid article small{display:block;color:var(--amber-dark);font-size:.52rem;font-weight:950;letter-spacing:.08em;line-height:1.2}
+
+/* Home: reserve a real column for the logo so it never sits under the text. */
+.compact-product-menu .creator-menu-card{
+  grid-template-columns:86px minmax(0,1fr) 42px!important;
+  column-gap:16px!important;
+  align-items:center!important
+}
+.compact-product-menu .creator-menu-logo{
+  display:grid!important;place-items:center!important;
+  width:78px!important;height:90px!important;padding:7px!important;
+  margin:0!important;overflow:hidden!important
+}
+.compact-product-menu .creator-menu-logo img{
+  display:block!important;width:100%!important;height:100%!important;
+  object-fit:contain!important;transform:none!important
+}
+.compact-product-menu .creator-menu-card>span:nth-child(2){min-width:0!important}
+.compact-product-menu .creator-menu-card b,
+.compact-product-menu .creator-menu-card small{position:static!important;display:block!important;max-width:100%!important}
+
+/* Creator modal: keep every element inside the viewport and give the heading real padding. */
+.product-modal-info{padding:10px!important;overflow-x:hidden!important}
+.product-modal-info .modal-card.wide{
+  width:min(780px,calc(100vw - 20px))!important;
+  max-width:calc(100vw - 20px)!important;
+  padding:24px!important;
+  overflow-x:hidden!important
+}
+.product-modal-info .modal-close{top:18px!important;right:18px!important;z-index:5}
+.product-modal-info .creator-modal-heading{
+  width:100%!important;max-width:none!important;
+  margin:0 0 20px!important;padding:0 72px 0 0!important
+}
+.product-modal-info .creator-modal-heading .eyebrow{margin-bottom:8px!important}
+.product-modal-info .creator-modal-heading h2{
+  max-width:620px!important;margin:0!important;
+  font-size:clamp(2rem,7vw,2.85rem)!important;
+  line-height:.98!important;letter-spacing:-.035em!important;
+  text-wrap:balance!important;overflow-wrap:normal!important
+}
+.product-modal-info .creator-modal-heading>p:last-child{
+  max-width:590px!important;margin-top:14px!important;
+  font-size:1rem!important;line-height:1.5!important
+}
+.product-modal-info .creator-page-v16{width:100%!important;min-width:0!important;gap:14px!important}
+.product-modal-info .creator-intro-card{
+  width:100%!important;min-width:0!important;
+  grid-template-columns:138px minmax(0,1fr)!important;
+  gap:20px!important;align-items:center!important;
+  padding:20px!important;border-radius:18px!important
+}
+.product-modal-info .creator-intro-card>img{
+  width:138px!important;height:138px!important;
+  align-self:start!important;border-radius:17px!important
+}
+.product-modal-info .creator-intro-card>div{min-width:0!important}
+.product-modal-info .creator-intro-card h3{
+  max-width:100%!important;margin:0!important;
+  font-size:clamp(1.45rem,4vw,2rem)!important;
+  line-height:1.04!important;overflow-wrap:anywhere!important
+}
+.product-modal-info .creator-intro-card .creator-role{
+  margin-top:7px!important;font-size:.82rem!important;line-height:1.3!important
+}
+.product-modal-info .creator-intro-card p:not(.creator-role){
+  margin-top:11px!important;font-size:.91rem!important;line-height:1.48!important
+}
+.product-modal-info .creator-intro-card .creator-links{
+  display:flex!important;align-items:center!important;gap:12px!important;
+  flex-wrap:wrap!important;margin-top:14px!important
+}
+.product-modal-info .creator-intro-card .creator-links a{
+  min-height:42px!important;padding:9px 13px!important
+}
+.product-modal-info .creator-manifesto,
+.product-modal-info .creator-roadmap-pro{padding:28px!important;border-radius:17px!important}
+.product-modal-info .creator-manifesto h3,
+.product-modal-info .creator-roadmap-pro h3{
+  font-size:clamp(1.75rem,5vw,2.55rem)!important;
+  line-height:1.02!important;text-wrap:balance!important
+}
+.product-modal-info .creator-manifesto>p,
+.product-modal-info .creator-roadmap-pro p{
+  font-size:1rem!important;line-height:1.58!important
+}
+
+@media(max-width:620px){
+  .product-modal-info{padding:6px!important}
+  .product-modal-info .modal-card.wide{
+    width:calc(100vw - 12px)!important;max-width:calc(100vw - 12px)!important;
+    padding:20px 16px 18px!important
+  }
+  .product-modal-info .creator-modal-heading{padding-right:58px!important}
+  .product-modal-info .creator-modal-heading h2{font-size:clamp(2rem,10vw,2.55rem)!important}
+  .product-modal-info .creator-intro-card{
+    grid-template-columns:112px minmax(0,1fr)!important;
+    gap:14px!important;padding:15px!important
+  }
+  .product-modal-info .creator-intro-card>img{width:112px!important;height:112px!important}
+  .product-modal-info .creator-intro-card h3{font-size:1.35rem!important}
+  .product-modal-info .creator-intro-card p:not(.creator-role){font-size:.84rem!important;line-height:1.4!important}
+  .product-modal-info .creator-intro-card .creator-links{grid-column:1/-1!important}
+  .product-modal-info .creator-manifesto,
+  .product-modal-info .creator-roadmap-pro{padding:22px 18px!important}
+  .product-modal-info .creator-manifesto h3,
+  .product-modal-info .creator-roadmap-pro h3{font-size:2rem!important}
+}
+
+@media(max-width:420px){
+  .compact-product-menu .creator-menu-card{grid-template-columns:74px minmax(0,1fr) 32px!important;gap:11px!important}
+  .compact-product-menu .creator-menu-logo{width:68px!important;height:80px!important;padding:6px!important}
+  .product-modal-info .creator-intro-card{grid-template-columns:92px minmax(0,1fr)!important;gap:12px!important}
+  .product-modal-info .creator-intro-card>img{width:92px!important;height:92px!important}
+  .product-modal-info .creator-intro-card h3{font-size:1.2rem!important}
+  .product-modal-info .creator-intro-card .creator-role{font-size:.7rem!important}
+  .product-modal-info .creator-intro-card p:not(.creator-role){grid-column:1/-1!important;font-size:.83rem!important}
+}
