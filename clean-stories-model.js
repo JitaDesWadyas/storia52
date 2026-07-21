@@ -12,7 +12,15 @@
     return { filtered, pages, visible: filtered.slice(S.storyUi.page * 3, S.storyUi.page * 3 + 3) };
   };
   S.chooseReadyStory = (session, story) => {
-    if (!story) return;
+    if (!S.storyAllowedInSession?.(session, story)) {
+      session.readyStoryId = '';
+      session.openingText = '';
+      session.stage = S.isCollectionAvailable?.(session.collectionId) ? 'stories' : 'collections';
+      S.save(session);
+      S.toast('Questa storia non è disponibile');
+      if (session.stage === 'collections') S.renderCollections(session); else S.renderStories(session);
+      return;
+    }
     session.source = 'ready';
     session.readyStoryId = story.id;
     session.openingText = story.opening;
@@ -21,11 +29,17 @@
   };
   S.changeReadyStory = session => {
     session.source = 'ready';
-    session.stage = 'stories';
     session.readyStoryId = '';
     session.openingText = '';
     session.spokenOpening = false;
     session.confirmed = Array(session.count).fill(false);
+    if (!S.isCollectionAvailable?.(session.collectionId)) {
+      session.stage = 'collections';
+      S.save(session);
+      S.renderCollections(session);
+      return;
+    }
+    session.stage = 'stories';
     S.save(session);
     S.renderStories(session);
   };
