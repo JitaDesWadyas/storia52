@@ -47,9 +47,15 @@
     return legacy ? { kind: 'personal', session: legacy } : null;
   };
 
+  const copyableStoryContext = session => S.storyContextMarkup(session).replace(
+    'class="ready-story context-story-preview"',
+    'class="ready-story context-story-preview copyable-opening" data-copy-opening role="button" tabindex="0" aria-label="Copia l’incipit"'
+  );
+  const scrollTopButton = () => '<button type="button" class="game-scroll-top" data-game-scroll-top aria-label="Torna in alto">↑</button>';
+
   const personalInviteMarkup = (session, index) => {
     const objectiveButton = session.confirmed?.[index] ? 'Obiettivo letto · Riapri' : 'Mostra il mio obiettivo';
-    return `<section class="surface"><div class="screen-heading"><p class="eyebrow">${S.esc(S.playerName(session, index))}</p><h2>La storia e il tuo obiettivo.</h2><p>Apri la carta soltanto quando gli altri non stanno guardando.</p></div>${S.storyContextMarkup(session)}<div class="actions one"><button type="button" class="primary" data-show-card>${objectiveButton}</button>${session.count > 1 ? '<button type="button" class="text-button" data-change-player>Cambia giocatore</button>' : ''}</div>${S.turnGuideMarkup()}<details class="accordion"><summary>Significato delle carte</summary><div class="accordion-body">${S.cardRulesMarkup()}</div></details><details class="accordion"><summary>Come si chiude la storia</summary><div class="accordion-body">${S.finalRulesMarkup()}</div></details></section>`;
+    return `<section class="surface"><div class="screen-heading"><p class="eyebrow">${S.esc(S.playerName(session, index))}</p><h2>La storia e il tuo obiettivo.</h2><p>Apri la carta soltanto quando gli altri non stanno guardando.</p></div>${copyableStoryContext(session)}<div class="actions one"><button type="button" class="primary" data-show-card>${objectiveButton}</button>${session.count > 1 ? '<button type="button" class="text-button" data-change-player>Cambia giocatore</button>' : ''}</div>${S.turnGuideMarkup()}<details class="accordion"><summary>Significato delle carte</summary><div class="accordion-body">${S.cardRulesMarkup()}</div></details><details class="accordion"><summary>Come si chiude la storia</summary><div class="accordion-body">${S.finalRulesMarkup()}</div></details>${scrollTopButton()}</section>`;
   };
 
   S.renderSharedPlayer = (session, index) => {
@@ -58,6 +64,15 @@
     S.mount(personalInviteMarkup(session, index), { label: 'Invito personale', session: true, preserveHash: true });
     S.play.querySelector('[data-show-card]').addEventListener('click', () => S.openObjective(session, index, true));
     S.play.querySelector('[data-change-player]')?.addEventListener('click', () => S.renderSharedInvitePicker(session));
+    const opening = S.play.querySelector('[data-copy-opening]');
+    const copyOpening = () => S.copy(S.storyText(session), 'Incipit copiato');
+    opening?.addEventListener('click', copyOpening);
+    opening?.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      copyOpening();
+    });
+    S.play.querySelector('[data-game-scroll-top]')?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
   };
 
   const confirmPlayer = (session, index) => {
