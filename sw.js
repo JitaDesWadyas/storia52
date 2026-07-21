@@ -1,20 +1,24 @@
 'use strict';
 
 const CACHE_PREFIX = 'epoi-';
-const SHELL_CACHE = `${CACHE_PREFIX}shell-v28`;
-const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v28`;
+const SHELL_CACHE = `${CACHE_PREFIX}shell-v29`;
+const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v29`;
 const CORE_FILES = [
   './', './index.html', './privacy.html', './copyright.html',
   './clean-app.css', './refine-flow.css', './home-product.css', './app-polish.css', './home-fixes.css',
-  './tutorial-game.css', './interaction-polish.css', './invite-polish.css', './release-ready.css', './loading-skeleton.css', './ux-rework.css', './scroll-fix.css', './content-polish.css', './collection-prima-scintilla.css', './public-release-polish.css', './release-fixes-v17.css', './release-fixes-v19.css', './release-final-v21.css', './release-fixes-v23.css', './release-fixes-v26.css',
-  './app.js', './ui-core.js', './collection-prima-scintilla-stories.js', './ready-stories-data.js', './collection-prima-scintilla.js',
-  './clean-core.js', './clean-rules.js', './clean-home.js', './content-polish.js', './public-release-fixes.js',
-  './clean-config.js', './clean-opening.js', './clean-stories-model.js',
-  './archive-v20-objectives-01.js', './archive-v20-objectives-02.js', './archive-v20-objectives-03-04.js', './archive-v20-objectives-05-06.js', './archive-v20-objectives-07-08.js', './archive-v20-session-guard.js',
-  './ready-story-objectives-01.js', './ready-story-objectives-02.js', './ready-story-objectives-03.js', './ready-story-objectives-04.js', './ready-story-objectives-05.js', './ready-story-objectives-06.js', './ready-story-objectives-07.js', './ready-story-objectives-08.js', './ready-story-objectives-09.js', './ready-story-objectives-10.js', './ready-story-objectives-11.js', './ready-story-objectives-12.js', './ready-story-objectives-13.js', './ready-story-objectives.js', './collection-prima-scintilla-outcomes.js',
-  './clean-stories-markup.js', './clean-stories-view.js', './collection-prima-scintilla-ui.js', './clean-objectives.js', './clean-prep.js',
-  './qr-local.js', './invite-codec.js', './collection-security.js', './archive-v20-invite-codec.js', './clean-invite-host.js', './clean-invite-data.js', './clean-exit.js',
-  './interaction-polish.js', './scroll-safety.js', './clean-init.js', './pwa-refresh-v28.js', './icon.svg', './storia52-cards-logo.svg', './creator-jita.svg', './creator-jita.webp',
+  './tutorial-game.css', './interaction-polish.css', './invite-polish.css', './release-ready.css',
+  './loading-skeleton.css', './ux-rework.css', './scroll-fix.css', './content-polish.css',
+  './collection-prima-scintilla.css', './public-release-polish.css', './release-polish.css',
+  './app.js', './ui-core.js', './collection-data.js', './clean-core.js', './clean-rules.js',
+  './clean-home.js', './content-polish.js', './public-release-fixes.js', './clean-config.js',
+  './clean-stories-model.js',
+  './archive-v20-objectives-01.js', './archive-v20-objectives-02.js', './archive-v20-objectives-03-04.js',
+  './archive-v20-objectives-05-06.js', './archive-v20-objectives-07-08.js',
+  './collection-objectives.js', './ready-story-objectives.js', './clean-stories-markup.js',
+  './clean-stories-view.js', './collection-controller.js', './clean-objectives.js', './clean-prep.js',
+  './qr-local.js', './invite-codec.js', './clean-invite-host.js', './clean-invite-data.js',
+  './clean-exit.js', './interaction-polish.js', './scroll-safety.js', './clean-init.js', './pwa-refresh.js',
+  './icon.svg', './storia52-cards-logo.svg', './creator-jita.svg', './creator-jita.webp',
   './manifest.webmanifest'
 ];
 
@@ -57,7 +61,9 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(key => key.startsWith(CACHE_PREFIX) && key !== SHELL_CACHE && key !== RUNTIME_CACHE).map(key => caches.delete(key)));
+    await Promise.all(keys
+      .filter(key => key.startsWith(CACHE_PREFIX) && key !== SHELL_CACHE && key !== RUNTIME_CACHE)
+      .map(key => caches.delete(key)));
     if (self.registration.navigationPreload) await self.registration.navigationPreload.enable().catch(() => {});
     await self.clients.claim();
   })());
@@ -78,7 +84,10 @@ const navigationResponse = async event => {
     return (await caches.match(request, { ignoreSearch: true }))
       || (await caches.match(scopedUrl('./index.html')))
       || (await caches.match(scopedUrl('./')))
-      || new Response('<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>E POI?</title><body><h1>E POI?</h1><p>La rete non è disponibile e la pagina non è ancora nella cache.</p></body></html>', { headers: { 'Content-Type': 'text/html; charset=utf-8' }, status: 503 });
+      || new Response('<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>E POI?</title><body><h1>E POI?</h1><p>La rete non è disponibile e la pagina non è ancora nella cache.</p></body></html>', {
+        headers: { 'Content-Type': 'text/html; charset=utf-8' },
+        status: 503
+      });
   }
 };
 
