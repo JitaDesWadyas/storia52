@@ -1,0 +1,37 @@
+/* La Prima Scintilla: prima collezione gratuita. */
+.home-collection-strip{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;
+  margin:18px 0 4px;padding:15px 17px;border:1px solid var(--line-soft);border-left:4px solid var(--amber);
+  border-radius:12px;background:var(--panel);
+}
+.home-collection-strip>div{display:grid;gap:3px;min-width:0}
+.home-collection-strip span{color:var(--amber-dark);font-size:.65rem;font-weight:950;letter-spacing:.1em}
+.home-collection-strip b{font-size:1rem;line-height:1.2}
+.home-collection-strip small{color:var(--muted);font-size:.8rem;line-height:1.4}
+.home-collection-strip i{color:var(--amber-dark);font-size:1.65rem;font-style:normal;line-height:1}
+
+.story-archive-surface{display:grid;gap:22px}
+.story-collection-banner{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:end;
+  padding:20px;border:1px solid var(--line-soft);border-top:4px solid var(--amber);border-radius:14px;background:var(--panel);
+}
+.story-collection-copy{display:grid;gap:7px;min-width:0}
+.story-collection-copy .eyebrow{margin:0}
+.story-collection-copy h3{margin:0;font-size:clamp(1.45rem,4vw,2.1rem);letter-spacing:-.025em}
+.story-collection-copy>p{margin:0;max-width:760px;line-height:1.5}
+.story-collection-world{color:var(--muted);font-size:.9rem}
+.story-collection-stats{display:grid;grid-template-columns:repeat(3,72px);gap:7px}
+.story-collection-stats span{display:grid;place-items:center;gap:2px;min-height:66px;padding:8px;border:1px solid var(--line-soft);border-radius:10px;background:var(--panel-2)}
+.story-collection-stats b{font-size:1.15rem}
+.story-collection-stats small{color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.06em}
+.story-archive-heading{margin-top:0}
+.ready-story .meta span:last-child{white-space:nowrap}
+
+@media(max-width:720px){
+  .home-collection-strip{margin-top:14px;padding:13px 14px}
+  .home-collection-strip i{font-size:1.4rem}
+  .story-collection-banner{grid-template-columns:1fr;gap:15px;padding:17px}
+  .story-collection-stats{grid-template-columns:repeat(3,minmax(0,1fr));width:100%}
+  .story-collection-stats span{min-height:58px}
+  .story-collection-world{font-size:.84rem}
+}
