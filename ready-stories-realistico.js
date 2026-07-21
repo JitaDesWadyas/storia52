@@ -10,5 +10,5 @@
     'archive-v20-stories-avventura.js',
     'archive-v20-stories-commedia.js'
   ];
-  document.write(files.map(file => `<script src="${file}?v=20"><\/script>`).join(''));
+  document.write(files.map(file => `<script src="${file}"><\/script>`).join(''));
 })();
