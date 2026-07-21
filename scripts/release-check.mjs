@@ -8,7 +8,8 @@ const exists = file => fs.existsSync(path.join(root, file));
 const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 
-for (const file of fs.readdirSync(root).filter(name => name.endsWith('.js'))) {
+const rootFiles = fs.readdirSync(root);
+for (const file of rootFiles.filter(name => name.endsWith('.js'))) {
   try { new Function(read(file)); }
   catch (error) { failures.push(`${file}: sintassi non valida (${error.message})`); }
 }
@@ -23,7 +24,7 @@ for (const htmlFile of ['index.html', 'privacy.html', 'copyright.html']) {
   }
 }
 
-for (const cssFile of fs.readdirSync(root).filter(name => name.endsWith('.css'))) {
+for (const cssFile of rootFiles.filter(name => name.endsWith('.css'))) {
   for (const match of read(cssFile).matchAll(/url\((?:"|')?([^"')]+)(?:"|')?\)/g)) {
     const reference = match[1].trim();
     if (/^(?:https?:|data:|#)/i.test(reference)) continue;
@@ -34,34 +35,80 @@ for (const cssFile of fs.readdirSync(root).filter(name => name.endsWith('.css'))
 
 const index = read('index.html');
 const scriptOrder = [...index.matchAll(/<script src="([^"]+)"/g)].map(match => match[1].split('?')[0]);
+const styleOrder = [...index.matchAll(/<link rel="stylesheet" href="([^"]+)"/g)].map(match => match[1].split('?')[0]);
 const scriptIndex = name => scriptOrder.indexOf(name);
-check(index.includes('initial-skeleton'), 'index.html: skeleton iniziale mancante');
-check(scriptIndex('collection-prima-scintilla-stories.js') >= 0, 'index.html: catalogo gratuito non caricato');
-check(scriptIndex('collection-prima-scintilla-stories.js') < scriptIndex('ready-stories-data.js'), 'index.html: catalogo gratuito caricato troppo tardi');
-check(scriptIndex('collection-prima-scintilla.js') > scriptIndex('ready-stories-data.js'), 'index.html: metadati collezione caricati troppo presto');
-check(scriptIndex('collection-prima-scintilla.js') < scriptIndex('clean-core.js'), 'index.html: metadati collezione caricati dopo clean-core');
-check(scriptIndex('collection-prima-scintilla-outcomes.js') > scriptIndex('ready-story-objectives.js'), 'index.html: finali riscritti caricati prima degli obiettivi');
-check(scriptIndex('collection-prima-scintilla-ui.js') > scriptIndex('clean-stories-view.js'), 'index.html: UI collezione caricata prima dell’archivio');
-check(scriptIndex('collection-security.js') > scriptIndex('invite-codec.js'), 'index.html: sicurezza inviti caricata troppo presto');
-check(scriptIndex('collection-security.js') < scriptIndex('clean-invite-host.js'), 'index.html: sicurezza inviti caricata troppo tardi');
-check(scriptIndex('pwa-refresh-v28.js') > scriptIndex('clean-init.js'), 'index.html: refresh PWA v28 non caricato alla fine');
-check(!scriptOrder.some(file => /^ready-stories-(?:realistico|mistero|fantascienza|fantasy|horror|amore|avventura|commedia)\.js$/.test(file)), 'index.html: vengono ancora scaricate le 16 storie bloccate');
-check(index.includes('creator-jita.webp?v=28'), 'index.html: anteprima WebP del creatore mancante');
+const styleIndex = name => styleOrder.indexOf(name);
 
-const allTextFiles = fs.readdirSync(root).filter(name => /\.(?:html|css|js|webmanifest)$/i.test(name));
-const allText = allTextFiles.map(read).join('\n');
+check(new Set(scriptOrder).size === scriptOrder.length, 'index.html: script duplicati');
+check(new Set(styleOrder).size === styleOrder.length, 'index.html: fogli di stile duplicati');
+check(!index.includes('<style>'), 'index.html: contiene ancora CSS inline');
+check(index.includes('initial-skeleton'), 'index.html: skeleton iniziale mancante');
+check(styleIndex('loading-skeleton.css') >= 0, 'index.html: loading-skeleton.css non caricato');
+check(styleIndex('release-polish.css') >= 0, 'index.html: release-polish.css non caricato');
+check(scriptIndex('collection-data.js') < scriptIndex('clean-core.js'), 'index.html: dati collezione caricati dopo il core');
+check(scriptIndex('collection-objectives.js') > scriptIndex('archive-v20-objectives-07-08.js'), 'index.html: filtro obiettivi caricato troppo presto');
+check(scriptIndex('ready-story-objectives.js') > scriptIndex('collection-objectives.js'), 'index.html: assegnazione obiettivi caricata prima dei dati');
+check(scriptIndex('collection-controller.js') > scriptIndex('clean-stories-view.js'), 'index.html: controller collezioni caricato prima della vista');
+check(scriptIndex('collection-controller.js') < scriptIndex('clean-objectives.js'), 'index.html: controller collezioni caricato troppo tardi');
+check(scriptIndex('invite-codec.js') < scriptIndex('clean-invite-host.js'), 'index.html: codec inviti caricato troppo tardi');
+check(scriptIndex('pwa-refresh.js') > scriptIndex('clean-init.js'), 'index.html: refresh PWA non caricato alla fine');
+check(!scriptOrder.includes('clean-opening.js'), 'index.html: carica ancora il flusso incipit disattivato');
+check(!scriptOrder.some(file => /^ready-story-objectives-\d+\.js$/.test(file)), 'index.html: carica ancora i vecchi pacchetti obiettivi');
+check(!scriptOrder.some(file => /^ready-stories-/.test(file)), 'index.html: carica ancora i vecchi wrapper storie');
+
+const activeScripts = scriptOrder.filter(file => file.endsWith('.js'));
+for (const file of activeScripts) {
+  check(!read(file).includes('document.write'), `${file}: usa ancora document.write`);
+}
+
+const controller = read('collection-controller.js');
+const collectionCss = read('collection-prima-scintilla.css');
+check(!controller.includes('Qui trovate il contesto generale'), 'Testo interno presente nella scelta collezione');
+check(!controller.includes('senza ripetere queste informazioni'), 'Testo interno presente nella scelta collezione');
+check(!controller.includes('modificando il salvataggio locale'), 'Dettagli tecnici mostrati agli utenti');
+check(controller.includes('Ogni collezione riunisce storie con una propria atmosfera'), 'Testo definitivo della scelta collezione mancante');
+check(!controller.includes('collection-coming-overlay'), 'Il cartello In arrivo copre ancora la scheda');
+check(!collectionCss.includes('collection-coming-overlay'), 'Il vecchio overlay In arrivo è ancora nello stile');
+check(collectionCss.includes('collection-status-coming'), 'Lo stato In arrivo discreto è mancante');
+
+const removedFiles = [
+  'collection-prima-scintilla-stories.js', 'ready-stories-data.js', 'collection-prima-scintilla.js',
+  'collection-prima-scintilla-ui.js', 'collection-prima-scintilla-outcomes.js', 'collection-security.js',
+  'clean-opening.js', 'archive-v20-session-guard.js', 'archive-v20-invite-codec.js',
+  'pwa-refresh-v26.js', 'pwa-refresh-v27.js', 'pwa-refresh-v28.js',
+  'release-fixes-v17.css', 'release-fixes-v19.css', 'release-final-v21.css',
+  'release-fixes-v23.css', 'release-fixes-v25.css', 'release-fixes-v26.css',
+  'opening-loader.js', 'opening-engine.css', 'opening-engine-core.js', 'opening-engine-priority.js',
+  'opening-engine-generate.js', 'opening-engine-compose.js', 'opening-engine-copy.js', 'opening-engine-ui.js',
+  'opening-engine-stability-loader.js', 'opening-engine-indexes.js', 'opening-engine-parts.js',
+  'opening-engine-stable-batch.js', 'opening-bank-small.js', 'opening-bank-people-safe.js',
+  'opening-bank-duties.js', 'opening-bank-scenes-a.js', 'opening-bank-scenes-b.js',
+  'opening-bank-actions-safe.js', 'opening-bank-obstacles-safe.js'
+];
+for (const file of removedFiles) check(!exists(file), `File legacy ancora presente: ${file}`);
+for (let index = 1; index <= 13; index += 1) {
+  check(!exists(`ready-story-objectives-${String(index).padStart(2, '0')}.js`), `Vecchio pacchetto obiettivi ${index} ancora presente`);
+}
+for (const suffix of ['realistico', 'mistero', 'fantascienza', 'fantasy', 'horror', 'amore', 'avventura', 'commedia']) {
+  check(!exists(`ready-stories-${suffix}.js`), `Wrapper storie legacy ancora presente: ${suffix}`);
+  check(!exists(`archive-v20-stories-${suffix}.js`), `Archivio storie duplicato ancora presente: ${suffix}`);
+}
+check(!exists('archive-v20-data.js'), 'Archivio categorie duplicato ancora presente');
+
+const allText = rootFiles
+  .filter(name => /\.(?:html|css|js|webmanifest)$/i.test(name) && exists(name))
+  .map(read)
+  .join('\n');
 check(!allText.includes('Harminger'), 'È ancora presente un riferimento a Harminger');
 check(!allText.includes('Massimo 28 caratteri'), 'È ancora presente il testo fisso sul limite dei nomi');
 check(!allText.includes('api.qrserver.com'), 'È ancora presente il generatore QR esterno');
-check(!allText.includes('creator-jita.png'), 'È ancora presente un riferimento al vecchio PNG');
-check(read('clean-config.js').includes('option-locked'), 'L’incipit personalizzato non è visivamente bloccato');
-check(read('clean-config.js').includes('S.renderCollections(session)'), 'Il setup non passa dalla scelta collezione');
-check(read('collection-security.js').includes("safeCode.startsWith('r2.')"), 'Gli inviti personalizzati non sono bloccati');
+check(!allText.includes('document.write'), 'È ancora presente document.write nel codice');
+check(!allText.includes('const encoded='), 'Il QR locale contiene ancora un payload compresso');
 
 const portrait = fs.readFileSync(path.join(root, 'creator-jita.webp'));
 check(portrait.length > 10000, 'Il ritratto WebP sembra vuoto o troppo piccolo');
 check(portrait.subarray(0, 4).toString('ascii') === 'RIFF' && portrait.subarray(8, 12).toString('ascii') === 'WEBP', 'creator-jita.webp non è un WebP valido');
-check(read('release-fixes-v26.css').includes('creator-jita.webp?v=28'), 'Dietro E POI? non usa il ritratto WebP');
+check(read('release-polish.css').includes('creator-jita.webp?v=29'), 'La scheda del creatore non usa il WebP');
 
 const sw = read('sw.js');
 const coreBlock = sw.match(/const CORE_FILES = \[([\s\S]*?)\];/)?.[1] || '';
@@ -69,41 +116,38 @@ for (const match of coreBlock.matchAll(/['"]\.\/([^'"]*)['"]/g)) {
   const file = match[1];
   if (file) check(exists(file), `sw.js: file in cache mancante ${file}`);
 }
-check(sw.includes('shell-v28') && sw.includes('runtime-v28'), 'sw.js: cache PWA v28 non attiva');
-check(sw.includes("'./creator-jita.webp'"), 'sw.js: ritratto WebP non precacheato');
-check(sw.includes("'./collection-security.js'"), 'sw.js: sicurezza collezioni non precacheata');
-check(!sw.includes('archive-v20-stories-realistico.js'), 'sw.js: precachea ancora il catalogo bloccato');
+check(sw.includes('shell-v29') && sw.includes('runtime-v29'), 'sw.js: cache PWA v29 non attiva');
+check(sw.includes("'./collection-data.js'"), 'sw.js: dati collezione non precacheati');
+check(sw.includes("'./collection-controller.js'"), 'sw.js: controller collezione non precacheato');
+check(sw.includes("'./release-polish.css'"), 'sw.js: CSS finale non precacheato');
+check(!sw.includes('archive-v20-stories-'), 'sw.js: precachea ancora gli archivi storie legacy');
 check(sw.includes('cache.addAll(requests)'), 'sw.js: installazione cache non atomica');
 check(sw.includes('staleWhileRevalidate'), 'sw.js: strategia rete instabile mancante');
 
 const evaluate = file => (0, eval)(read(file));
 globalThis.window = globalThis;
-evaluate('collection-prima-scintilla-stories.js');
-evaluate('ready-stories-data.js');
-evaluate('collection-prima-scintilla.js');
-
+evaluate('collection-data.js');
 const collections = globalThis.STORIA52_READY_COLLECTIONS || [];
+const stories = globalThis.STORIA52_READY_STORIES || [];
 const available = collections.find(collection => collection.id === 'prima-scintilla');
 const coming = collections.find(collection => collection.id === 'nuove-scintille');
-const stories = globalThis.STORIA52_READY_STORIES || [];
 check(collections.length === 2, 'Devono esistere due collezioni');
-check(available?.status === 'available' && available.storyCount === 8, 'La Prima Scintilla deve avere 8 storie disponibili');
-check(coming?.status === 'coming-soon' && coming.storyCount === 16, 'La seconda collezione deve avere 16 storie in arrivo');
+check(available?.status === 'available' && available.storyCount === 8, 'La Prima Scintilla deve avere 8 storie');
+check(coming?.status === 'coming-soon' && coming.storyCount === 16, 'Nuove Scintille deve indicare 16 storie');
 check(stories.length === 8 && new Set(stories.map(story => story.category)).size === 8, 'Servono 8 storie, una per categoria');
-check(stories.every(story => story.collectionId === 'prima-scintilla'), 'Una storia gratuita non appartiene alla collezione corretta');
-check(!available?.world.includes('Valmora'), 'La descrizione moderna della città non deve raccontare Valmora');
+check(stories.every(story => story.collectionId === 'prima-scintilla'), 'Una storia non appartiene alla collezione gratuita');
 check(available?.independence.includes('indipendente'), 'Manca la nota sull’indipendenza delle storie');
-check(globalThis.STORIA52_FEATURES?.customOpening === false && globalThis.STORIA52_FEATURES?.paidCollections === false, 'Le funzionalità in arrivo non sono disattivate');
+check(globalThis.STORIA52_FEATURES?.customOpening === false, 'L’incipit personalizzato non è disattivato');
 
 for (const file of [
   'archive-v20-objectives-01.js', 'archive-v20-objectives-02.js', 'archive-v20-objectives-03-04.js',
   'archive-v20-objectives-05-06.js', 'archive-v20-objectives-07-08.js'
 ]) evaluate(file);
-evaluate('collection-prima-scintilla-outcomes.js');
+evaluate('collection-objectives.js');
 const objectiveGroups = globalThis.STORIA52_READY_OBJECTIVES || {};
-check(Object.keys(objectiveGroups).length === 8, 'In memoria devono restare solo gli obiettivi delle 8 storie gratuite');
-check(Object.values(objectiveGroups).every(group => Array.isArray(group) && group.length === 8), 'Ogni storia gratuita deve avere 8 finali');
-check(globalThis.STORIA52_PRIMA_SCINTILLA_REWRITTEN_OUTCOMES === 16, 'Devono essere applicati 16 finali editoriali alla collezione gratuita');
+check(Object.keys(objectiveGroups).length === 8, 'In memoria devono restare solo 8 gruppi di obiettivi');
+check(Object.values(objectiveGroups).every(group => Array.isArray(group) && group.length === 8), 'Ogni storia deve avere 8 finali');
+check(globalThis.STORIA52_COLLECTION_REWRITTEN_OUTCOMES === 16, 'Devono essere applicati 16 finali editoriali');
 
 (0, eval)(read('qr-local.js'));
 await globalThis.EpoiQrReady;
@@ -111,56 +155,33 @@ const qrSvg = globalThis.EpoiQr.toSvg(`https://example.test/storia52/#g=${'A'.re
 assert.match(qrSvg, /^<svg class="epoi-qr-svg"/);
 assert.ok(qrSvg.includes('<path'));
 
-const cleanText = (value, max = 500, multiline = false) => {
-  let text = String(value ?? '').normalize('NFKC').replace(multiline ? /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g : /[\u0000-\u001F\u007F]/g, '');
-  text = multiline ? text.replace(/\r\n?/g, '\n').replace(/[\t ]+/g, ' ').replace(/\n{3,}/g, '\n\n') : text.replace(/\s+/g, ' ');
-  return text.trim().slice(0, max);
-};
-globalThis.serializeStory = value => JSON.stringify(value);
-globalThis.parseStory = value => { try { return JSON.parse(value); } catch { return null; } };
-globalThis.serializeCard = value => value ? `${value.suit}:${value.number}` : '';
-globalThis.parseCard = value => {
-  const [suit, number] = String(value || '').split(':');
-  return suit && Number(number) ? { suit, number: Number(number) } : null;
-};
-
+const cleanText = (value, max = 500) => String(value ?? '').normalize('NFKC').replace(/[\u0000-\u001F\u007F]/g, '').replace(/\s+/g, ' ').trim().slice(0, max);
 globalThis.window.S52 = {
-  limits: { name: 28, opening: 700, inviteCode: 6000, inviteQr: 1900, inviteDecoded: 18000 },
+  limits: { name: 28, inviteCode: 6000 },
+  stories,
+  primaryCollectionId: 'prima-scintilla',
   cleanText,
   cleanName: (value, index = 0) => cleanText(value, 28) || `Giocatore ${index + 1}`,
-  playerName(session, index) { return this.cleanName(session.names?.[index], index); },
-  stories,
-  save() {},
-  secureCollectionSession(session) { return session; },
-  isCollectionAvailable(id) { return id === 'prima-scintilla'; },
-  readyStory(session) { return this.stories.find(story => story.id === session.readyStoryId) || null; },
-  storyAllowedInSession(session, story) { return Boolean(story && session.collectionId === 'prima-scintilla' && story.collectionId === 'prima-scintilla'); },
-  objectivesForReadyStory(story, count) {
-    return Array.from({ length: count }, (_, index) => ({ custom: true, storyId: story.id, slot: index, title: `Piano ${index + 1}`, text: `Testo ${index + 1}`, finale: `Finale ${index + 1}` }));
-  }
+  normalizeSession: session => session,
+  storyAllowedInSession: (session, story) => Boolean(session.collectionId === 'prima-scintilla' && story?.collectionId === 'prima-scintilla'),
+  objectivesForReadyStory: (story, count) => Array.from({ length: count }, (_, index) => ({ custom: true, storyId: story.id, slot: index, title: `Piano ${index + 1}`, text: 'Testo', finale: 'Finale' }))
 };
 (0, eval)(read('invite-codec.js'));
-(0, eval)(read('collection-security.js'));
 const S = globalThis.window.S52;
 const story = stories[0];
 const readySession = {
   source: 'ready', collectionId: 'prima-scintilla', readyStoryId: story.id, count: 4,
-  names: ['Marta', 'Luca', '', 'Sara'], objectives: S.objectivesForReadyStory(story, 4), openingText: story.opening, spokenOpening: false
+  names: ['Marta', 'Luca', '', 'Sara'], objectives: S.objectivesForReadyStory(story, 4), openingText: story.opening
 };
 const readyCode = await S.encodeGameInvite(readySession);
-check(readyCode.startsWith('r2.'), 'Invito storia pronta non compatto');
+check(readyCode.startsWith('r3.'), 'Invito storia pronta non usa il formato r3');
 const readyDecoded = await S.decodeGameInvite(readyCode);
-check(readyDecoded?.collectionId === 'prima-scintilla' && readyDecoded?.readyStoryId === story.id, 'Invito pronto non ricostruisce la collezione');
-let customRejected = false;
-try {
-  await S.encodeGameInvite({ ...readySession, source: 'cards', collectionId: '', readyStoryId: '' });
-} catch { customRejected = true; }
-check(customRejected, 'Un invito personalizzato può ancora essere creato');
-check(await S.decodeGameInvite('c2.jAAAA') === null, 'Un invito personalizzato può ancora essere importato');
+check(readyDecoded?.collectionId === 'prima-scintilla' && readyDecoded?.readyStoryId === story.id, 'Invito non ricostruisce la collezione');
+check(await S.decodeGameInvite('c2.jAAAA') === null, 'Un vecchio invito personalizzato viene ancora accettato');
 check(await S.decodeGameInvite('A'.repeat(6001)) === null, 'Invito enorme non rifiutato');
 
 if (failures.length) {
   console.error('\nRelease check fallito:\n- ' + failures.join('\n- '));
   process.exit(1);
 }
-console.log(`Release check completato: ${scriptOrder.length} script, 8+16 collezioni, WebP, blocchi e cache v28 verificati.`);
+console.log(`Release check completato: ${scriptOrder.length} script, architettura consolidata, 8+16 collezioni, WebP e cache v29 verificati.`);

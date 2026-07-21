@@ -44,8 +44,7 @@
 
   let changed = 0;
   for (const [storyId, storyPatches] of Object.entries(patches)) {
-    const storyObjectives = objectives[storyId] || [];
-    for (const objective of storyObjectives) {
+    for (const objective of objectives[storyId] || []) {
       const finale = storyPatches[objective.title];
       if (!finale) continue;
       objective.finale = finale;
@@ -53,6 +52,6 @@
     }
   }
 
-  window.STORIA52_PRIMA_SCINTILLA_REWRITTEN_OUTCOMES = changed;
+  window.STORIA52_COLLECTION_REWRITTEN_OUTCOMES = changed;
   if (changed !== 16) console.error(`La Prima Scintilla: attesi 16 finali riscritti, trovati ${changed}.`);
 })();

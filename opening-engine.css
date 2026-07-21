@@ -1,9 +1,0 @@
-.context-link{display:grid;gap:5px;margin:0 0 12px;padding:11px 12px;border-left:4px solid var(--amber);background:var(--card-bg-2);color:var(--card-ink)}
-.context-link>span{color:var(--amber-deep);font-size:.62rem;font-weight:950;letter-spacing:.1em}
-.context-link q{font:700 .95rem/1.42 Georgia,serif}
-.context-link small{color:var(--card-muted);line-height:1.42}
-.concrete-tip{margin:10px 0 0;padding:9px 11px;border:1px dashed var(--card-line);border-radius:7px;color:var(--card-muted);font-size:.82rem;line-height:1.4}
-.concrete-tip b{color:var(--card-ink)}
-.suggestion-chip{position:relative;padding-bottom:30px!important}
-.suggestion-chip:after{content:'USA QUESTA IDEA';position:absolute;left:12px;bottom:9px;color:var(--amber-deep);font-size:.58rem;font-weight:950;letter-spacing:.08em}
-.suggestion-chip.selected:after{content:'SCELTA · MODIFICABILE SOTTO'}
