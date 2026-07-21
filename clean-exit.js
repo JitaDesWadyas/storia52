@@ -1,19 +1,21 @@
 'use strict';
+
 (() => {
   const S = window.S52;
 
   S.openExitModal = () => {
-    const session = S.secureCollectionSession?.(S.currentSession || S.load()) || S.currentSession || S.load();
+    const session = S.normalizeSession?.(S.currentSession || S.load()) || S.currentSession || S.load();
     if (!session) { S.renderHome(); return; }
+
     const body = `<p class="exit-note">La partita resta salvata automaticamente.</p><div class="exit-options exit-options-simple"><button type="button" class="primary" data-exit-continue>Continua</button><button type="button" class="danger" data-exit-home>Torna alla home</button><button type="button" class="secondary" data-exit-new>Nuova partita</button></div>`;
     const { host, close } = S.modal('Uscire?', body, { className: 'exit-modal' });
-    host.querySelector('[data-exit-continue]').addEventListener('click', close);
-    host.querySelector('[data-exit-home]').addEventListener('click', () => {
+    host.querySelector('[data-exit-continue]')?.addEventListener('click', close);
+    host.querySelector('[data-exit-home]')?.addEventListener('click', () => {
       S.save(session);
       close();
       setTimeout(S.renderHome, 150);
     });
-    host.querySelector('[data-exit-new]').addEventListener('click', () => {
+    host.querySelector('[data-exit-new]')?.addEventListener('click', () => {
       S.clear();
       close();
       setTimeout(() => S.renderSetup('play'), 150);
@@ -21,8 +23,9 @@
   };
 
   S.resume = session => {
-    session = S.secureCollectionSession?.(session) || session;
+    session = S.normalizeSession?.(session) || session;
     if (!session) { S.renderHome(); return; }
+
     const routes = {
       setup: () => S.renderSetup('play', session),
       collections: () => S.renderCollections(session),
@@ -32,8 +35,7 @@
       invites: () => S.renderInvites(session),
       game: () => session.delivery === 'multi' ? S.renderHostGame(session) : S.renderGame(session)
     };
-    const safeStage = ['cards', 'questions'].includes(session.stage) ? 'collections' : session.stage;
-    if (!S.isCollectionAvailable?.(session.collectionId) && !['setup', 'collections'].includes(safeStage)) session.stage = 'collections';
-    (routes[session.stage] || (() => S.renderSetup('play', session)))();
+
+    (routes[session.stage] || routes.setup)();
   };
 })();
