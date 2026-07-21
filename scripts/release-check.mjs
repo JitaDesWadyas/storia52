@@ -39,11 +39,18 @@ for (const cssFile of fs.readdirSync(root).filter(name => name.endsWith('.css'))
 
 const index = read('index.html');
 const scriptOrder = [...index.matchAll(/<script src="([^"]+)"/g)].map(match => match[1]);
+const scriptIndex = name => scriptOrder.findIndex(source => source.split('?')[0] === name);
 const qrIndex = scriptOrder.indexOf('qr-local.js');
 const inviteHostIndex = scriptOrder.indexOf('clean-invite-host.js');
 check(qrIndex >= 0, 'index.html: qr-local.js non caricato');
 check(qrIndex < inviteHostIndex, 'index.html: il QR locale deve caricarsi prima del flusso inviti');
 check(index.includes('initial-skeleton'), 'index.html: skeleton iniziale mancante');
+check(scriptIndex('collection-prima-scintilla.js') > scriptIndex('ready-stories-data.js'), 'index.html: metadati collezione caricati troppo presto');
+check(scriptIndex('collection-prima-scintilla.js') < scriptIndex('clean-core.js'), 'index.html: metadati collezione caricati dopo clean-core');
+check(scriptIndex('collection-prima-scintilla-outcomes.js') > scriptIndex('ready-story-objectives.js'), 'index.html: finali riscritti caricati prima degli obiettivi');
+check(scriptIndex('collection-prima-scintilla-outcomes.js') < scriptIndex('clean-objectives.js'), 'index.html: finali riscritti caricati troppo tardi');
+check(scriptIndex('collection-prima-scintilla-ui.js') > scriptIndex('clean-stories-view.js'), 'index.html: UI collezione caricata prima dell’archivio storie');
+check(scriptIndex('pwa-refresh-v27.js') > scriptIndex('clean-init.js'), 'index.html: refresh PWA v27 non caricato alla fine');
 
 const allText = fs.readdirSync(root)
   .filter(name => /\.(?:html|css|js|webmanifest)$/i.test(name))
@@ -61,8 +68,31 @@ for (const match of coreBlock.matchAll(/['"]\.\/([^'"]*)['"]/g)) {
 }
 check(sw.includes('cache.addAll(requests)'), 'sw.js: installazione della cache non atomica');
 check(sw.includes('staleWhileRevalidate'), 'sw.js: strategia rete instabile mancante');
+check(sw.includes('shell-v27') && sw.includes('runtime-v27'), 'sw.js: cache PWA v27 non attiva');
 
+const evaluate = file => (0, eval)(read(file));
 globalThis.window = globalThis;
+for (const file of [
+  'archive-v20-stories-realistico.js', 'archive-v20-stories-mistero.js', 'archive-v20-stories-fantascienza.js', 'archive-v20-stories-fantasy.js',
+  'archive-v20-stories-horror.js', 'archive-v20-stories-amore.js', 'archive-v20-stories-avventura.js', 'archive-v20-stories-commedia.js'
+]) evaluate(file);
+evaluate('ready-stories-data.js');
+evaluate('collection-prima-scintilla.js');
+check(globalThis.STORIA52_READY_COLLECTION?.id === 'prima-scintilla', 'Collezione La Prima Scintilla non inizializzata');
+check(globalThis.STORIA52_READY_COLLECTION?.title === 'La Prima Scintilla', 'Nome della collezione non corretto');
+check(globalThis.STORIA52_READY_STORIES?.length === 24, 'La Prima Scintilla deve contenere 24 storie');
+check(globalThis.STORIA52_READY_STORIES?.every(story => story.collectionId === 'prima-scintilla'), 'Alcune storie non appartengono a La Prima Scintilla');
+
+for (const file of [
+  'archive-v20-objectives-01.js', 'archive-v20-objectives-02.js', 'archive-v20-objectives-03-04.js',
+  'archive-v20-objectives-05-06.js', 'archive-v20-objectives-07-08.js'
+]) evaluate(file);
+evaluate('collection-prima-scintilla-outcomes.js');
+const objectiveGroups = globalThis.STORIA52_READY_OBJECTIVES || {};
+check(Object.keys(objectiveGroups).length === 24, 'La Prima Scintilla deve avere obiettivi per 24 storie');
+check(Object.values(objectiveGroups).every(group => Array.isArray(group) && group.length === 8), 'Ogni storia deve avere 8 finali');
+check(globalThis.STORIA52_PRIMA_SCINTILLA_REWRITTEN_OUTCOMES === 48, 'Devono essere applicati esattamente 48 finali riscritti');
+
 (0, eval)(read('qr-local.js'));
 await globalThis.EpoiQrReady;
 const qrSvg = globalThis.EpoiQr.toSvg(`https://example.test/storia52/#g=${'A'.repeat(900)}`);
@@ -125,4 +155,4 @@ if (failures.length) {
   console.error('\nRelease check fallito:\n- ' + failures.join('\n- '));
   process.exit(1);
 }
-console.log(`Release check completato: ${scriptOrder.length} script, QR locale, inviti e cache verificati.`);
+console.log(`Release check completato: ${scriptOrder.length} script, La Prima Scintilla, QR locale, inviti e cache v27 verificati.`);
