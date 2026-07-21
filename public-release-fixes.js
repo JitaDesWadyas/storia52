@@ -1,7 +1,7 @@
 'use strict';
 
 (() => {
-  const CREATOR_SRC = 'creator-jita.svg?v=16';
+  const CREATOR_SRC = 'creator-jita.svg?v=23';
 
   const refreshCreatorImages = root => {
     const scope = root?.querySelectorAll ? root : document;
