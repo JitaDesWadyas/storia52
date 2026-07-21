@@ -1,7 +1,7 @@
 'use strict';
 (() => {
   const categories = {
-    realistico: { label: 'Realistico', symbol: '●', description: 'Lavoro, famiglia, denaro e decisioni credibili con conseguenze concrete.' },
+    realistico: { label: 'Dramma', symbol: '●', description: 'Conflitti umani, lavoro, famiglia, denaro e decisioni credibili con conseguenze concrete.' },
     mistero: { label: 'Mistero', symbol: '♦', description: 'Indizi, sparizioni e verità nascoste da ricostruire insieme.' },
     fantascienza: { label: 'Fantascienza', symbol: '✦', description: 'Tecnologia e futuri in cui ogni scelta cambia le regole.' },
     fantasy: { label: 'Fantasy', symbol: '♜', description: 'Harminger, Valmora, magia e patti difficili da spezzare.' },
