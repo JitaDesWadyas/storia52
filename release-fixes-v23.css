@@ -1,4 +1,4 @@
-/* v23: stable home viewport and one theme glyph. */
+/* v24: stable home viewport, one theme glyph and restored creator background card. */
 
 /* The first home render must be visually still. */
 body.home-static-entry .product-hero,
@@ -28,6 +28,86 @@ body.home-static-entry .compact-product-menu .resume-card{
   text-indent:0!important;
   transform:none!important;
   opacity:1!important
+}
+
+/* Restore the original Dietro E POI? card: portrait as the full background. */
+.product-modal-info .creator-intro-card{
+  position:relative!important;
+  isolation:isolate!important;
+  display:flex!important;
+  align-items:flex-end!important;
+  min-height:430px!important;
+  padding:clamp(28px,5vw,48px)!important;
+  overflow:hidden!important;
+  background:
+    linear-gradient(90deg,rgba(7,7,9,.96) 0%,rgba(7,7,9,.88) 48%,rgba(7,7,9,.44) 100%),
+    url("creator-jita.svg?v=24") 72% 38%/cover no-repeat!important;
+  border-color:color-mix(in srgb,var(--amber) 70%,var(--line))!important;
+  box-shadow:0 22px 48px rgba(0,0,0,.28)!important
+}
+.product-modal-info .creator-intro-card::after{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  inset:0!important;
+  z-index:-1!important;
+  pointer-events:none!important;
+  background:linear-gradient(180deg,rgba(0,0,0,.04) 25%,rgba(0,0,0,.76) 100%)!important
+}
+.product-modal-info .creator-intro-card>img{display:none!important}
+.product-modal-info .creator-intro-copy{
+  position:relative!important;
+  z-index:1!important;
+  width:min(620px,78%)!important;
+  min-width:0!important;
+  color:#fff9ee!important;
+  text-shadow:0 2px 12px rgba(0,0,0,.72)!important
+}
+.product-modal-info .creator-intro-card .creator-game-name{
+  color:#fbbf24!important;
+  text-shadow:0 2px 9px rgba(0,0,0,.75)!important
+}
+.product-modal-info .creator-intro-card h3{
+  color:#fff9ee!important;
+  max-width:100%!important;
+  overflow-wrap:normal!important;
+  text-shadow:0 3px 16px rgba(0,0,0,.86)!important
+}
+.product-modal-info .creator-intro-card .creator-role{
+  color:#fbbf24!important;
+  font-size:.82rem!important;
+  line-height:1.38!important;
+  text-shadow:0 2px 10px rgba(0,0,0,.8)!important
+}
+.product-modal-info .creator-intro-card p:not(.creator-role){
+  color:rgba(255,249,238,.9)!important;
+  max-width:60ch!important;
+  font-size:1rem!important;
+  line-height:1.58!important;
+  text-shadow:0 2px 12px rgba(0,0,0,.85)!important
+}
+.product-modal-info .creator-intro-card .creator-links a{
+  color:#211a12!important;
+  background:#fbbf24!important;
+  border-color:#fbbf24!important;
+  text-shadow:none!important
+}
+.product-modal-info .creator-intro-card .creator-links>span{
+  color:rgba(255,249,238,.84)!important
+}
+
+@media(max-width:620px){
+  .product-modal-info .creator-intro-card{
+    min-height:540px!important;
+    padding:28px 20px 24px!important;
+    align-items:flex-end!important;
+    background:
+      linear-gradient(180deg,rgba(7,7,9,.18) 0%,rgba(7,7,9,.58) 45%,rgba(7,7,9,.96) 76%),
+      url("creator-jita.svg?v=24") center 20%/cover no-repeat!important
+  }
+  .product-modal-info .creator-intro-copy{width:100%!important}
+  .product-modal-info .creator-intro-card h3{font-size:clamp(1.65rem,8vw,2.2rem)!important}
+  .product-modal-info .creator-intro-card p:not(.creator-role){font-size:.94rem!important;line-height:1.52!important}
 }
 
 @media(prefers-reduced-motion:reduce){
