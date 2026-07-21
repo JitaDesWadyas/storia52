@@ -1,6 +1,7 @@
 'use strict';
 (() => {
   const S = window.S52;
+  document.write('<script src="archive-v20-invite-codec.js?v=20"><\/script>');
   const SAFE_QR_CODE_LENGTH = 1500;
 
   S.createGameInviteUrl = async session => {
