@@ -4,7 +4,7 @@
     realistico: { label: 'Dramma', symbol: '●', description: 'Conflitti umani, lavoro, famiglia, denaro e decisioni credibili con conseguenze concrete.' },
     mistero: { label: 'Mistero', symbol: '♦', description: 'Indizi, sparizioni e verità nascoste da ricostruire insieme.' },
     fantascienza: { label: 'Fantascienza', symbol: '✦', description: 'Tecnologia e futuri in cui ogni scelta cambia le regole.' },
-    fantasy: { label: 'Fantasy', symbol: '♜', description: 'Harminger, Valmora, magia e patti difficili da spezzare.' },
+    fantasy: { label: 'Fantasy', symbol: '♜', description: 'Valmora, magia e patti difficili da spezzare.' },
     horror: { label: 'Horror', symbol: '☾', description: 'Luoghi e presenze inquietanti, con una via d’uscita da conquistare.' },
     amore: { label: 'Amore e relazioni', symbol: '♥', description: 'Legami, ex, promesse e sentimenti messi davanti a una scelta reale.' },
     avventura: { label: 'Avventura', symbol: '▲', description: 'Viaggi, spedizioni e missioni in cui tempo e territorio contano.' },
