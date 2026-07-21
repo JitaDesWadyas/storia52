@@ -6,6 +6,7 @@
 
   const motionAllowed = () => !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const nextFrame = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  const isHeavyRuleBody = (body, height = body.scrollHeight) => Boolean(body.querySelector('.card-meaning-board')) || height > 720;
 
   const animateRuleBody = async (detail, opening) => {
     const body = detail.querySelector(':scope > .body');
@@ -32,6 +33,23 @@
       body.style.opacity = '0';
       await nextFrame();
       const targetHeight = body.scrollHeight;
+
+      if (isHeavyRuleBody(body, targetHeight)) {
+        body.style.height = 'auto';
+        const animation = body.animate([
+          { opacity: 0, transform: 'translateY(-5px)' },
+          { opacity: 1, transform: 'translateY(0)' }
+        ], { duration: 180, easing: 'cubic-bezier(.22,.72,.2,1)', fill: 'both' });
+        await animation.finished.catch(() => {});
+        body.style.opacity = '1';
+        body.style.transform = '';
+        detail.classList.remove('is-opening');
+        detail.classList.add('is-open');
+        summary.setAttribute('aria-expanded', 'true');
+        detail.dataset.animating = 'false';
+        return;
+      }
+
       const duration = Math.max(360, Math.min(560, 300 + targetHeight * .08));
       const animation = body.animate([
         { height: '0px', opacity: 0, transform: 'translateY(-8px)' },
@@ -54,6 +72,23 @@
     detail.classList.remove('is-open');
     detail.classList.add('is-closing');
     await nextFrame();
+
+    if (isHeavyRuleBody(body, startHeight)) {
+      const animation = body.animate([
+        { opacity: 1, transform: 'translateY(0)' },
+        { opacity: 0, transform: 'translateY(-4px)' }
+      ], { duration: 140, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'both' });
+      await animation.finished.catch(() => {});
+      body.style.height = '0px';
+      body.style.opacity = '0';
+      body.style.transform = '';
+      detail.open = false;
+      detail.classList.remove('is-closing');
+      summary.setAttribute('aria-expanded', 'false');
+      detail.dataset.animating = 'false';
+      return;
+    }
+
     const duration = Math.max(300, Math.min(460, 250 + startHeight * .06));
     const animation = body.animate([
       { height: `${startHeight}px`, opacity: 1, transform: 'translateY(0)' },

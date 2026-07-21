@@ -47,10 +47,14 @@
     return legacy ? { kind: 'personal', session: legacy } : null;
   };
 
-  const personalInviteMarkup = (session, index) => `<section class="surface"><div class="screen-heading"><p class="eyebrow">${S.esc(S.playerName(session, index))}</p><h2>La storia e il tuo obiettivo.</h2><p>Apri la carta soltanto quando gli altri non stanno guardando.</p></div>${S.storyContextMarkup(session)}<div class="actions one"><button type="button" class="primary" data-show-card>Mostra il mio obiettivo</button>${session.count > 1 ? '<button type="button" class="text-button" data-change-player>Cambia giocatore</button>' : ''}</div>${S.turnGuideMarkup()}<details class="accordion"><summary>Significato delle carte</summary><div class="accordion-body">${S.cardRulesMarkup()}</div></details><details class="accordion"><summary>Come si chiude la storia</summary><div class="accordion-body">${S.finalRulesMarkup()}</div></details></section>`;
+  const personalInviteMarkup = (session, index) => {
+    const objectiveButton = session.confirmed?.[index] ? 'Obiettivo letto · Riapri' : 'Mostra il mio obiettivo';
+    return `<section class="surface"><div class="screen-heading"><p class="eyebrow">${S.esc(S.playerName(session, index))}</p><h2>La storia e il tuo obiettivo.</h2><p>Apri la carta soltanto quando gli altri non stanno guardando.</p></div>${S.storyContextMarkup(session)}<div class="actions one"><button type="button" class="primary" data-show-card>${objectiveButton}</button>${session.count > 1 ? '<button type="button" class="text-button" data-change-player>Cambia giocatore</button>' : ''}</div>${S.turnGuideMarkup()}<details class="accordion"><summary>Significato delle carte</summary><div class="accordion-body">${S.cardRulesMarkup()}</div></details><details class="accordion"><summary>Come si chiude la storia</summary><div class="accordion-body">${S.finalRulesMarkup()}</div></details></section>`;
+  };
 
   S.renderSharedPlayer = (session, index) => {
     if (!Number.isInteger(index) || index < 0 || index >= session.count) return S.renderSharedInvitePicker(session);
+    session.confirmed ||= Array(session.count).fill(false);
     S.mount(personalInviteMarkup(session, index), { label: 'Invito personale', session: true, preserveHash: true });
     S.play.querySelector('[data-show-card]').addEventListener('click', () => S.openObjective(session, index, true));
     S.play.querySelector('[data-change-player]')?.addEventListener('click', () => S.renderSharedInvitePicker(session));
