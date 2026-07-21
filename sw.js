@@ -1,12 +1,12 @@
 'use strict';
 
 const CACHE_PREFIX = 'epoi-';
-const SHELL_CACHE = `${CACHE_PREFIX}shell-v18`;
-const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v18`;
+const SHELL_CACHE = `${CACHE_PREFIX}shell-v19`;
+const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v19`;
 const CORE_FILES = [
   './', './index.html', './privacy.html', './copyright.html',
   './clean-app.css', './refine-flow.css', './home-product.css', './app-polish.css', './home-fixes.css',
-  './tutorial-game.css', './interaction-polish.css', './invite-polish.css', './release-ready.css', './loading-skeleton.css', './ux-rework.css', './scroll-fix.css', './content-polish.css', './public-release-polish.css', './release-fixes-v17.css',
+  './tutorial-game.css', './interaction-polish.css', './invite-polish.css', './release-ready.css', './loading-skeleton.css', './ux-rework.css', './scroll-fix.css', './content-polish.css', './public-release-polish.css', './release-fixes-v17.css', './release-fixes-v19.css',
   './app.js', './ui-core.js', './ready-stories-realistico.js', './ready-stories-mistero.js', './ready-stories-fantascienza.js', './ready-stories-fantasy.js', './ready-stories-horror.js', './ready-stories-amore.js', './ready-stories-avventura.js', './ready-stories-commedia.js', './ready-stories-data.js', './clean-core.js', './clean-rules.js', './clean-home.js', './content-polish.js', './public-release-fixes.js',
   './clean-config.js', './clean-opening.js', './clean-stories-model.js',
   './ready-story-objectives-01.js', './ready-story-objectives-02.js', './ready-story-objectives-03.js', './ready-story-objectives-04.js', './ready-story-objectives-05.js', './ready-story-objectives-06.js', './ready-story-objectives-07.js', './ready-story-objectives-08.js', './ready-story-objectives-09.js', './ready-story-objectives-10.js', './ready-story-objectives-11.js', './ready-story-objectives-12.js', './ready-story-objectives-13.js', './ready-story-objectives.js',
