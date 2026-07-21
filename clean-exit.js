@@ -5,7 +5,7 @@
   S.openExitModal = () => {
     const session = S.currentSession || S.load();
     if (!session) { S.renderHome(); return; }
-    const body = `<p class="exit-note">La partita resta salvata automaticamente.</p><div class="exit-options exit-options-simple"><button type="button" class="primary" data-exit-continue>Continua</button><button type="button" class="secondary" data-exit-home>Torna alla home</button><button type="button" class="danger" data-exit-new>Nuova partita</button></div>`;
+    const body = `<p class="exit-note">La partita resta salvata automaticamente.</p><div class="exit-options exit-options-simple"><button type="button" class="primary" data-exit-continue>Continua</button><button type="button" class="danger" data-exit-home>Torna alla home</button><button type="button" class="secondary" data-exit-new>Nuova partita</button></div>`;
     const { host, close } = S.modal('Uscire?', body, { className: 'exit-modal' });
     host.querySelector('[data-exit-continue]').addEventListener('click', close);
     host.querySelector('[data-exit-home]').addEventListener('click', () => {
