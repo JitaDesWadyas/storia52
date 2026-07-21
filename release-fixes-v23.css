@@ -1,4 +1,4 @@
-/* v23: stable home viewport, single theme glyph and sharp creator portrait. */
+/* v23: stable home viewport and one theme glyph. */
 
 /* The first home render must be visually still. */
 body.home-static-entry .product-hero,
@@ -28,91 +28,6 @@ body.home-static-entry .compact-product-menu .resume-card{
   text-indent:0!important;
   transform:none!important;
   opacity:1!important
-}
-
-/* Do not stretch a small raster portrait across the entire modal. */
-.product-modal-info .creator-intro-card{
-  position:relative!important;
-  isolation:auto!important;
-  display:grid!important;
-  grid-template-columns:minmax(180px,240px) minmax(0,1fr)!important;
-  align-items:center!important;
-  min-height:0!important;
-  gap:24px!important;
-  padding:22px!important;
-  overflow:hidden!important;
-  background:var(--panel-2)!important;
-  border-color:var(--line-soft)!important;
-  box-shadow:none!important
-}
-.product-modal-info .creator-intro-card::after{display:none!important}
-.product-modal-info .creator-intro-card>img{
-  display:block!important;
-  width:100%!important;
-  height:auto!important;
-  max-width:240px!important;
-  aspect-ratio:1!important;
-  align-self:center!important;
-  object-fit:cover!important;
-  object-position:center!important;
-  image-rendering:auto!important;
-  border:2px solid var(--amber)!important;
-  border-radius:18px!important;
-  box-shadow:0 12px 28px rgba(0,0,0,.16)!important
-}
-.product-modal-info .creator-intro-copy{
-  position:static!important;
-  width:100%!important;
-  min-width:0!important;
-  color:var(--ink)!important;
-  text-shadow:none!important
-}
-.product-modal-info .creator-intro-card .creator-game-name,
-.product-modal-info .creator-intro-card .creator-role{
-  color:var(--amber-dark)!important;
-  text-shadow:none!important
-}
-.product-modal-info .creator-intro-card h3{
-  color:var(--ink)!important;
-  text-shadow:none!important
-}
-.product-modal-info .creator-intro-card p:not(.creator-role){
-  color:var(--muted)!important;
-  text-shadow:none!important
-}
-.product-modal-info .creator-intro-card .creator-links a{
-  color:#211a12!important;
-  background:var(--amber)!important;
-  border-color:var(--amber)!important;
-  text-shadow:none!important
-}
-.product-modal-info .creator-intro-card .creator-links>span{
-  color:var(--muted)!important
-}
-
-@media(max-width:620px){
-  .product-modal-info .creator-intro-card{
-    grid-template-columns:118px minmax(0,1fr)!important;
-    gap:15px!important;
-    padding:16px!important
-  }
-  .product-modal-info .creator-intro-card>img{
-    width:118px!important;
-    max-width:118px!important;
-    border-radius:15px!important
-  }
-}
-
-@media(max-width:430px){
-  .product-modal-info .creator-intro-card{
-    grid-template-columns:1fr!important;
-    gap:16px!important
-  }
-  .product-modal-info .creator-intro-card>img{
-    width:168px!important;
-    max-width:168px!important;
-    justify-self:center!important
-  }
 }
 
 @media(prefers-reduced-motion:reduce){
