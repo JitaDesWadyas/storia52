@@ -3,7 +3,7 @@
 (() => {
   const S = window.S52;
 
-  const namesMarkup = session => `<section class="setup-panel"><div class="setup-head"><div><p class="eyebrow">GIOCATORI</p><b>Nomi e numero partecipanti</b></div><div class="player-count-control" aria-label="Numero di giocatori"><button type="button" data-count-change="-1" aria-label="Togli un giocatore"${session.count <= 2 ? ' disabled' : ''}>−</button><div class="player-count-value"><strong>${session.count}</strong> giocatori</div><button type="button" data-count-change="1" aria-label="Aggiungi un giocatore"${session.count >= 10 ? ' disabled' : ''}>+</button></div></div><div class="name-grid">${Array.from({ length: session.count }, (_, index) => `<label class="field"><span>Giocatore ${index + 1}</span><input data-player-name="${index}" value="${S.esc(session.names[index] || '')}" placeholder="Nome facoltativo" maxlength="${S.limits.name}" autocomplete="off" autocapitalize="words" enterkeyhint="next"><small>Massimo ${S.limits.name} caratteri</small></label>`).join('')}</div></section>`;
+  const namesMarkup = session => `<section class="setup-panel"><div class="setup-head"><div><p class="eyebrow">GIOCATORI</p><b>Nomi e numero partecipanti</b></div><div class="player-count-control" aria-label="Numero di giocatori"><button type="button" data-count-change="-1" aria-label="Togli un giocatore"${session.count <= 2 ? ' disabled' : ''}>−</button><div class="player-count-value"><strong>${session.count}</strong> giocatori</div><button type="button" data-count-change="1" aria-label="Aggiungi un giocatore"${session.count >= 8 ? ' disabled' : ''}>+</button></div></div><div class="name-grid">${Array.from({ length: session.count }, (_, index) => `<label class="field"><span>Giocatore ${index + 1}</span><input data-player-name="${index}" value="${S.esc(session.names[index] || '')}" placeholder="Nome facoltativo" maxlength="${S.limits.name}" autocomplete="off" autocapitalize="words" enterkeyhint="next"><small>Massimo ${S.limits.name} caratteri</small></label>`).join('')}</div></section>`;
 
   const option = (value, selected, icon, title, copy, attr) => `<button type="button" class="option-card${selected ? ' selected' : ''}" ${attr}="${value}"><span>${icon}</span><div><b>${title}</b><small>${copy}</small></div></button>`;
 
@@ -34,7 +34,7 @@
     });
     S.play.querySelectorAll('[data-count-change]').forEach(button => button.addEventListener('click', () => {
       sync();
-      session.count = Math.max(2, Math.min(10, session.count + Number(button.dataset.countChange)));
+      session.count = Math.max(2, Math.min(8, session.count + Number(button.dataset.countChange)));
       session.names = Array.from({ length: session.count }, (_, index) => session.names[index] || '');
       session.objectives = Array.from({ length: session.count }, (_, index) => objectiveFromSeed(session.seed, index + 1));
       session.confirmed = Array(session.count).fill(false);
