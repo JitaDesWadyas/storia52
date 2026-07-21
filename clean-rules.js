@@ -11,6 +11,19 @@
 
   S.cardRulesMarkup = () => `<div class="card-rules-compact">${S.cardMeaningMarkup()}</div>`;
 
+  S.preparationGuideMarkup = () => guideMarkup({
+    eyebrow: 'PRIMA DI COMINCIARE',
+    title: 'Preparazione',
+    intro: 'Preparate la storia, il mazzo e gli obiettivi segreti prima di iniziare il primo turno.',
+    className: 'play-guide-preparation',
+    steps: [
+      { title: 'Scegliete la storia', text: 'Usate una storia pronta oppure inventate insieme un incipit con le carte.' },
+      { title: 'Preparate il mazzo', text: 'Togliete i jolly, mescolate e distribuite 5 carte a ogni giocatore.' },
+      { title: 'Leggete gli obiettivi', text: 'Ogni persona legge soltanto il proprio obiettivo segreto, senza mostrarlo agli altri.' },
+      { title: 'Decidete chi inizia', text: 'Scegliete il primo giocatore. Poi i turni continuano sempre nello stesso ordine.' }
+    ]
+  });
+
   S.turnGuideMarkup = () => guideMarkup({
     eyebrow: 'UN TURNO ALLA VOLTA',
     title: 'Il turno',
@@ -37,6 +50,6 @@
     ]
   });
 
-  S.rulesMarkup = () => `<div class="rules-menu"><p class="rules-menu-intro">Dalla preparazione al finale: tutte le regole per giocare con un normale mazzo di carte.</p><div class="rulebook"><details><summary>1. Preparazione</summary><div class="body numbered"><p><i>1</i><span>Scegliete una storia pronta oppure inventate l’incipit con le carte.</span></p><p><i>2</i><span>Togliete i jolly, mescolate e date 5 carte a testa.</span></p><p><i>3</i><span>Ogni giocatore legge il proprio obiettivo segreto senza mostrarlo.</span></p></div></details><details><summary>2. Significato delle carte</summary><div class="body">${S.cardRulesMarkup()}</div></details><details><summary>3. Il turno</summary><div class="body">${S.turnGuideMarkup()}</div></details><details><summary>4. Come si chiude la storia</summary><div class="body">${S.finalRulesMarkup()}</div></details></div></div>`;
+  S.rulesMarkup = () => `<div class="rules-menu"><p class="rules-menu-intro">Dalla preparazione al finale: tutte le regole per giocare con un normale mazzo di carte.</p><div class="rulebook"><details><summary>1. Preparazione</summary><div class="body">${S.preparationGuideMarkup()}</div></details><details><summary>2. Significato delle carte</summary><div class="body">${S.cardRulesMarkup()}</div></details><details><summary>3. Il turno</summary><div class="body">${S.turnGuideMarkup()}</div></details><details><summary>4. Come si chiude la storia</summary><div class="body">${S.finalRulesMarkup()}</div></details></div></div>`;
   S.openRulesModal = () => S.modal('Regole di E POI?', S.rulesMarkup(), { wide: true, className: 'rules-modal' });
 })();
