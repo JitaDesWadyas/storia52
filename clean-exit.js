@@ -3,7 +3,7 @@
   const S = window.S52;
 
   S.openExitModal = () => {
-    const session = S.currentSession || S.load();
+    const session = S.secureCollectionSession?.(S.currentSession || S.load()) || S.currentSession || S.load();
     if (!session) { S.renderHome(); return; }
     const body = `<p class="exit-note">La partita resta salvata automaticamente.</p><div class="exit-options exit-options-simple"><button type="button" class="primary" data-exit-continue>Continua</button><button type="button" class="danger" data-exit-home>Torna alla home</button><button type="button" class="secondary" data-exit-new>Nuova partita</button></div>`;
     const { host, close } = S.modal('Uscire?', body, { className: 'exit-modal' });
@@ -21,17 +21,19 @@
   };
 
   S.resume = session => {
+    session = S.secureCollectionSession?.(session) || session;
     if (!session) { S.renderHome(); return; }
     const routes = {
       setup: () => S.renderSetup('play', session),
-      cards: () => S.renderCardsSource(session),
-      questions: () => S.renderOpeningQuestions(session),
+      collections: () => S.renderCollections(session),
       stories: () => S.renderStories(session),
       objectives: () => S.renderObjectives(session),
       prep: () => S.renderPreparation(session),
       invites: () => S.renderInvites(session),
       game: () => session.delivery === 'multi' ? S.renderHostGame(session) : S.renderGame(session)
     };
+    const safeStage = ['cards', 'questions'].includes(session.stage) ? 'collections' : session.stage;
+    if (!S.isCollectionAvailable?.(session.collectionId) && !['setup', 'collections'].includes(safeStage)) session.stage = 'collections';
     (routes[session.stage] || (() => S.renderSetup('play', session)))();
   };
 })();
