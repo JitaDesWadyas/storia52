@@ -10,25 +10,34 @@
     0
   );
 
+  const objectiveFromPlan = (story, slot, plan) => ({
+    custom: true,
+    storyId: story.id,
+    slot,
+    title: plan.title,
+    text: plan.text,
+    finale: plan.finale
+  });
+
+  S.objectiveForReadyStorySlot = (story, slot) => {
+    const plans = objectivesByStory[story?.id] || [];
+    if (!plans.length) return null;
+    const safeSlot = Number(slot);
+    if (!Number.isInteger(safeSlot) || safeSlot < 0 || safeSlot >= plans.length) return null;
+    return objectiveFromPlan(story, safeSlot, plans[safeSlot]);
+  };
+
   S.objectivesForReadyStory = (story, count = 4, seed = '') => {
     const plans = objectivesByStory[story?.id] || [];
     if (!plans.length) return [];
 
     const wanted = Math.max(1, Math.min(Number(count) || 4, plans.length));
     const start = score(`${seed}:${story.id}`) % plans.length;
-    const step = plans.length === 10 ? 3 : 1;
+    const step = plans.length === 8 ? 3 : 1;
 
     return Array.from({ length: wanted }, (_, index) => {
       const slot = (start + index * step) % plans.length;
-      const plan = plans[slot];
-      return {
-        custom: true,
-        storyId: story.id,
-        slot,
-        title: plan.title,
-        text: plan.text,
-        finale: plan.finale
-      };
+      return objectiveFromPlan(story, slot, plans[slot]);
     });
   };
 
@@ -41,9 +50,9 @@
   };
 
   const invalid = (window.STORIA52_READY_STORIES || []).filter(
-    story => !Array.isArray(objectivesByStory[story.id]) || objectivesByStory[story.id].length !== 10
+    story => !Array.isArray(objectivesByStory[story.id]) || objectivesByStory[story.id].length !== 8
   );
   if (invalid.length) {
-    console.error('Obiettivi non validi: ogni storia pronta deve avere esattamente 10 finali.', invalid.map(story => story.id));
+    console.error('Obiettivi non validi: ogni storia pronta deve avere esattamente 8 finali.', invalid.map(story => story.id));
   }
 })();

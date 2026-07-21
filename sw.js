@@ -1,17 +1,21 @@
 'use strict';
 
 const CACHE_PREFIX = 'epoi-';
-const SHELL_CACHE = `${CACHE_PREFIX}shell-v19`;
-const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v19`;
+const SHELL_CACHE = `${CACHE_PREFIX}shell-v20`;
+const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v20`;
 const CORE_FILES = [
   './', './index.html', './privacy.html', './copyright.html',
   './clean-app.css', './refine-flow.css', './home-product.css', './app-polish.css', './home-fixes.css',
   './tutorial-game.css', './interaction-polish.css', './invite-polish.css', './release-ready.css', './loading-skeleton.css', './ux-rework.css', './scroll-fix.css', './content-polish.css', './public-release-polish.css', './release-fixes-v17.css', './release-fixes-v19.css',
-  './app.js', './ui-core.js', './ready-stories-realistico.js', './ready-stories-mistero.js', './ready-stories-fantascienza.js', './ready-stories-fantasy.js', './ready-stories-horror.js', './ready-stories-amore.js', './ready-stories-avventura.js', './ready-stories-commedia.js', './ready-stories-data.js', './clean-core.js', './clean-rules.js', './clean-home.js', './content-polish.js', './public-release-fixes.js',
+  './app.js', './ui-core.js',
+  './archive-v20-stories-realistico.js', './archive-v20-stories-mistero.js', './archive-v20-stories-fantascienza.js', './archive-v20-stories-fantasy.js', './archive-v20-stories-horror.js', './archive-v20-stories-amore.js', './archive-v20-stories-avventura.js', './archive-v20-stories-commedia.js',
+  './ready-stories-realistico.js', './ready-stories-mistero.js', './ready-stories-fantascienza.js', './ready-stories-fantasy.js', './ready-stories-horror.js', './ready-stories-amore.js', './ready-stories-avventura.js', './ready-stories-commedia.js', './ready-stories-data.js',
+  './clean-core.js', './clean-rules.js', './clean-home.js', './content-polish.js', './public-release-fixes.js',
   './clean-config.js', './clean-opening.js', './clean-stories-model.js',
+  './archive-v20-objectives-01.js', './archive-v20-objectives-02.js', './archive-v20-objectives-03-04.js', './archive-v20-objectives-05-06.js', './archive-v20-objectives-07-08.js', './archive-v20-session-guard.js',
   './ready-story-objectives-01.js', './ready-story-objectives-02.js', './ready-story-objectives-03.js', './ready-story-objectives-04.js', './ready-story-objectives-05.js', './ready-story-objectives-06.js', './ready-story-objectives-07.js', './ready-story-objectives-08.js', './ready-story-objectives-09.js', './ready-story-objectives-10.js', './ready-story-objectives-11.js', './ready-story-objectives-12.js', './ready-story-objectives-13.js', './ready-story-objectives.js',
   './clean-stories-markup.js', './clean-stories-view.js', './clean-objectives.js', './clean-prep.js', './clean-print.js',
-  './qr-local.js', './invite-codec.js', './clean-invite-host.js', './clean-invite-data.js', './clean-exit.js',
+  './qr-local.js', './invite-codec.js', './archive-v20-invite-codec.js', './clean-invite-host.js', './clean-invite-data.js', './clean-exit.js',
   './interaction-polish.js', './scroll-safety.js', './clean-init.js', './icon.svg', './storia52-cards-logo.svg', './creator-jita.svg',
   './manifest.webmanifest'
 ];
