@@ -18,7 +18,7 @@
     className: 'play-guide-turn',
     steps: [
       { title: 'Cambia una carta', text: 'Con 2 o più carte in mano devi scartarne 1 e pescarne subito 1. Con una sola carta puoi cambiarla oppure tenerla.' },
-      { title: 'Gioca una o due carte', text: 'Racconta una sola scena usando il significato di tutte le carte che hai giocato.' },
+      { title: 'Gioca una carta', text: 'Scegli una sola carta e racconta la scena seguendo il suo significato.' },
       { title: 'Aggiungi una scena', text: 'Fai succedere un solo passaggio chiaro e coerente con tutto ciò che è già successo.' },
       { title: 'Pesca oppure passa', text: 'Dopo la scena puoi pescare 1 carta. Poi il turno finisce e continua la persona successiva.' }
     ]
