@@ -14,19 +14,13 @@
   const rank = { realistico: 0, mistero: 1, fantascienza: 2, fantasy: 3, horror: 4, amore: 5, avventura: 6, commedia: 7 };
   const rows = (window.STORIA52_READY_STORY_ROWS || []).filter(story => /^(?:real|mys|sci|fan|hor|lov|adv|com)\d{2}$/.test(story.id));
   const groups = Object.fromEntries(Object.keys(categories).map(key => [key, rows.filter(story => story.category === key)]));
-  const stories = [];
-
-  for (let index = 0; stories.length < rows.length; index += 1) {
-    for (const key of Object.keys(categories).sort((a, b) => rank[a] - rank[b])) {
-      if (groups[key][index]) stories.push(groups[key][index]);
-    }
-  }
+  const stories = Object.keys(categories).sort((a, b) => rank[a] - rank[b]).flatMap(key => groups[key]);
 
   const ids = new Set(stories.map(story => story.id));
   const invalidCategory = stories.find(story => !categories[story.category]);
-  const invalidDistribution = Object.keys(categories).find(key => groups[key].length !== 3);
-  if (stories.length !== 24 || ids.size !== 24 || invalidCategory || invalidDistribution) {
-    console.error('Archivio v20 non valido: servono 24 storie uniche, 3 per categoria.');
+  const invalidDistribution = Object.keys(categories).find(key => groups[key].length !== 1);
+  if (stories.length !== 8 || ids.size !== 8 || invalidCategory || invalidDistribution) {
+    console.error('La Prima Scintilla non è valida: servono 8 storie uniche, una per categoria.');
   }
 
   window.STORIA52_READY_CATEGORIES = categories;
