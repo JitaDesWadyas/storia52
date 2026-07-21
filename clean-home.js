@@ -3,6 +3,7 @@
 (() => {
   const S = window.S52;
   const HOME_LOGO = 'storia52-cards-logo.svg';
+  const CREATOR_SRC = 'creator-jita.svg?v=23';
   const opening = 'Durante una festa in una villa isolata, sparisce un quadro.';
   const objectives = {
     Marta: 'Fai ricadere la colpa sul padrone.',
@@ -83,7 +84,7 @@
 
   const rulesMarkup = () => `<div class="screen-heading modal-heading"><p class="eyebrow">REGOLE COMPLETE</p><h2>Tutto ciò che serve durante la partita.</h2><p>Apri soltanto la sezione che ti serve: preparazione, carte, turno o finale.</p></div>${S.rulesMarkup ? S.rulesMarkup() : ''}`;
 
-  const infoMarkup = () => `<div class="screen-heading modal-heading creator-modal-heading"><p class="eyebrow">DIETRO E POI?</p><h2>Perché esiste e chi l’ha creato.</h2><p>Il progetto, l’idea di gioco e la direzione della versione pubblica.</p></div><div class="creator-editorial creator-page-v16"><section class="creator-intro-card"><div class="creator-intro-copy"><span class="creator-game-name">E POI?</span><h3>Creato da JitaDesWadyas</h3><p class="creator-role">Scrittore · sviluppatore · game designer · autore indipendente</p><p>Dopo anni di progetti, lavoro e un sacco di brainstorming, sono arrivato a E POI?: un gioco pensato per riportare creatività e immaginazione nel nostro modo di stare insieme, qualità che il mondo moderno ci porta spesso a usare sempre meno. Immaginare, sognare e comunicare sono tra i doni più umani che abbiamo. Qui si uniscono in una sola esperienza condivisa.</p><div class="creator-links"><a href="https://github.com/JitaDesWadyas" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a><span>JitaDiSwadya · Italia</span></div></div></section><section class="creator-roadmap-pro"><div><p class="eyebrow">DIREZIONE</p><h3>Prima deve funzionare in una serata vera.</h3><p>La web app prepara la partita, distribuisce gli obiettivi e riduce l’attrito. Le storie vengono migliorate attraverso test reali; il mazzo fisico viene dopo.</p></div><ol><li class="done"><b>01</b><span>Idea e regole</span></li><li class="done"><b>02</b><span>Web app</span></li><li class="current"><b>03</b><span>Test pubblici</span></li><li><b>04</b><span>Nuove storie</span></li><li><b>05</b><span>Mazzo fisico</span></li></ol></section><footer class="creator-legal-links"><a href="privacy.html" target="_blank" rel="noopener">Privacy</a><a href="copyright.html" target="_blank" rel="noopener">Copyright e crediti</a><span>© 2026 JitaDesWadyas</span></footer></div>`;
+  const infoMarkup = () => `<div class="screen-heading modal-heading creator-modal-heading"><p class="eyebrow">DIETRO E POI?</p><h2>Perché esiste e chi l’ha creato.</h2><p>Il progetto, l’idea di gioco e la direzione della versione pubblica.</p></div><div class="creator-editorial creator-page-v16"><section class="creator-intro-card"><img src="${CREATOR_SRC}" alt="Jita DesWadyas, creatore di E POI?" width="360" height="360" decoding="async"><div class="creator-intro-copy"><span class="creator-game-name">E POI?</span><h3>Creato da JitaDesWadyas</h3><p class="creator-role">Scrittore · sviluppatore · game designer · autore indipendente</p><p>Dopo anni di progetti, lavoro e un sacco di brainstorming, sono arrivato a E POI?: un gioco pensato per riportare creatività e immaginazione nel nostro modo di stare insieme, qualità che il mondo moderno ci porta spesso a usare sempre meno. Immaginare, sognare e comunicare sono tra i doni più umani che abbiamo. Qui si uniscono in una sola esperienza condivisa.</p><div class="creator-links"><a href="https://github.com/JitaDesWadyas" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a><span>JitaDiSwadya · Italia</span></div></div></section><section class="creator-roadmap-pro"><div><p class="eyebrow">DIREZIONE</p><h3>Prima deve funzionare in una serata vera.</h3><p>La web app prepara la partita, distribuisce gli obiettivi e riduce l’attrito. Le storie vengono migliorate attraverso test reali; il mazzo fisico viene dopo.</p></div><ol><li class="done"><b>01</b><span>Idea e regole</span></li><li class="done"><b>02</b><span>Web app</span></li><li class="current"><b>03</b><span>Test pubblici</span></li><li><b>04</b><span>Nuove storie</span></li><li><b>05</b><span>Mazzo fisico</span></li></ol></section><footer class="creator-legal-links"><a href="privacy.html" target="_blank" rel="noopener">Privacy</a><a href="copyright.html" target="_blank" rel="noopener">Copyright e crediti</a><span>© 2026 JitaDesWadyas</span></footer></div>`;
 
   S.homeMarkup = () => {
     const saved = S.load();
@@ -102,7 +103,7 @@
       host.querySelector('[data-tutorial-rules]')?.addEventListener('click', () => S.openHomePanel('rules'));
       host.querySelector('[data-tutorial-play]')?.addEventListener('click', () => {
         root.remove();
-        document.body.classList.remove('modal-open');
+        document.body.classList.remove('modal-open', 'home-static-entry');
         S.renderSetup('play');
       });
     };
@@ -164,11 +165,34 @@
     S.play.querySelectorAll('[data-open-panel]').forEach(button => button.addEventListener('click', () => S.openHomePanel(button.dataset.openPanel)));
   };
 
+  const resetHomeViewport = () => {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    if (location.hash === '#play') {
+      const cleanUrl = new URL(location.href);
+      cleanUrl.hash = '';
+      history.replaceState(null, '', `${cleanUrl.pathname}${cleanUrl.search}`);
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  };
+
   S.renderHome = () => {
     S.currentSession = null;
-    S.mount(S.homeMarkup(), { session: false });
-    S.play.querySelectorAll('[data-home-play]').forEach(button => button.addEventListener('click', () => S.renderSetup('play')));
-    S.play.querySelector('[data-home-resume]')?.addEventListener('click', () => S.resume(S.load()));
+    document.body.classList.add('home-static-entry');
+    resetHomeViewport();
+    S.mount(S.homeMarkup(), { session: false, scroll: false, animate: false, preserveHash: true });
+    resetHomeViewport();
+    requestAnimationFrame(() => {
+      resetHomeViewport();
+      requestAnimationFrame(resetHomeViewport);
+    });
+    S.play.querySelectorAll('[data-home-play]').forEach(button => button.addEventListener('click', () => {
+      document.body.classList.remove('home-static-entry');
+      S.renderSetup('play');
+    }));
+    S.play.querySelector('[data-home-resume]')?.addEventListener('click', () => {
+      document.body.classList.remove('home-static-entry');
+      S.resume(S.load());
+    });
     S.bindHomeNavigation();
   };
 })();
