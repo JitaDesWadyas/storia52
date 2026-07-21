@@ -1,22 +1,22 @@
-/* Collezioni, opzioni in arrivo e contatori discreti. */
+/* Collection selection, story archive and setup availability states. */
 .collection-choice-screen{display:grid;gap:22px}
 .collection-choice-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(280px,.92fr);gap:12px;align-items:stretch}
-.collection-choice-card{position:relative;display:grid;align-content:start;gap:13px;min-width:0;padding:20px;background:var(--panel-2);border:1px solid var(--line-soft);border-radius:12px;overflow:hidden}
+.collection-choice-card{display:grid;align-content:start;gap:13px;min-width:0;padding:20px;background:var(--panel-2);border:1px solid var(--line-soft);border-radius:12px}
 .collection-choice-card header{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--amber-dark);font-size:.68rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase}
-.collection-choice-card header b{padding:5px 8px;color:var(--ink);background:var(--panel);border:1px solid var(--line-soft);border-radius:999px;font-size:.66rem;letter-spacing:.02em;text-transform:none}
+.collection-status{padding:5px 8px;color:var(--ink);background:var(--panel);border:1px solid var(--line-soft);border-radius:999px;font-size:.66rem;letter-spacing:.02em;text-transform:none}
+.collection-status-available{border-color:color-mix(in srgb,var(--amber) 56%,var(--line-soft))}
+.collection-status-coming{color:var(--muted);background:transparent;border-style:dashed}
 .collection-choice-card h3{margin:0;font:750 clamp(1.55rem,4vw,2.15rem)/1.05 Georgia,serif;letter-spacing:-.025em}
 .collection-choice-description,.collection-choice-world p,.collection-info-modal p{margin:0;color:var(--muted);line-height:1.55}
 .collection-choice-world{display:grid;gap:5px;padding:14px 0;border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft)}
 .collection-choice-world h4,.collection-info-modal h3{margin:0;font:700 1rem Georgia,serif}
-.collection-independent-note{margin:0;padding:11px 12px;color:var(--ink);background:rgba(214,152,32,.09);border-left:4px solid var(--amber);border-radius:7px;line-height:1.45}
+.collection-independent-note{margin:0;padding:11px 12px;color:var(--ink);background:color-mix(in srgb,var(--amber) 9%,transparent);border-left:4px solid var(--amber);border-radius:7px;line-height:1.45}
 .collection-choice-card footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;padding-top:3px}
 .collection-choice-card footer>span{color:var(--muted);font-weight:850}
 .collection-choice-card footer button{min-width:190px}
-.collection-choice-coming{filter:saturate(.72)}
-.collection-choice-coming>*:not(.collection-coming-overlay){opacity:.54}
-.collection-coming-overlay{position:absolute;inset:0;z-index:2;display:grid;place-items:start end;padding:15px;pointer-events:none;background:linear-gradient(140deg,transparent 44%,rgba(21,18,13,.08))}
-.collection-coming-overlay span{padding:7px 10px;color:#211a12;background:var(--amber);border:1px solid var(--amber);border-radius:7px;font-size:.72rem;font-weight:950;letter-spacing:.08em}
-.collection-choice-coming footer button{position:relative;z-index:3;pointer-events:auto;opacity:1}
+.collection-choice-coming{background:color-mix(in srgb,var(--panel-2) 82%,var(--panel));border-style:dashed}
+.collection-choice-coming .collection-choice-description,.collection-choice-coming .collection-independent-note{color:var(--muted)}
+.collection-choice-coming footer button{min-width:130px}
 .collection-info-modal{display:grid;gap:16px}
 .collection-info-modal section{display:grid;gap:7px;padding:15px;background:var(--panel-2);border:1px solid var(--line-soft);border-radius:10px}
 
