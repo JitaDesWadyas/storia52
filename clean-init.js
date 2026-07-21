@@ -1,6 +1,17 @@
 'use strict';
 (async () => {
   const S = window.S52;
+
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  if (location.hash === '#play') {
+    const cleanUrl = new URL(location.href);
+    cleanUrl.hash = '';
+    history.replaceState(null, '', `${cleanUrl.pathname}${cleanUrl.search}`);
+  }
+  const pinInitialViewport = () => window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  pinInitialViewport();
+  requestAnimationFrame(pinInitialViewport);
+
   initTheme();
 
   document.querySelector('#headerRules')?.addEventListener('click', () => S.openRulesModal());
