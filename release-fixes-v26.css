@@ -1,4 +1,4 @@
-/* v26: literal restore of the creator card that was working before v23. */
+/* Creator card: the user-provided portrait is a real WebP asset. */
 body .modal.product-modal-info .creator-intro-card{
   position:relative!important;
   isolation:isolate!important;
@@ -9,9 +9,9 @@ body .modal.product-modal-info .creator-intro-card{
   overflow:hidden!important;
   background-color:#070709!important;
   background-image:
-    linear-gradient(90deg,rgba(7,7,9,.96) 0%,rgba(7,7,9,.88) 48%,rgba(7,7,9,.44) 100%),
-    url("creator-jita.svg?v=26")!important;
-  background-position:0 0,72% 38%!important;
+    linear-gradient(90deg,rgba(7,7,9,.97) 0%,rgba(7,7,9,.88) 44%,rgba(7,7,9,.2) 100%),
+    url("creator-jita.webp?v=28")!important;
+  background-position:0 0,72% 40%!important;
   background-size:auto,cover!important;
   background-repeat:no-repeat!important;
   border-color:color-mix(in srgb,var(--amber) 70%,var(--line))!important;
@@ -29,7 +29,7 @@ body .modal.product-modal-info .creator-intro-card::after{
   inset:0!important;
   z-index:0!important;
   pointer-events:none!important;
-  background:linear-gradient(180deg,rgba(0,0,0,.04) 25%,rgba(0,0,0,.76) 100%)!important
+  background:linear-gradient(180deg,rgba(0,0,0,0) 22%,rgba(0,0,0,.72) 100%)!important
 }
 
 body .modal.product-modal-info .creator-intro-copy{
@@ -72,13 +72,13 @@ body .modal.product-modal-info .creator-intro-card .creator-links>span{
 
 @media(max-width:620px){
   body .modal.product-modal-info .creator-intro-card{
-    min-height:540px!important;
+    min-height:560px!important;
     padding:28px 20px 24px!important;
     align-items:flex-end!important;
     background-image:
-      linear-gradient(180deg,rgba(7,7,9,.18) 0%,rgba(7,7,9,.58) 45%,rgba(7,7,9,.96) 76%),
-      url("creator-jita.svg?v=26")!important;
-    background-position:0 0,center 20%!important;
+      linear-gradient(180deg,rgba(7,7,9,.03) 0%,rgba(7,7,9,.42) 42%,rgba(7,7,9,.97) 75%),
+      url("creator-jita.webp?v=28")!important;
+    background-position:0 0,center 18%!important;
     background-size:auto,cover!important;
     background-repeat:no-repeat!important
   }
