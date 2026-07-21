@@ -29,36 +29,25 @@
     if (opening) {
       detail.open = true;
       detail.classList.add('is-opening');
+      body.style.contentVisibility = 'visible';
       body.style.height = '0px';
       body.style.opacity = '0';
+      body.style.overflow = 'hidden';
       await nextFrame();
       const targetHeight = body.scrollHeight;
-
-      if (isHeavyRuleBody(body, targetHeight)) {
-        body.style.height = 'auto';
-        const animation = body.animate([
-          { opacity: 0, transform: 'translateY(-5px)' },
-          { opacity: 1, transform: 'translateY(0)' }
-        ], { duration: 180, easing: 'cubic-bezier(.22,.72,.2,1)', fill: 'both' });
-        await animation.finished.catch(() => {});
-        body.style.opacity = '1';
-        body.style.transform = '';
-        detail.classList.remove('is-opening');
-        detail.classList.add('is-open');
-        summary.setAttribute('aria-expanded', 'true');
-        detail.dataset.animating = 'false';
-        return;
-      }
-
-      const duration = Math.max(360, Math.min(560, 300 + targetHeight * .08));
+      const heavy = isHeavyRuleBody(body, targetHeight);
+      const duration = heavy
+        ? Math.max(1100, Math.min(1450, 900 + targetHeight * .2))
+        : Math.max(420, Math.min(650, 330 + targetHeight * .1));
       const animation = body.animate([
-        { height: '0px', opacity: 0, transform: 'translateY(-8px)' },
+        { height: '0px', opacity: 0, transform: 'translateY(-10px)' },
         { height: `${targetHeight}px`, opacity: 1, transform: 'translateY(0)' }
-      ], { duration, easing: 'cubic-bezier(.22,.72,.2,1)', fill: 'both' });
+      ], { duration, easing: 'cubic-bezier(.16,.72,.18,1)', fill: 'both' });
       await animation.finished.catch(() => {});
       body.style.height = 'auto';
       body.style.opacity = '1';
       body.style.transform = '';
+      body.style.overflow = '';
       detail.classList.remove('is-opening');
       detail.classList.add('is-open');
       summary.setAttribute('aria-expanded', 'true');
@@ -67,37 +56,27 @@
     }
 
     const startHeight = body.getBoundingClientRect().height || body.scrollHeight;
+    body.style.contentVisibility = 'visible';
     body.style.height = `${startHeight}px`;
     body.style.opacity = '1';
+    body.style.overflow = 'hidden';
     detail.classList.remove('is-open');
     detail.classList.add('is-closing');
     await nextFrame();
 
-    if (isHeavyRuleBody(body, startHeight)) {
-      const animation = body.animate([
-        { opacity: 1, transform: 'translateY(0)' },
-        { opacity: 0, transform: 'translateY(-4px)' }
-      ], { duration: 140, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'both' });
-      await animation.finished.catch(() => {});
-      body.style.height = '0px';
-      body.style.opacity = '0';
-      body.style.transform = '';
-      detail.open = false;
-      detail.classList.remove('is-closing');
-      summary.setAttribute('aria-expanded', 'false');
-      detail.dataset.animating = 'false';
-      return;
-    }
-
-    const duration = Math.max(300, Math.min(460, 250 + startHeight * .06));
+    const heavy = isHeavyRuleBody(body, startHeight);
+    const duration = heavy
+      ? Math.max(780, Math.min(1100, 660 + startHeight * .14))
+      : Math.max(340, Math.min(520, 280 + startHeight * .07));
     const animation = body.animate([
       { height: `${startHeight}px`, opacity: 1, transform: 'translateY(0)' },
-      { height: '0px', opacity: 0, transform: 'translateY(-6px)' }
+      { height: '0px', opacity: 0, transform: 'translateY(-8px)' }
     ], { duration, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'both' });
     await animation.finished.catch(() => {});
     body.style.height = '0px';
     body.style.opacity = '0';
     body.style.transform = '';
+    body.style.overflow = '';
     detail.open = false;
     detail.classList.remove('is-closing');
     summary.setAttribute('aria-expanded', 'false');

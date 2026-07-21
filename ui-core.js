@@ -65,9 +65,7 @@ function updateThemeButton(){
   button.setAttribute('aria-pressed',String(dark));
   button.setAttribute('aria-label',dark?'Passa al tema chiaro':'Passa al tema scuro');
   const icon=button.querySelector('.theme-toggle-icon');
-  const label=button.querySelector('.theme-toggle-label');
-  if(icon)icon.textContent=dark?'☀':'◐';
-  if(label)label.textContent=dark?'Tema chiaro':'Tema scuro';
+  if(icon)icon.textContent=dark?'☀':'☾';
 }
 
 function openPage(pageId){
