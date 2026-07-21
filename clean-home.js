@@ -35,7 +35,7 @@
       tone: 'spades'
     }
   ];
-  const finale = 'Marta mostra la polizza e dimostra che il padrone aveva fatto sparire il quadro per incassare l’assicurazione.';
+  const finale = 'Marta mostra la polizza: il padrone prova a strappargliela, ma così facendo rivela di aver nascosto il quadro per incassare l’assicurazione.';
 
   const tutorialSteps = [
     { kind: 'goal', eyebrow: '1 · COSA STATE FACENDO', title: 'Costruite la stessa storia, ma ognuno prepara un finale diverso.', body: 'A turno aggiungete nuovi fatti. Nel frattempo provate a rendere possibile il vostro obiettivo segreto senza rivelarlo agli altri.' },
@@ -46,7 +46,7 @@
     { kind: 'example', sceneIndex: 1, eyebrow: '6 · SECONDO TURNO', title: 'Luca continua esattamente da ciò che è già successo.' },
     { kind: 'example', sceneIndex: 2, eyebrow: '7 · TERZO TURNO', title: 'Sara continua la stessa storia e prepara il proprio obiettivo.' },
     { kind: 'limits', eyebrow: '8 · COSA NON PUOI FARE', title: 'Puoi aggiungere un fatto. Non puoi cancellare o risolvere tutto da solo.', body: 'Ogni scena deve collegarsi a quella precedente e lasciare una situazione comprensibile alla persona successiva.' },
-    { kind: 'ending', eyebrow: '9 · IL FINALE', title: 'L’ultima scena può portare direttamente al finale.', body: 'Quando resti senza carte, racconti comunque la scena dell’ultima carta. Se scegli di non pescare, puoi collegarla direttamente alla conclusione; poi riveli il tuo obiettivo e chiudi la storia. La carta non decide il finale.' },
+    { kind: 'ending', eyebrow: '9 · IL FINALE', title: 'L’ultima carta diventa direttamente il finale.', body: 'Giochi normalmente l’ultima carta e racconti la scena che impone. Nello stesso racconto la colleghi direttamente al finale del tuo obiettivo segreto: non sono due scene separate.' },
     { kind: 'ready', eyebrow: '10 · ADESSO PUOI GIOCARE', title: 'Questo è l’intero ciclo.', body: 'Cambia una carta → gioca una o due carte → racconta una scena → pesca se vuoi → passa il turno.' }
   ];
 
@@ -66,11 +66,11 @@
   const stepContent = step => {
     if (step.kind === 'goal') return `<div class="tutorial-goal"><div><span>INCIPIT COMUNE</span><b>${S.esc(opening)}</b></div>${objectiveCards()}</div>`;
     if (step.kind === 'setup') return `<div class="tutorial-setup"><article><span>1</span><div><b>Scegliete una storia</b><p>Leggete l’incipit ad alta voce. È il punto di partenza comune.</p></div></article><article><span>2</span><div><b>Preparate il mazzo</b><p>Togliete i jolly, mescolate e date 5 carte a ogni giocatore.</p></div></article><article><span>3</span><div><b>Leggete gli obiettivi</b><p>Passate il telefono. Ognuno legge soltanto il proprio obiettivo segreto.</p></div></article><article><span>4</span><div><b>Scegliete chi inizia</b><p>Dopo ogni turno si continua in ordine, una persona alla volta.</p></div></article></div>`;
-    if (step.kind === 'turn') return `<div class="tutorial-turn"><article><span>1</span><div><b>Cambia una carta</b><p>Con 2 o più carte è obbligatorio: scartane 1 e pescane 1. Con una sola carta puoi cambiarla oppure tenerla.</p></div></article><article><span>2</span><div><b>Gioca una carta, oppure due insieme</b><p>Con una carta segui il suo effetto. Con due carte racconti una sola scena che rispetta entrambe.</p></div></article><article><span>3</span><div><b>Dì una sola scena</b><p>Aggiungi un fatto chiaro che continua ciò che è già successo. Non raccontare anche la reazione successiva.</p></div></article><article><span>4</span><div><b>Pesca, se vuoi, e termina</b><p>Dopo la scena puoi pescare 1 carta. Poi il turno è finito comunque.</p></div></article></div><aside class="tutorial-core-rule"><strong>Formula pratica:</strong><span>“Gioco questa carta, quindi nella storia succede che…”</span></aside>`;
+    if (step.kind === 'turn') return `<div class="tutorial-turn"><article><span>1</span><div><b>Cambia una carta</b><p>Con 2 o più carte è obbligatorio: scartane 1 e pescane 1. Con una sola carta puoi cambiarla oppure tenerla.</p></div></article><article><span>2</span><div><b>Gioca una o due carte</b><p>Racconta una sola scena usando il significato di tutte le carte che hai giocato.</p></div></article><article><span>3</span><div><b>Dì una sola scena</b><p>Aggiungi un fatto chiaro che continua ciò che è già successo. Non raccontare anche la reazione successiva.</p></div></article><article><span>4</span><div><b>Pesca, se vuoi, e termina</b><p>Dopo la scena puoi pescare 1 carta. Poi il turno è finito comunque.</p></div></article></div><aside class="tutorial-core-rule"><strong>Formula pratica:</strong><span>“Gioco questa carta, quindi nella storia succede che…”</span></aside>`;
     if (step.kind === 'meaning') return cardRules();
     if (step.kind === 'example') return exampleMarkup(step.sceneIndex);
     if (step.kind === 'limits') return `<div class="tutorial-do-dont"><section><h4>Puoi farlo</h4><p>“Luca trova una polizza dietro la cornice vuota.”</p><small>Continua il mistero e aggiunge un solo fatto utilizzabile dagli altri.</small></section><section><h4>Non puoi farlo</h4><p>“Il quadro non è mai sparito, il colpevole confessa e tutti tornano a casa.”</p><small>Cancella l’incipit, risolve tutto e impedisce agli altri di giocare.</small></section></div><div class="tutorial-checklist"><b>Prima di parlare, controlla:</b><span>La mia frase rispetta la carta?</span><span>Continua davvero l’ultima situazione?</span><span>Aggiunge un solo passaggio comprensibile?</span><span>Lascia spazio al turno successivo?</span></div>`;
-    if (step.kind === 'ending') return `${storyTimeline(playedScenes.length)}<div class="tutorial-ending"><section><span>CONDIZIONE</span><b>Marta non ha più carte e decide di non pescare.</b></section><section><span>OBIETTIVO RIVELATO</span><b>${S.esc(objectives.Marta)}</b></section><p class="tutorial-final-card-note"><strong>L’ultima carta si gioca normalmente.</strong> Marta racconta la sua scena e, se vuole tentare il finale, può usarla per preparare o collegare direttamente la conclusione. Il finale resta guidato dall’obiettivo, non dalla carta.</p><blockquote>“${S.esc(finale)}”</blockquote><div><b>Perché Marta vince</b><p>Il padrone, il quadro e la polizza erano già nella storia. Il finale collega questi elementi e raggiunge il suo obiettivo.</p></div></div>`;
+    if (step.kind === 'ending') return `${storyTimeline(playedScenes.length)}<div class="tutorial-ending"><section><span>ULTIMA CARTA</span><b>Marta gioca la carta e racconta normalmente la scena che impone.</b></section><section><span>OBIETTIVO SEGRETO</span><b>${S.esc(objectives.Marta)}</b></section><p class="tutorial-final-card-note"><strong>Scena e finale sono un unico racconto.</strong> Marta usa l’effetto dell’ultima carta e da quella stessa scena si collega direttamente alla conclusione del suo obiettivo.</p><blockquote>“${S.esc(finale)}”</blockquote><div><b>Perché Marta vince</b><p>La polizza era già comparsa e il tentativo del padrone di strapparla è la scena dell’ultima carta. Quella scena porta direttamente alla rivelazione finale.</p></div></div>`;
     return `<div class="tutorial-cycle"><span>Cambia 1 carta</span><i>→</i><span>Gioca 1 o 2 carte</span><i>→</i><span>Racconta</span><i>→</i><span>Pesca se vuoi</span><i>→</i><span>Passa</span></div><p class="tutorial-cycle-note">Il cambio è obbligatorio con 2 o più carte; con una sola carta è facoltativo.</p><div class="tutorial-ready-actions"><button type="button" class="primary" data-tutorial-play>Prepara una partita <span aria-hidden="true">→</span></button><button type="button" class="secondary" data-tutorial-rules>Consulta le regole</button></div>`;
   };
 
@@ -100,7 +100,20 @@
 
     const bindStepActions = () => {
       host.querySelector('[data-tutorial-rules]')?.addEventListener('click', () => S.openHomePanel('rules'));
-      host.querySelector('[data-tutorial-play]')?.addEventListener('click', () => { S.closeModal?.(); S.renderSetup('play'); });
+      host.querySelector('[data-tutorial-play]')?.addEventListener('click', () => {
+        root.remove();
+        document.body.classList.remove('modal-open');
+        S.renderSetup('play');
+      });
+    };
+
+    const scrollContainer = () => host.scrollHeight > host.clientHeight + 8 ? host : modalCard;
+    const isAtBottom = element => !element || element.scrollHeight - element.scrollTop - element.clientHeight <= 18;
+    const showRestBeforeAdvancing = () => {
+      const element = scrollContainer();
+      if (isAtBottom(element)) return false;
+      element.scrollTo({ top: element.scrollHeight, behavior: 'smooth' });
+      return true;
     };
 
     const returnToTop = () => requestAnimationFrame(() => {
@@ -124,10 +137,15 @@
       render(direction);
     };
 
+    const advance = () => {
+      if (showRestBeforeAdvancing()) return;
+      goTo(index >= tutorialSteps.length - 1 ? 0 : index + 1, index >= tutorialSteps.length - 1 ? 'back' : 'forward');
+    };
+
     prev.addEventListener('click', () => goTo(index - 1, 'back'));
-    next.addEventListener('click', () => goTo(index >= tutorialSteps.length - 1 ? 0 : index + 1, index >= tutorialSteps.length - 1 ? 'back' : 'forward'));
+    next.addEventListener('click', advance);
     root.addEventListener('keydown', event => {
-      if (event.key === 'ArrowRight') goTo(index >= tutorialSteps.length - 1 ? 0 : index + 1);
+      if (event.key === 'ArrowRight') advance();
       if (event.key === 'ArrowLeft') goTo(index - 1, 'back');
     });
   };
