@@ -7,7 +7,6 @@
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
   const GAME_PREFIX = 'r3.';
-  const PLAYER_PREFIX = 'p3.';
 
   const toBase64Url = value => {
     const bytes = encoder.encode(String(value || ''));
@@ -28,7 +27,7 @@
 
   const validCount = value => Math.max(2, Math.min(8, Number(value) || 2));
   const storyById = id => S.stories.find(story => story.id === id) || null;
-  const canonicalCollectionId = () => S.primaryCollectionId || window.STORIA52_PRIMARY_COLLECTION_ID || 'prima-scintilla';
+  const collectionId = () => S.primaryCollectionId || window.STORIA52_PRIMARY_COLLECTION_ID || 'prima-scintilla';
   const namesFor = (names, count) => Array.from({ length: count }, (_, index) => S.cleanName(names?.[index], index));
   const compactNames = (names, count) => namesFor(names, count).map((name, index) => name === `Giocatore ${index + 1}` ? '' : name);
 
@@ -37,7 +36,7 @@
     return Boolean(
       session
       && session.source === 'ready'
-      && session.collectionId === canonicalCollectionId()
+      && session.collectionId === collectionId()
       && S.storyAllowedInSession?.(session, story)
     );
   };
@@ -72,7 +71,7 @@
       mode: 'autonomous',
       delivery: 'multi',
       source: 'ready',
-      collectionId: canonicalCollectionId(),
+      collectionId: collectionId(),
       stage: 'game',
       count,
       names: namesFor(Array.isArray(names) ? names : [], count),
@@ -84,52 +83,6 @@
       story: null,
       openingNotes: { protagonist: '', setting: '', action: '', problem: '' },
       seed: 'INVITO-COMUNE'
-    };
-
-    return S.normalizeSession?.(session) || session;
-  };
-
-  S.encodeInvite = async (session, index, objective) => {
-    S.normalizeSession?.(session);
-    if (!validReadySession(session) || !objective?.custom || !Number.isInteger(objective.slot)) {
-      throw new Error('Obiettivo non disponibile.');
-    }
-    const canonical = S.objectiveForReadyStorySlot?.(storyById(session.readyStoryId), objective.slot);
-    if (!canonical) throw new Error('Obiettivo non disponibile.');
-    return `${PLAYER_PREFIX}${session.readyStoryId}.${objective.slot.toString(36)}.${toBase64Url(S.playerName(session, index))}`;
-  };
-
-  S.decodeInvite = async code => {
-    const safeCode = String(code || '');
-    if (!safeCode.startsWith(PLAYER_PREFIX) || safeCode.length > S.limits.inviteCode) return null;
-
-    const [, storyId, slotCode, nameCode] = safeCode.split('.');
-    const story = storyById(storyId);
-    const slot = parseInt(slotCode, 36);
-    const objective = S.objectiveForReadyStorySlot?.(story, slot);
-    if (!story || !objective) return null;
-
-    let name = 'Giocatore';
-    try { name = S.cleanText(fromBase64Url(nameCode), S.limits.name) || name; }
-    catch { return null; }
-
-    const session = {
-      version: 5,
-      mode: 'autonomous',
-      delivery: 'multi',
-      source: 'ready',
-      collectionId: canonicalCollectionId(),
-      stage: 'game',
-      count: 1,
-      names: [name],
-      objectives: [objective],
-      confirmed: [false],
-      openingText: story.opening,
-      spokenOpening: false,
-      readyStoryId: story.id,
-      story: null,
-      openingNotes: { protagonist: '', setting: '', action: '', problem: '' },
-      seed: 'INVITO'
     };
 
     return S.normalizeSession?.(session) || session;
