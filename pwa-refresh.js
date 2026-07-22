@@ -2,8 +2,8 @@
 
 (() => {
   if (!('serviceWorker' in navigator)) return;
-  // La v40 forza il layout mobile a piena viewport con carte grandi, mano singola e retri.
-  const reloadKey = 'epoi_sw_reload_v40';
+  // La v41 aggiorna l'accordion delle regole e la pulizia dei trascinamenti delle carte.
+  const reloadKey = 'epoi_sw_reload_v41';
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     try {
       if (sessionStorage.getItem(reloadKey) === '1') return;
