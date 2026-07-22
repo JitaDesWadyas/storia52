@@ -23,12 +23,12 @@ const scripts = [...index.matchAll(/<script src="([^"?]+)/g)].map(match => match
 const styles = [...index.matchAll(/<link rel="stylesheet" href="([^"?]+)/g)].map(match => match[1]);
 check(new Set(scripts).size === scripts.length, 'index.html: script duplicati');
 check(new Set(styles).size === styles.length, 'index.html: stili duplicati');
-check(index.includes('virtual-cards.js?v=39'), 'index.html: motore virtuale v39 non caricato');
-check(index.includes('virtual-cards.css?v=39'), 'index.html: stile virtuale v39 non caricato');
+check(index.includes('virtual-cards.js?v=40'), 'index.html: motore virtuale v40 non caricato');
+check(index.includes('virtual-cards.css?v=40'), 'index.html: stile virtuale v40 non caricato');
 check(index.includes('clean-rules.js?v=32'), 'index.html: regole aggiornate non caricate');
 check(index.includes('clean-objectives.js?v=20'), 'index.html: fix obiettivo in partita non caricato');
 check(!index.includes('virtual-cards-mobile-v35.css') && !index.includes('virtual-table-redesign-v35.js'), 'index.html: vecchi override v35 ancora caricati');
-check(index.includes('pwa-refresh.js?v=39'), 'index.html: refresh PWA v39 non caricato');
+check(index.includes('pwa-refresh.js?v=40'), 'index.html: refresh PWA v40 non caricato');
 
 const virtualSource = read('virtual-cards.js');
 const virtualCss = read('virtual-cards.css');
@@ -58,7 +58,7 @@ check(virtualCss.includes('html body.virtual-table-active .site-header') && virt
 check(virtualCss.includes('env(safe-area-inset-bottom)'), 'Mancano le safe area');
 check(virtualCss.includes('flex-wrap:nowrap!important'), 'La mano non resta su una riga sola');
 check(virtualCss.includes('opacity:1!important') && virtualCss.includes('DA CAMBIARE') && virtualCss.includes('DA GIOCARE'), 'Simbolo o stato della carta selezionata non sono abbastanza evidenti');
-check(virtualCss.includes('width:clamp(62px,calc((100vw - 32px)/5),76px)') && virtualCss.includes('height:clamp(104px,13.4dvh,116px)'), 'Le carte non hanno la misura da mano singola');
+check(virtualCss.includes('width:clamp(72px,20.8vw,88px)') && virtualCss.includes('height:clamp(132px,18.2dvh,172px)'), 'Le carte non hanno la misura da mano singola');
 check(virtualCss.includes('.virtual-table-card[hidden],.virtual-focus-placeholder[hidden]{display:none!important}'), 'Le carte nascoste del tavolo possono ancora occupare spazio e tagliare il layout');
 check(virtualCss.includes('touch-action:none!important'), 'Le carte non bloccano il pan del browser');
 check(virtualCss.includes('visibility:hidden!important'), 'La carta originale non viene nascosta correttamente durante il drag');
@@ -69,10 +69,10 @@ check(virtualCss.includes('@media(max-height:700px)'), 'Manca l’adattamento pe
 check(virtualCss.includes('.rule-card-mini-sections>details'), 'Le mini sezioni delle regole non hanno uno stile dedicato');
 
 const sw = read('sw.js');
-check(sw.includes('shell-v39') && sw.includes('runtime-v39'), 'Cache PWA v39 non attiva');
+check(sw.includes('shell-v40') && sw.includes('runtime-v40'), 'Cache PWA v40 non attiva');
 check(sw.includes("'./virtual-cards.css'") && sw.includes("'./virtual-cards.js'"), 'Carte virtuali non precacheate');
 check(!sw.includes('virtual-cards-mobile-v35.css') && !sw.includes('virtual-table-redesign-v35.js'), 'Vecchi file v35 ancora nella cache');
-check(read('pwa-refresh.js').includes('epoi_sw_reload_v39'), 'Refresh PWA v39 non attivo');
+check(read('pwa-refresh.js').includes('epoi_sw_reload_v40'), 'Refresh PWA v40 non attivo');
 const coreBlock = sw.match(/const CORE_FILES = \[([\s\S]*?)\];/)?.[1] || '';
 for (const match of coreBlock.matchAll(/['"]\.\/([^'"]*)['"]/g)) check(exists(match[1]), `sw.js: file mancante ${match[1]}`);
 
@@ -115,4 +115,4 @@ if (failures.length) {
   console.error('\nRelease check fallito:\n- ' + failures.join('\n- '));
   process.exit(1);
 }
-console.log('Release check completato: modalità virtuale v39, mano singola, retro carte, incipit apribile e cache verificati.');
+console.log('Release check completato: modalità virtuale v40, layout mobile pieno, carte grandi, mano accavallata e cache verificati.');
