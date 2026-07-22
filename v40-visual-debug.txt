@@ -1,0 +1,10 @@
+file:///home/runner/work/storia52/storia52/verify-mobile-v40.mjs:28
+  const fail = message => { throw new Error(`${width}x${height}: ${message} ${JSON.stringify(metrics)}`); };
+                                  ^
+
+Error: 360x740: cards outside viewport {"innerWidth":360,"innerHeight":740,"scrollWidth":360,"scrollHeight":740,"cards":[{"left":15.8125,"right":90.6875,"top":519,"width":74.875,"height":132},{"left":82.6875,"right":157.5625,"top":519,"width":74.875,"height":132},{"left":149.5625,"right":224.4375,"top":519,"width":74.875,"height":132},{"left":216.4375,"right":291.3125,"top":519,"width":74.875,"height":132},{"left":283.3125,"right":358.1875,"top":519,"width":74.875,"height":132}],"action":{"top":682,"bottom":750},"hintBottom":678,"table":{"top":106,"bottom":398,"height":292},"storyHeight":134.46875,"openingFont":12.8,"cardTextFont":8}
+    at fail (file:///home/runner/work/storia52/storia52/verify-mobile-v40.mjs:28:35)
+    at file:///home/runner/work/storia52/storia52/verify-mobile-v40.mjs:32:76
+
+Node.js v22.23.1
+EXIT=1
