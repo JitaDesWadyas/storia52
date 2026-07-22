@@ -1,0 +1,124 @@
+name: Apply rulebook and stale drag fix
+
+on:
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  apply-fix:
+    if: github.head_ref == 'agent/fix-rulebook-resize-and-stale-drag'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Apply root-cause fixes
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              text = path.read_text()
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected one match, found {count}')
+              path.write_text(text.replace(old, new, 1))
+
+          interaction = Path('interaction-polish.js')
+          text = interaction.read_text()
+          needle = "      await animation.finished.catch(() => {});\n"
+          if text.count(needle) != 2:
+              raise SystemExit(f'interaction-polish.js: expected two finished animations, found {text.count(needle)}')
+          interaction.write_text(text.replace(needle, needle + "      animation.cancel();\n"))
+
+          cards = Path('virtual-cards.js')
+          replace_once(
+              cards,
+              "    let pointer = null;\n    let frame = 0;\n",
+              "    let pointer = null;\n    let frame = 0;\n    let dragEpoch = 0;\n"
+          )
+          replace_once(
+              cards,
+              "    const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;\n\n    const showAction",
+              "    const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;\n\n    const discardActiveDrag = () => {\n      const current = pointer;\n      pointer = null;\n      dragEpoch += 1;\n      if (frame) cancelAnimationFrame(frame);\n      frame = 0;\n      if (current?.slot && current.pointerId != null) {\n        try {\n          if (current.slot.hasPointerCapture?.(current.pointerId)) current.slot.releasePointerCapture(current.pointerId);\n        } catch { /* Il puntatore può essere già stato rilasciato dal browser. */ }\n      }\n      current?.ghost?.remove();\n      refs.overlay.querySelectorAll('.virtual-drag-ghost').forEach(ghost => ghost.remove());\n      root.querySelectorAll('.virtual-card-slot.is-drag-source').forEach(source => source.classList.remove('is-drag-source'));\n      refs.focus.classList.remove('drag-armed');\n      primaryAction()?.classList.remove('drag-preview');\n    };\n\n    const showAction"
+          )
+          replace_once(
+              cards,
+              "      current.ghost.remove();\n      current.slot.classList.remove('is-drag-source');\n      refs.focus.classList.remove('drag-armed');\n",
+              "      current.ghost.remove();\n      current.slot.classList.remove('is-drag-source');\n      if (current.epoch === dragEpoch) {\n        refs.focus.classList.remove('drag-armed');\n        primaryAction()?.classList.remove('drag-preview');\n      }\n"
+          )
+          replace_once(
+              cards,
+              "        if (!id || busy || cardsHidden || !['exchange', 'play'].includes(state.phase)) return;\n        event.preventDefault();\n",
+              "        if (!id || busy || cardsHidden || !['exchange', 'play'].includes(state.phase)) return;\n        discardActiveDrag();\n        event.preventDefault();\n"
+          )
+          replace_once(
+              cards,
+              "          pointerId: event.pointerId,\n          startX: event.clientX,",
+              "          pointerId: event.pointerId,\n          epoch: dragEpoch,\n          startX: event.clientX,"
+          )
+          replace_once(
+              cards,
+              "      current.ghost.remove();\n      current.slot.classList.remove('is-drag-source');\n      refs.focus.classList.remove('drag-armed');\n      await commitOutcome(outcome, action);\n",
+              "      current.ghost.remove();\n      current.slot.classList.remove('is-drag-source');\n      refs.focus.classList.remove('drag-armed');\n      primaryAction()?.classList.remove('drag-preview');\n      await commitOutcome(outcome, action);\n"
+          )
+          replace_once(
+              cards,
+              "    const cleanup = () => {\n      if (pointer?.ghost) pointer.ghost.remove();\n      if (pointer?.slot) pointer.slot.classList.remove('is-drag-source');\n      pointer = null;\n      refs.overlay.innerHTML = '';\n      refs.focus.classList.remove('drag-armed');\n",
+              "    const cleanup = () => {\n      discardActiveDrag();\n      refs.overlay.innerHTML = '';\n"
+          )
+
+          index = Path('index.html')
+          text = index.read_text()
+          for old, new in [
+              ('virtual-cards.js?v=40', 'virtual-cards.js?v=41'),
+              ('interaction-polish.js?v=21', 'interaction-polish.js?v=22'),
+              ('pwa-refresh.js?v=40', 'pwa-refresh.js?v=41'),
+          ]:
+              if text.count(old) != 1:
+                  raise SystemExit(f'index.html: expected one {old}')
+              text = text.replace(old, new)
+          index.write_text(text)
+
+          sw = Path('sw.js')
+          text = sw.read_text()
+          if text.count('v40') != 2:
+              raise SystemExit(f'sw.js: expected two v40 cache names, found {text.count("v40")}')
+          sw.write_text(text.replace('v40', 'v41'))
+
+          pwa = Path('pwa-refresh.js')
+          text = pwa.read_text()
+          text = text.replace('// La v40 forza il layout mobile a piena viewport con carte grandi, mano singola e retri.', '// La v41 aggiorna accordion delle regole e gestione dei trascinamenti delle carte.')
+          text = text.replace("const reloadKey = 'epoi_sw_reload_v40';", "const reloadKey = 'epoi_sw_reload_v41';")
+          if 'v40' in text:
+              raise SystemExit('pwa-refresh.js: stale v40 marker remains')
+          pwa.write_text(text)
+          PY
+
+      - name: Verify JavaScript and release
+        run: |
+          node --check interaction-polish.js
+          node --check virtual-cards.js
+          node --check clean-rules.js
+          node scripts/release-check.mjs
+          grep -q "animation.cancel();" interaction-polish.js
+          grep -q "const discardActiveDrag" virtual-cards.js
+          grep -q "epoch: dragEpoch" virtual-cards.js
+          grep -q "virtual-cards.js?v=41" index.html
+          grep -q "interaction-polish.js?v=22" index.html
+          grep -q "shell-v41" sw.js
+
+      - name: Commit clean patch
+        run: |
+          rm .github/workflows/apply-rulebook-drag-fix.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add interaction-polish.js virtual-cards.js index.html sw.js pwa-refresh.js .github/workflows/apply-rulebook-drag-fix.yml
+          git commit -m "Fix rulebook resizing and stale drag ghosts"
+          git push origin HEAD:${{ github.head_ref }}
