@@ -1,4 +1,6 @@
 /* Private virtual hand and guided turn. */
+.card-mode-options .option-card>span{font-size:.82rem;letter-spacing:-.04em}
+.join-mode-badge{display:inline-flex;align-items:center;width:max-content;margin-top:12px;padding:6px 9px;color:#211a12;background:var(--amber);border:1px solid var(--amber);border-radius:999px;font-size:.66rem;font-weight:950;letter-spacing:.08em}
 .virtual-game{display:grid;gap:20px;overflow:hidden}
 .virtual-game-header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
 .virtual-game-header h2{margin:.25rem 0 .55rem;font:800 clamp(1.9rem,6vw,3rem)/1 Georgia,serif;letter-spacing:-.035em}
