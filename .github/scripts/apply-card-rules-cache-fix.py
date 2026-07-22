@@ -52,6 +52,11 @@ text = text.replace('shell-v41', 'shell-v42').replace('runtime-v41', 'runtime-v4
 text = text.replace('Cache PWA v41', 'Cache PWA v42')
 text = text.replace('epoi_sw_reload_v41', 'epoi_sw_reload_v42')
 text = text.replace('Refresh PWA v41', 'Refresh PWA v42')
+old_drag_check = "check(virtualSource.includes('const valid = !cancelled && action && (overlaps || thrownUp)') && virtualSource.includes('await commitOutcome(outcome, action)'), 'Il drag non esegue direttamente Cambia o Gioca');"
+new_drag_check = "check(virtualSource.includes('const valid = !cancelled && action && dropState(current).valid') && virtualSource.includes('await commitOutcome(outcome, action)'), 'Il drag non esegue direttamente Cambia o Gioca');"
+if text.count(old_drag_check) != 1:
+    raise SystemExit('scripts/release-check.mjs: old drag assertion missing')
+text = text.replace(old_drag_check, new_drag_check)
 needle = "check(rulesSource.includes('rule-card-mini-sections') && rulesSource.includes('<details open>') && rulesSource.includes('Figure e assi'), 'Le regole delle carte non sono divise in mini sezioni');"
 replacement = needle + "\ncheck(rulesSource.includes('Solo J, Q, K e A') && !rulesSource.includes('<summary>Positivo e negativo</summary>'), 'La regola del colore non è integrata esclusivamente nelle figure e negli assi');\ncheck(virtualSource.includes(\"ghost.classList.remove('selected'\") && virtualSource.includes('const dropState = current') && virtualSource.includes('distance >= 76'), 'Il drag della carta selezionata o la soglia di rilascio non sono corretti');"
 if text.count(needle) != 1:
