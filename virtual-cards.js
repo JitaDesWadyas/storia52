@@ -44,7 +44,7 @@
   const cardFromId = id => {
     const [suitId, rank] = String(id || '').split('-');
     const suit = SUITS.find(item => item.id === suitId);
-    return suit && RANKS.includes(rank) ? { id, rank, ...suit } : null;
+    return suit && RANKS.includes(rank) ? { ...suit, id, rank } : null;
   };
 
   const polarity = (positive, neutral = false) => neutral
