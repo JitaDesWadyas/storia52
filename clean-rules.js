@@ -57,7 +57,38 @@
   S.rulesMarkup = () => `<div class="rules-menu"><p class="rules-menu-intro">Dalla preparazione al finale: tutte le regole per giocare con un mazzo reale o con le carte virtuali.</p><div class="rulebook"><details><summary>1. Preparazione</summary><div class="body">${S.preparationGuideMarkup()}</div></details><details><summary>2. Significato delle carte</summary><div class="body">${S.cardRulesMarkup()}</div></details><details><summary>3. Il turno</summary><div class="body">${S.turnGuideMarkup()}</div></details><details><summary>4. Come si chiude la storia</summary><div class="body">${S.finalRulesMarkup()}</div></details></div></div>`;
 
   const setImportant = (element, property, value) => element?.style.setProperty(property, value, 'important');
+
+  const ensureRulesExpansionStyles = () => {
+    if (document.getElementById('epoi-rules-expansion-fix')) return;
+    const style = document.createElement('style');
+    style.id = 'epoi-rules-expansion-fix';
+    style.textContent = `
+      .rules-modal .rulebook > details[open] > .body,
+      .rules-modal .rulebook > details.is-open > .body {
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+        opacity: 1 !important;
+      }
+      .rules-modal .card-rules-compact,
+      .rules-modal .card-meaning-board,
+      .rules-modal .rule-card-mini-sections {
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+      }
+      .rules-modal .rule-card-mini-sections > details[open] > .rule-mini-body {
+        display: block !important;
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+      }
+    `;
+    document.head.append(style);
+  };
+
   const enableRulesModalScroll = () => {
+    ensureRulesExpansionStyles();
     const apply = () => {
       const modals = document.querySelectorAll('.rules-modal');
       const modal = modals[modals.length - 1];
@@ -86,8 +117,31 @@
       setImportant(rulebook, 'overscroll-behavior', 'contain');
       setImportant(rulebook, 'touch-action', 'pan-y');
       setImportant(rulebook, '-webkit-overflow-scrolling', 'touch');
-      setImportant(rulebook, 'padding-bottom', 'max(18px,env(safe-area-inset-bottom))');
-      rulebook?.querySelectorAll('details,details>.body,.card-meaning-board,.rule-card-mini-sections').forEach(element => setImportant(element, 'touch-action', 'pan-y'));
+      setImportant(rulebook, 'padding-bottom', 'max(32px,env(safe-area-inset-bottom))');
+      setImportant(rulebook, 'scroll-padding-bottom', '32px');
+      rulebook?.querySelectorAll('details,details>.body,.rule-mini-body,.card-meaning-board,.rule-card-mini-sections').forEach(element => setImportant(element, 'touch-action', 'pan-y'));
+
+      const refreshExpandedBodies = () => {
+        rulebook?.querySelectorAll(':scope > details').forEach(detail => {
+          const body = detail.querySelector(':scope > .body');
+          if (!body || (!detail.open && !detail.classList.contains('is-open'))) return;
+          setImportant(body, 'height', 'auto');
+          setImportant(body, 'max-height', 'none');
+          setImportant(body, 'overflow', 'visible');
+          setImportant(body, 'opacity', '1');
+        });
+      };
+
+      const scheduleRefresh = () => {
+        requestAnimationFrame(refreshExpandedBodies);
+        setTimeout(refreshExpandedBodies, 60);
+        setTimeout(refreshExpandedBodies, 260);
+      };
+      rulebook?.addEventListener('toggle', scheduleRefresh, true);
+      rulebook?.addEventListener('click', event => {
+        if (event.target.closest('summary')) scheduleRefresh();
+      });
+      scheduleRefresh();
     };
     requestAnimationFrame(apply);
     setTimeout(apply, 80);
