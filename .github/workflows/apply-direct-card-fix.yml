@@ -24,14 +24,22 @@ jobs:
       - name: Apply figure color rules and cache fix
         run: python3 .github/scripts/apply-card-rules-cache-fix.py
 
-      - name: Verify patch
+      - name: Check JavaScript syntax
         run: |
           node --check virtual-cards.js
           node --check clean-rules.js
           node --check interaction-polish.js
-          node scripts/release-check.mjs
+
+      - name: Run release check
+        run: node scripts/release-check.mjs
+
+      - name: Check drag assertions
+        run: |
           grep -q "ghost.classList.remove('selected'" virtual-cards.js
           grep -q "distance >= 76" virtual-cards.js
+
+      - name: Check rules assertions
+        run: |
           grep -q "Solo J, Q, K e A" clean-rules.js
           ! grep -q '<summary>Positivo e negativo</summary>' clean-rules.js
 
