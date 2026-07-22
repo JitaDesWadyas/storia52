@@ -50,8 +50,8 @@ jobs:
           )
           replace_once(
               cards,
-              "      current.ghost.remove();\n      current.slot.classList.remove('is-drag-source');\n      refs.focus.classList.remove('drag-armed');\n",
-              "      current.ghost.remove();\n      current.slot.classList.remove('is-drag-source');\n      if (current.epoch === dragEpoch) {\n        refs.focus.classList.remove('drag-armed');\n        primaryAction()?.classList.remove('drag-preview');\n      }\n"
+              "      current.ghost.remove();\n      current.slot.classList.remove('is-drag-source');\n      refs.focus.classList.remove('drag-armed');\n    };\n\n    const finishPointer",
+              "      current.ghost.remove();\n      current.slot.classList.remove('is-drag-source');\n      if (current.epoch === dragEpoch) {\n        refs.focus.classList.remove('drag-armed');\n        primaryAction()?.classList.remove('drag-preview');\n      }\n    };\n\n    const finishPointer"
           )
           replace_once(
               cards,
@@ -107,7 +107,7 @@ jobs:
           node --check virtual-cards.js
           node --check clean-rules.js
           node scripts/release-check.mjs
-          grep -q "animation.cancel();" interaction-polish.js
+          test "$(grep -c "animation.cancel();" interaction-polish.js)" -eq 2
           grep -q "const discardActiveDrag" virtual-cards.js
           grep -q "epoch: dragEpoch" virtual-cards.js
           grep -q "virtual-cards.js?v=41" index.html
