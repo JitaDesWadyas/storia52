@@ -21,7 +21,8 @@ jobs:
           show-progress: false
       - name: Decode patch
         shell: bash
-        run: awk '/PATCH64/{getline; print; exit}' .github/workflows/apply-virtual-v38.yml | base64 -d | gzip -d > scripts/apply-virtual-v38.py
+        run: |
+          sed -n "/cat <<'PATCH64'/,/^[[:space:]]*PATCH64[[:space:]]*$/p" .github/workflows/apply-virtual-v38.yml | sed '1d;$d' | tr -d '[:space:]' | base64 -d | gzip -d > scripts/apply-virtual-v38.py
       - name: Apply patch
         shell: bash
         run: python scripts/apply-virtual-v38.py
