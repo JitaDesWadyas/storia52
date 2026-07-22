@@ -1,0 +1,290 @@
+name: Rebuild virtual mobile layout v40
+
+on:
+  pull_request:
+    types: [synchronize]
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild-mobile-v40:
+    if: github.head_ref == 'agent/virtual-cards-single-row-v39'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Rebuild mobile proportions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          css_path = Path('virtual-cards.css')
+          css = css_path.read_text()
+
+          def exact(old, new, label):
+              global css
+              if old not in css:
+                  raise SystemExit(f'Missing CSS fragment: {label}')
+              css = css.replace(old, new, 1)
+
+          def regex(pattern, replacement, label):
+              global css
+              css, count = re.subn(pattern, replacement, css, count=1, flags=re.S)
+              if count != 1:
+                  raise SystemExit(f'Unexpected CSS block count for {label}: {count}')
+
+          exact(
+              '  display:flex!important;\n  flex-direction:column!important;\n  gap:5px!important;',
+              '  display:grid!important;\n  grid-template-rows:auto auto minmax(0,1fr) auto auto 68px!important;\n  gap:6px!important;',
+              'root grid layout'
+          )
+
+          regex(r'\.virtual-game-header\{.*?\n\}', '''.virtual-game-header{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:10px!important;
+  min-height:54px!important
+}''', 'game header')
+          exact('.virtual-player-title img{width:36px!important;height:36px!important;flex:0 0 36px!important}', '.virtual-player-title img{width:42px!important;height:42px!important;flex:0 0 42px!important}', 'header logo')
+          exact('  font-size:.7rem!important;', '  font-size:.78rem!important;', 'player name')
+          exact('  font:850 1.12rem/1.05 Georgia,serif!important;', '  font:850 1.3rem/1.03 Georgia,serif!important;', 'turn title')
+          exact('  width:42px!important;\n  height:42px!important;\n  min-width:42px!important;\n  min-height:42px!important;', '  width:46px!important;\n  height:46px!important;\n  min-width:46px!important;\n  min-height:46px!important;', 'top buttons')
+          exact('.virtual-menu-button{width:52px!important;min-width:52px!important}', '.virtual-menu-button{width:58px!important;min-width:58px!important}', 'menu button')
+          exact('.virtual-menu-button span{font-size:.66rem!important;font-weight:950!important}', '.virtual-menu-button span{font-size:.74rem!important;font-weight:950!important}', 'menu label')
+
+          exact('  height:29px!important;\n  padding:2px 6px!important;', '  height:35px!important;\n  padding:3px 7px!important;', 'phase rail height')
+          exact('  font-size:.66rem!important\n}', '  font-size:.75rem!important\n}', 'phase rail label')
+          exact('  width:19px!important;\n  height:19px!important;', '  width:23px!important;\n  height:23px!important;', 'phase rail circles')
+          exact('  font-size:.56rem!important\n}', '  font-size:.64rem!important\n}', 'phase rail number')
+
+          regex(r'\.virtual-phase-callout\{.*?\n\}', '''.virtual-phase-callout{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  align-items:center!important;
+  gap:3px!important;
+  min-height:56px!important;
+  padding:8px 12px!important;
+  text-align:center!important;
+  color:var(--vg-ink)!important;
+  background:color-mix(in srgb,var(--vg-amber) 13%,var(--vg-panel))!important;
+  border:1px solid color-mix(in srgb,var(--vg-amber) 62%,var(--vg-line))!important;
+  border-radius:13px!important
+}''', 'phase callout')
+          exact('.virtual-phase-callout b{font-size:.72rem!important;', '.virtual-phase-callout b{font-size:.86rem!important;', 'phase title')
+          exact('font-size:.58rem!important;line-height:1.15!important;', 'font-size:.68rem!important;line-height:1.18!important;', 'phase help')
+
+          exact('  min-height:118px!important;\n  padding:10px 10px!important;', '  min-height:144px!important;\n  padding:12px 12px!important;', 'story stage')
+          exact('  grid-template-columns:42px minmax(0,1fr) auto!important;', '  grid-template-columns:52px minmax(0,1fr) auto!important;', 'story columns')
+          exact('  width:42px!important;\n  height:42px!important;', '  width:52px!important;\n  height:52px!important;', 'story icon')
+          exact('  font-size:1.25rem!important', '  font-size:1.5rem!important', 'story icon glyph')
+          exact('  font-size:.56rem!important;', '  font-size:.66rem!important;', 'story genre')
+          exact('  font:850 clamp(.96rem,4vw,1.12rem)/1.04 Georgia,serif!important;', '  font:850 clamp(1.12rem,4.8vw,1.38rem)/1.02 Georgia,serif!important;', 'story title')
+          exact('  font-size:.69rem!important;\n  line-height:1.22!important;', '  font-size:.8rem!important;\n  line-height:1.25!important;', 'story opening')
+          exact('  width:24px!important;\n  height:24px!important;', '  width:28px!important;\n  height:28px!important;', 'party avatars')
+          exact('  font-size:.45rem!important;', '  font-size:.52rem!important;', 'party labels')
+
+          regex(r'\.virtual-table-board\{.*?\n\}', '''.virtual-table-board{
+  position:relative!important;
+  display:grid!important;
+  grid-template-columns:76px 108px!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:30px!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:184px!important;
+  margin:0!important
+}''', 'table board')
+          exact('  width:min(226px,82%);\n  height:min(118px,58%);', '  width:min(286px,88%);\n  height:min(150px,70%);', 'table ellipse')
+          exact('  width:52px!important;\n  height:74px!important;\n  min-width:52px!important;', '  width:68px!important;\n  height:98px!important;\n  min-width:68px!important;', 'deck size')
+          exact('  width:84px!important;\n  min-height:104px!important;\n  padding-top:17px!important', '  width:108px!important;\n  min-height:142px!important;\n  padding-top:22px!important', 'focus area')
+          exact('  max-width:118px!important;', '  max-width:148px!important;', 'focus label width')
+          exact('  font-size:.47rem!important;', '  font-size:.56rem!important;', 'focus label')
+          exact('  width:74px!important;\n  height:90px!important;', '  width:94px!important;\n  height:124px!important;', 'drop placeholder')
+          exact('.virtual-focus-placeholder i{color:var(--vg-amber)!important;font-size:1.45rem!important;', '.virtual-focus-placeholder i{color:var(--vg-amber)!important;font-size:1.9rem!important;', 'drop arrow')
+          exact('.virtual-focus-placeholder b{width:62px!important;font-size:.45rem!important;', '.virtual-focus-placeholder b{width:82px!important;font-size:.58rem!important;', 'drop text')
+
+          exact('/* Mano: tre carte sopra e due centrate sotto, senza trasformarla nel contenuto dominante. */', '/* Mano mobile: cinque carte grandi, leggermente accavallate e sempre dentro la viewport. */', 'hand comment')
+          regex(r'\.virtual-hand-section\{.*?\n\}', '''.virtual-hand-section{
+  position:relative!important;
+  display:grid!important;
+  grid-template-rows:32px auto 22px!important;
+  align-content:start!important;
+  gap:4px!important;
+  min-height:0!important;
+  overflow:visible!important
+}''', 'hand section')
+          exact('  font-size:.62rem!important;', '  font-size:.74rem!important;', 'hand heading')
+          exact('  min-height:24px!important;\n  padding:2px 8px!important;', '  min-height:32px!important;\n  padding:4px 10px!important;', 'hide button size')
+          exact('  font-size:.57rem!important;', '  font-size:.66rem!important;', 'hide button label')
+          regex(r'\.virtual-hand\{.*?\n\}', '''.virtual-hand{
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  align-content:center!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  gap:0!important;
+  min-height:0!important;
+  padding:3px 0 1px!important;
+  overflow:visible!important
+}
+.virtual-card-slot + .virtual-card-slot{margin-left:-8px!important}''', 'hand row')
+          exact('  width:clamp(62px,calc((100vw - 32px)/5),76px)!important;\n  max-width:76px!important;\n  height:clamp(104px,13.4dvh,116px)!important;\n  min-height:104px!important;\n  padding:6px!important;', '  width:clamp(72px,20.8vw,88px)!important;\n  max-width:88px!important;\n  height:clamp(132px,18.2dvh,172px)!important;\n  min-height:132px!important;\n  padding:7px!important;', 'card dimensions')
+          exact('  transform:translateY(-4px)!important;', '  transform:translateY(-8px)!important;', 'selected lift')
+          exact('.virtual-card-corner b{font:900 .9rem/1 Georgia,serif!important}', '.virtual-card-corner b{font:900 1.05rem/1 Georgia,serif!important}', 'card rank')
+          exact('.virtual-card-corner i{font-style:normal!important;font-size:.78rem!important}', '.virtual-card-corner i{font-style:normal!important;font-size:.92rem!important}', 'card suit corner')
+          exact('font-size:1.95rem!important;line-height:1!important;', 'font-size:2.65rem!important;line-height:1!important;', 'card suit center')
+          exact('  font-size:.4rem!important;', '  font-size:.47rem!important;', 'card badge')
+          exact('  font:850 .59rem/1.02 Georgia,serif!important;', '  font:850 .72rem/1.02 Georgia,serif!important;', 'card meaning')
+          exact('  min-height:2.12em!important;\n  color:var(--vg-muted)!important;\n  font-size:.44rem!important;\n  line-height:1.06!important;', '  min-height:4.4em!important;\n  color:var(--vg-muted)!important;\n  font-size:.52rem!important;\n  line-height:1.1!important;', 'card description')
+          exact('  -webkit-line-clamp:2!important;', '  -webkit-line-clamp:4!important;', 'card description lines')
+          exact('  font-size:.56rem!important;\n  line-height:1.1!important;', '  font-size:.64rem!important;\n  line-height:1.15!important;', 'gesture hint')
+
+          exact('  width:72px!important;\n  max-width:72px!important;\n  height:100px!important;\n  min-height:100px!important;', '  width:90px!important;\n  max-width:90px!important;\n  height:130px!important;\n  min-height:130px!important;', 'table card size')
+          exact('.virtual-table-card .virtual-card-symbol{font-size:2.1rem!important}', '.virtual-table-card .virtual-card-symbol{font-size:2.7rem!important}', 'table card symbol')
+          exact('.virtual-table-card .virtual-card-effect b{font-size:.55rem!important}', '.virtual-table-card .virtual-card-effect b{font-size:.68rem!important}', 'table card title')
+          exact('.virtual-table-card .virtual-card-effect small{font-size:.42rem!important;min-height:2em!important}', '.virtual-table-card .virtual-card-effect small{font-size:.5rem!important;min-height:3.2em!important}', 'table card description')
+
+          exact('  flex:0 0 64px!important;\n  margin-top:auto!important;', '  margin-top:0!important;', 'action dead space')
+          exact('  height:64px!important;\n  min-height:64px!important;', '  height:68px!important;\n  min-height:68px!important;', 'action bar')
+          exact('  height:54px!important;\n  min-height:54px!important;', '  height:58px!important;\n  min-height:58px!important;', 'action button')
+          exact('  font-size:.9rem!important;', '  font-size:1rem!important;', 'action label')
+
+          exact('  .virtual-card-slot,.virtual-drag-ghost{width:calc((100vw - 32px)/5)!important}', '  .virtual-card-slot,.virtual-drag-ghost{width:clamp(72px,20.8vw,88px)!important}', 'narrow card width')
+          exact('  .virtual-story-stage{min-height:78px!important}', '  .virtual-story-stage{min-height:100px!important}', 'short story stage first')
+          exact('  .virtual-table-board{height:145px!important;min-height:145px!important}', '  .virtual-table-board{height:auto!important;min-height:156px!important}', 'short board')
+          exact('  .virtual-story-stage{min-height:64px!important;padding:6px 7px!important}', '  .virtual-story-stage{min-height:96px!important;padding:8px 9px!important}', 'short story stage')
+          exact('  .virtual-card-slot,.virtual-drag-ghost{height:102px!important;min-height:102px!important}', '  .virtual-card-slot,.virtual-drag-ghost{height:132px!important;min-height:132px!important}', 'short cards')
+          exact('  .virtual-card-effect small{font-size:.49rem!important}', '  .virtual-card-effect small{font-size:.5rem!important}', 'short descriptions')
+          exact('  .virtual-actions{height:60px!important;min-height:60px!important}', '  .virtual-actions{height:62px!important;min-height:62px!important}', 'short action bar')
+          exact('  .virtual-actions button{height:50px!important;min-height:50px!important}', '  .virtual-actions button{height:54px!important;min-height:54px!important}', 'short action button')
+          exact('  .virtual-table-board{height:128px!important;min-height:128px!important}', '  .virtual-table-board{height:auto!important;min-height:132px!important}', 'very short board')
+          exact('  .virtual-card-slot,.virtual-drag-ghost{height:102px!important;min-height:102px!important;padding:6px!important}', '  .virtual-card-slot,.virtual-drag-ghost{height:118px!important;min-height:118px!important;padding:6px!important}', 'very short cards')
+          exact('  .virtual-card-effect small{font-size:.47rem!important;-webkit-line-clamp:1!important;min-height:1.05em!important}', '  .virtual-card-effect small{font-size:.46rem!important;-webkit-line-clamp:2!important;min-height:2.15em!important}', 'very short card copy')
+          exact('  .virtual-hand-section{grid-template-rows:24px auto 15px!important}', '  .virtual-hand-section{grid-template-rows:28px auto 14px!important}', 'very short hand')
+          exact('  .virtual-story-stage{min-height:128px!important;', '  .virtual-story-stage{min-height:150px!important;', 'tall story')
+          exact('font-size:.69rem!important;line-height:1.22!important', 'font-size:.8rem!important;line-height:1.25!important', 'tall opening')
+          exact('  .virtual-hand{gap:5px!important}', '  .virtual-hand{gap:0!important}', 'wide hand')
+
+          css_path.write_text(css)
+
+          replacements = {
+              'index.html': [('v=39', 'v=40')],
+              'sw.js': [('shell-v39', 'shell-v40'), ('runtime-v39', 'runtime-v40')],
+              'pwa-refresh.js': [('epoi_sw_reload_v39', 'epoi_sw_reload_v40'), ('La v39', 'La v40')],
+              'scripts/release-check.mjs': [
+                  ('v=39', 'v=40'),
+                  ('v39', 'v40'),
+                  ('shell-v39', 'shell-v40'),
+                  ('runtime-v39', 'runtime-v40'),
+                  ('epoi_sw_reload_v39', 'epoi_sw_reload_v40'),
+                  ('width:clamp(62px,calc((100vw - 32px)/5),76px)', 'width:clamp(72px,20.8vw,88px)'),
+                  ('height:clamp(104px,13.4dvh,116px)', 'height:clamp(132px,18.2dvh,172px)'),
+                  ('mano singola, retro carte, incipit apribile e cache verificati', 'layout mobile pieno, carte grandi, mano accavallata e cache verificati')
+              ]
+          }
+          for filename, pairs in replacements.items():
+              path = Path(filename)
+              text = path.read_text()
+              for old, new in pairs:
+                  if old not in text:
+                      raise SystemExit(f'Missing version fragment in {filename}: {old}')
+                  text = text.replace(old, new)
+              path.write_text(text)
+          PY
+
+      - name: Validate release
+        run: node scripts/release-check.mjs
+
+      - name: Build mobile visual harness
+        run: |
+          cat > verify-mobile-v40.html <<'HTML'
+          <!doctype html><html lang="it" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="stylesheet" href="virtual-cards.css"></head><body class="virtual-table-active"><section class="virtual-game" data-phase="exchange">
+          <header class="virtual-game-header"><div class="virtual-player-title"><img src="storia52-cards-logo.svg"><div class="virtual-player-copy"><p>Giocatore 1</p><h2><span>Turno 1</span></h2></div></div><div class="virtual-top-actions"><button class="virtual-icon-button virtual-menu-button"><span>Menu</span></button><button class="virtual-icon-button">◐</button><button class="virtual-icon-button">×</button></div></header>
+          <ol class="virtual-turn-rail"><li class="current"><span>1</span><b>Cambia</b></li><li><span>2</span><b>Gioca</b></li><li><span>3</span><b>Chiudi</b></li></ol>
+          <section class="virtual-table"><button class="virtual-story-stage"><span class="virtual-story-icon">●</span><div class="virtual-story-copy"><p>Dramma</p><h3>Primo giorno in Meridiana</h3><small>Samir comincia il suo primo giorno nello stabilimento Meridiana di Valma. Durante il turno, Marta gli mostra una serie di sensori difettosi che potrebbero falsare i controlli.</small></div><div class="virtual-party"><span class="virtual-party-person active">G1</span><span class="virtual-party-person">G2</span><span class="virtual-party-person">G3</span><span class="virtual-party-person">G4</span></div></button><div class="virtual-table-board"><button class="virtual-deck-card"><span class="virtual-deck-layer"></span><span class="virtual-deck-layer"></span><span class="virtual-deck-layer"></span><span class="virtual-deck-face"><img src="storia52-cards-logo.svg"><small>MAZZO</small></span></button><article class="virtual-card-focus"><span class="virtual-focus-placeholder"><i>↥</i><b>Carta da cambiare</b></span></article></div></section>
+          <div class="virtual-phase-callout"><b>CAMBIA UNA CARTA</b><span>Tocca per selezionarla oppure trascinala sul tavolo.</span></div>
+          <section class="virtual-hand-section"><div class="virtual-hand-heading"><span>LA TUA MANO</span><div><b>5 carte</b><button>Nascondi</button></div></div><div class="virtual-hand">
+          <button class="virtual-card-slot red"><span class="virtual-card-corner"><b>A</b><i>♥</i></span><span class="virtual-card-symbol">♥</span><span class="virtual-card-effect"><em>POSITIVA</em><b>Svolta</b><small>Avviene una svolta favorevole</small></span></button>
+          <button class="virtual-card-slot"><span class="virtual-card-corner"><b>A</b><i>♠</i></span><span class="virtual-card-symbol">♠</span><span class="virtual-card-effect"><em>NEGATIVA</em><b>Svolta</b><small>Avviene una svolta sfavorevole</small></span></button>
+          <button class="virtual-card-slot red"><span class="virtual-card-corner"><b>8</b><i>♦</i></span><span class="virtual-card-symbol">♦</span><span class="virtual-card-effect"><em>POSITIVA</em><b>Scoperta</b><small>Una scoperta aiuta i personaggi</small></span></button>
+          <button class="virtual-card-slot"><span class="virtual-card-corner"><b>6</b><i>♠</i></span><span class="virtual-card-symbol">♠</span><span class="virtual-card-effect"><em>NEGATIVA</em><b>Ostacolo</b><small>Un ostacolo blocca o complica</small></span></button>
+          <button class="virtual-card-slot"><span class="virtual-card-corner"><b>3</b><i>♠</i></span><span class="virtual-card-symbol">♠</span><span class="virtual-card-effect"><em>NEGATIVA</em><b>Ostacolo</b><small>Un ostacolo blocca o complica</small></span></button>
+          </div><p class="virtual-gesture-hint">Tocco: seleziona. Trascinamento verso il tavolo: cambia subito.</p></section>
+          <div class="virtual-actions" data-count="1"><button disabled>Cambia</button></div></section></body></html>
+          HTML
+
+          cat > verify-mobile-v40.mjs <<'JS'
+          import { chromium } from 'playwright';
+          import path from 'node:path';
+          import fs from 'node:fs';
+          const viewports = [[360,740],[360,800],[390,844],[412,915],[430,932]];
+          const out = 'v40-screenshots'; fs.mkdirSync(out,{recursive:true});
+          const browser = await chromium.launch({headless:true});
+          for (const [width,height] of viewports) {
+            const page = await browser.newPage({viewport:{width,height}});
+            await page.goto('file://' + path.resolve('verify-mobile-v40.html'));
+            const metrics = await page.evaluate(() => {
+              const rect = s => document.querySelector(s).getBoundingClientRect();
+              const cards = [...document.querySelectorAll('.virtual-card-slot')].map(x => x.getBoundingClientRect());
+              const action = rect('.virtual-actions');
+              const hint = rect('.virtual-gesture-hint');
+              const table = rect('.virtual-table');
+              const story = rect('.virtual-story-stage');
+              return {
+                innerWidth, innerHeight,
+                scrollWidth:document.documentElement.scrollWidth,
+                scrollHeight:document.documentElement.scrollHeight,
+                cards:cards.map(r=>({left:r.left,right:r.right,top:r.top,width:r.width,height:r.height})),
+                action:{top:action.top,bottom:action.bottom}, hintBottom:hint.bottom,
+                table:{top:table.top,bottom:table.bottom,height:table.height}, storyHeight:story.height,
+                openingFont:parseFloat(getComputedStyle(document.querySelector('.virtual-story-copy small')).fontSize),
+                cardTextFont:parseFloat(getComputedStyle(document.querySelector('.virtual-card-effect small')).fontSize)
+              };
+            });
+            const fail = message => { throw new Error(`${width}x${height}: ${message} ${JSON.stringify(metrics)}`); };
+            if (metrics.scrollWidth > width + 1 || metrics.scrollHeight > height + 1) fail('overflow');
+            if (metrics.cards.length !== 5) fail('hand count');
+            if (Math.max(...metrics.cards.map(c=>c.top))-Math.min(...metrics.cards.map(c=>c.top)) > 2) fail('cards not one row');
+            if (metrics.cards[0].left < 5 || metrics.cards.at(-1).right > width - 5) fail('cards outside viewport');
+            if (Math.min(...metrics.cards.map(c=>c.width)) < 71 || Math.min(...metrics.cards.map(c=>c.height)) < 117) fail('cards still too small');
+            if (metrics.action.bottom > height + 1 || height - metrics.action.bottom > 12) fail('action bar not locked to bottom');
+            if (metrics.action.top - metrics.hintBottom > 14) fail('dead space below hand');
+            if (metrics.storyHeight < (height <= 780 ? 94 : 138)) fail('story area too small');
+            if (metrics.openingFont < 11 || metrics.cardTextFont < 7.2) fail('text still too small');
+            await page.screenshot({path:`${out}/${width}x${height}.png`});
+            await page.close();
+          }
+          await browser.close();
+          JS
+
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Verify mobile layout visually
+        run: node verify-mobile-v40.mjs
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: virtual-mobile-v40-screenshots
+          path: v40-screenshots
+          retention-days: 14
+
+      - name: Commit final mobile layout
+        run: |
+          rm -f verify-mobile-v40.html verify-mobile-v40.mjs .github/workflows/rebuild-mobile-layout-v40.yml .github/v40-trigger.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add virtual-cards.css index.html sw.js pwa-refresh.js scripts/release-check.mjs .github/workflows/rebuild-mobile-layout-v40.yml .github/v40-trigger.txt
+          git commit -m "fix: ricostruisce le proporzioni del tavolo mobile"
+          git push origin HEAD:${{ github.head_ref }}
