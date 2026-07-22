@@ -63,7 +63,7 @@
       return {
         title: `Relazione ${even ? 'positiva' : 'negativa'}`,
         short: 'Relazione',
-        text: even ? 'Rafforza un legame' : 'Crea distanza o tensione',
+        text: even ? 'Una relazione si rafforza' : 'Una relazione si incrina',
         ...polarity(even)
       };
     }
@@ -71,23 +71,23 @@
       return {
         title: `Scoperta ${even ? 'positiva' : 'negativa'}`,
         short: 'Scoperta',
-        text: even ? 'Scopri qualcosa che aiuta' : 'Scopri qualcosa che complica',
+        text: even ? 'Una scoperta aiuta i personaggi' : 'Una scoperta crea un problema',
         ...polarity(even)
       };
     }
     if (numeric && card.id.startsWith('C-')) {
-      return { title: 'Azione', short: 'Azione', text: 'Un personaggio agisce', ...polarity(false, true) };
+      return { title: 'Azione', short: 'Azione', text: 'Un personaggio tenta un’azione', ...polarity(false, true) };
     }
     if (numeric) {
-      return { title: 'Ostacolo', short: 'Ostacolo', text: 'Compare un problema', ...polarity(false) };
+      return { title: 'Ostacolo', short: 'Ostacolo', text: 'Un ostacolo blocca o complica', ...polarity(false) };
     }
 
     const positive = card.red;
     const special = {
-      J: { short: 'Oggetto', good: 'Un oggetto aiuta', bad: 'Un oggetto crea problemi' },
-      Q: { short: 'Personaggio', good: 'Una persona aiuta', bad: 'Una persona ostacola' },
-      K: { short: 'Luogo', good: 'Un luogo offre possibilità', bad: 'Un luogo complica tutto' },
-      A: { short: 'Svolta', good: 'La situazione migliora', bad: 'La situazione peggiora' }
+      J: { short: 'Oggetto', good: 'Entra un oggetto che aiuta', bad: 'Entra un oggetto problematico' },
+      Q: { short: 'Personaggio', good: 'Entra un personaggio che aiuta', bad: 'Entra un personaggio che ostacola' },
+      K: { short: 'Luogo', good: 'Entra un luogo favorevole', bad: 'Entra un luogo pericoloso' },
+      A: { short: 'Svolta', good: 'Avviene una svolta favorevole', bad: 'Avviene una svolta sfavorevole' }
     }[card.rank];
     return {
       title: `${special.short} ${positive ? 'positivo' : 'negativo'}`,
@@ -263,7 +263,7 @@
   const saveState = (session, playerIndex, state) => {
     try { localStorage.setItem(storageKey(session, playerIndex), JSON.stringify(state)); } catch { /* La partita continua. */ }
   };
-  const shortText = (value, max = 150) => {
+  const shortText = (value, max = 220) => {
     const clean = String(value || '').replace(/\s+/g, ' ').trim();
     return clean.length > max ? `${clean.slice(0, max - 1).trim()}…` : clean;
   };
@@ -320,6 +320,10 @@
         <li data-rail-step="1"><span>2</span><b>Gioca</b></li>
         <li data-rail-step="2"><span>3</span><b>Chiudi</b></li>
       </ol>
+      <div class="virtual-phase-callout" data-phase-callout>
+        <b data-phase-title>CAMBIA UNA CARTA</b>
+        <span data-phase-help>Tocca per selezionarla oppure trascinala sul tavolo.</span>
+      </div>
       <section class="virtual-table">
         <section class="virtual-story-stage">
           <span class="virtual-story-icon" aria-hidden="true">${S.esc(category.symbol || '✦')}</span>
@@ -337,7 +341,7 @@
           </button>
           <article class="virtual-card-focus" data-card-focus>
             <span class="virtual-focus-label" data-focus-label>Seleziona una carta</span>
-            <span class="virtual-focus-placeholder" data-focus-placeholder aria-hidden="true"><i>↥</i><b>La carta apparirà qui</b></span>
+            <span class="virtual-focus-placeholder" data-focus-placeholder aria-hidden="true"><i>↥</i><b data-focus-help>Carta da cambiare</b></span>
             <span class="virtual-table-card" data-table-card hidden></span>
           </article>
         </div>
@@ -406,11 +410,15 @@
       text: root.querySelector('[data-turn-text]'),
       handCount: root.querySelector('[data-hand-count]'),
       hint: root.querySelector('[data-gesture-hint]'),
+      phaseCallout: root.querySelector('[data-phase-callout]'),
+      phaseTitle: root.querySelector('[data-phase-title]'),
+      phaseHelp: root.querySelector('[data-phase-help]'),
       deck: root.querySelector('[data-virtual-deck]'),
       deckAction: root.querySelector('[data-deck-action]'),
       focus: root.querySelector('[data-card-focus]'),
       focusLabel: root.querySelector('[data-focus-label]'),
       focusPlaceholder: root.querySelector('[data-focus-placeholder]'),
+      focusHelp: root.querySelector('[data-focus-help]'),
       tableCard: root.querySelector('[data-table-card]'),
       slots: [...root.querySelectorAll('[data-card-slot]')],
       actions: [...root.querySelectorAll('[data-virtual-action]')],
@@ -444,7 +452,8 @@
       if (state.phase === 'completed') refs.focusLabel.textContent = 'Finale accettato';
       else if (played) refs.focusLabel.textContent = 'Carta giocata';
       else if (id) refs.focusLabel.textContent = 'Carta scartata';
-      else refs.focusLabel.textContent = state.phase === 'exchange' ? 'Seleziona una carta' : 'Gioca una carta';
+      else refs.focusLabel.textContent = state.phase === 'exchange' ? 'Trascina qui per cambiare' : 'Trascina qui per giocare';
+      if (refs.focusHelp) refs.focusHelp.textContent = state.phase === 'exchange' ? 'Carta da cambiare' : 'Carta da giocare';
 
       refs.tableCard.className = 'virtual-table-card';
       refs.tableCard.innerHTML = id ? cardFaceMarkup(id) : '';
@@ -509,10 +518,22 @@
       refs.deckAction.textContent = state.phase === 'afterPlay' || state.phase === 'final' ? 'PESCA' : 'MAZZO';
       refs.deck.classList.toggle('can-draw', state.phase === 'afterPlay' || state.phase === 'final');
       refs.deck.disabled = busy || !['afterPlay', 'final'].includes(state.phase);
-      refs.hint.textContent = state.phase === 'exchange'
-        ? 'Tocca una carta, poi premi Cambia. Trascinando la selezioni soltanto.'
+      const phaseCopy = state.phase === 'exchange'
+        ? [state.hand.length > 1 ? 'CAMBIA UNA CARTA' : 'CAMBIA O TIENI LA CARTA', 'Tocca per selezionarla oppure trascinala sul tavolo.']
         : state.phase === 'play'
-          ? 'Tocca una carta, poi premi Gioca. Trascinando la selezioni soltanto.'
+          ? ['GIOCA UNA CARTA', 'Tocca per selezionarla oppure trascinala sul tavolo.']
+          : state.phase === 'afterPlay'
+            ? ['RACCONTA LA SCENA', 'Poi scegli se pescare oppure continuare con una carta in meno.']
+            : state.phase === 'final'
+              ? ['COLLEGA IL FINALE', 'Rivela il tuo obiettivo e chiudi la storia.']
+              : ['FINALE ACCETTATO', 'La storia è conclusa.'];
+      refs.phaseTitle.textContent = phaseCopy[0];
+      refs.phaseHelp.textContent = phaseCopy[1];
+      refs.phaseCallout.dataset.phase = state.phase;
+      refs.hint.textContent = state.phase === 'exchange'
+        ? 'Tocco: seleziona. Trascinamento verso il tavolo: cambia subito.'
+        : state.phase === 'play'
+          ? 'Tocco: seleziona. Trascinamento verso il tavolo: gioca subito.'
           : state.phase === 'afterPlay'
             ? 'La carta resta sul tavolo mentre racconti.'
             : state.phase === 'final'
@@ -651,6 +672,7 @@
       }
       current.ghost.remove();
       current.slot.classList.remove('is-drag-source');
+      refs.focus.classList.remove('drag-armed');
     };
 
     const finishPointer = async (event, cancelled = false) => {
@@ -666,12 +688,45 @@
         return;
       }
 
-      await returnDragGhost(current);
-      if (cancelled) return;
-      selectCard(current.id, true);
-      const action = primaryAction();
-      action?.classList.add('drag-suggested');
-      setTimeout(() => action?.classList.remove('drag-suggested'), 900);
+      const action = state.phase === 'exchange' ? 'exchange' : state.phase === 'play' ? 'play' : '';
+      const focusRect = refs.focus.getBoundingClientRect();
+      const ghostRect = current.ghost.getBoundingClientRect();
+      const overlaps = ghostRect.right > focusRect.left && ghostRect.left < focusRect.right
+        && ghostRect.bottom > focusRect.top && ghostRect.top < focusRect.bottom;
+      const thrownUp = current.dy < -58 && Math.abs(current.dy) > Math.abs(current.dx) * .55;
+      const valid = !cancelled && action && (overlaps || thrownUp);
+
+      if (!valid) {
+        await returnDragGhost(current);
+        return;
+      }
+
+      const outcome = engine.apply(state, action, session.cardSeed, playerIndex, current.id);
+      if (!outcome.ok) {
+        await returnDragGhost(current);
+        S.toast(outcome.message);
+        return;
+      }
+
+      busy = true;
+      selectedId = current.id;
+      updateActions();
+      refs.focus.classList.add('drag-armed');
+      const targetRect = refs.focus.getBoundingClientRect();
+      const dx = targetRect.left + targetRect.width / 2 - (current.rect.left + current.rect.width / 2);
+      const dy = targetRect.top + targetRect.height / 2 - (current.rect.top + current.rect.height / 2);
+      if (!reducedMotion()) {
+        try {
+          await current.ghost.animate([
+            { transform: current.ghost.style.transform || `translate3d(${current.dx}px,${current.dy}px,0)` },
+            { transform: `translate3d(${dx}px,${dy}px,0) scale(.88) rotate(${action === 'exchange' ? 5 : -2}deg)` }
+          ], { duration: 210, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' }).finished;
+        } catch { /* Lo stato viene comunque applicato. */ }
+      }
+      current.ghost.remove();
+      current.slot.classList.remove('is-drag-source');
+      refs.focus.classList.remove('drag-armed');
+      await commitOutcome(outcome, action);
     };
 
     refs.slots.forEach(slot => {
@@ -710,7 +765,13 @@
           frame = 0;
           if (!pointer?.ghost) return;
           pointer.ghost.style.transform = `translate3d(${pointer.dx}px,${pointer.dy}px,0) rotate(${Math.max(-7, Math.min(7, pointer.dx / 18))}deg) scale(1.035)`;
-          if (Math.abs(pointer.dy) > 34 || Math.abs(pointer.dx) > 34) primaryAction()?.classList.add('drag-preview');
+          const focusRect = refs.focus.getBoundingClientRect();
+          const ghostRect = pointer.ghost.getBoundingClientRect();
+          const overlaps = ghostRect.right > focusRect.left && ghostRect.left < focusRect.right
+            && ghostRect.bottom > focusRect.top && ghostRect.top < focusRect.bottom;
+          const armed = overlaps || (pointer.dy < -58 && Math.abs(pointer.dy) > Math.abs(pointer.dx) * .55);
+          refs.focus.classList.toggle('drag-armed', armed);
+          primaryAction()?.classList.toggle('drag-preview', armed);
         });
       }, { passive: false });
 
@@ -754,6 +815,7 @@
       if (pointer?.slot) pointer.slot.classList.remove('is-drag-source');
       pointer = null;
       refs.overlay.innerHTML = '';
+      refs.focus.classList.remove('drag-armed');
       document.querySelectorAll('.virtual-menu-sheet').forEach(node => node.remove());
     };
     window.addEventListener('pagehide', cleanup, { once: true });

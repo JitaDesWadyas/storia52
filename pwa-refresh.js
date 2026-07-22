@@ -2,7 +2,7 @@
 
 (() => {
   if (!('serviceWorker' in navigator)) return;
-  const reloadKey = 'epoi_sw_reload_v37';
+  const reloadKey = 'epoi_sw_reload_v38';
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     try {
       if (sessionStorage.getItem(reloadKey) === '1') return;

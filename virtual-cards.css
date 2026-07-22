@@ -1,1 +1,726 @@
-html:has(body.virtual-table-active),html body.virtual-table-active{width:100%!important;height:100%!important;min-height:100%!important;overflow:hidden!important;overscroll-behavior:none!important;background:#0d0e12!important}html body.virtual-table-active{position:fixed!important;inset:0!important;height:100vh!important;height:100dvh!important;touch-action:none!important}html body.virtual-table-active .app-shell,html body.virtual-table-active main,html body.virtual-table-active #play,html body.virtual-table-active .page.active,html body.virtual-table-active .screen{position:fixed!important;inset:0!important;display:block!important;width:100%!important;max-width:none!important;height:100vh!important;height:100dvh!important;min-width:0!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;overscroll-behavior:none!important;touch-action:none!important}html body.virtual-table-active .site-header,html body.virtual-table-active .site-footer{display:none!important}html body.virtual-table-active .modal,html body.virtual-table-active .modal-card,html body.virtual-table-active .virtual-popup-scroll,html body.virtual-table-active .rulebook{touch-action:pan-y!important;overscroll-behavior:contain!important}.virtual-game{--vg-bg:#f2eadf;--vg-panel:#fffaf1;--vg-panel-2:#eadfcf;--vg-table:#d8c7ad;--vg-table-deep:#c9b696;--vg-ink:#241d15;--vg-muted:#746756;--vg-line:#c7b397;--vg-amber:#d99b18;--vg-red:#b03937;--vg-card:#fffdf7;--vg-card-edge:#766957;--vg-shadow:0 8px 18px rgba(45,31,16,.15);position:fixed!important;inset:0!important;display:grid!important;grid-template-rows:auto auto minmax(196px,1fr) auto 64px!important;gap:5px!important;width:100%!important;height:100vh!important;height:100dvh!important;min-height:0!important;padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(7px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))!important;color:var(--vg-ink)!important;background:var(--vg-bg)!important;border:0!important;border-radius:0!important;overflow:hidden!important;overscroll-behavior:none!important;touch-action:none!important;contain:layout paint style}html[data-theme="dark"] .virtual-game{--vg-bg:#0d0e12;--vg-panel:#17181e;--vg-panel-2:#22232b;--vg-table:#17181d;--vg-table-deep:#0f1014;--vg-ink:#fff8eb;--vg-muted:#bcb4a8;--vg-line:#393a45;--vg-amber:#fbbf24;--vg-red:#ff8d87;--vg-card:#202128;--vg-card-edge:#77737d;--vg-shadow:0 10px 22px rgba(0,0,0,.34)}.virtual-game-header{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important;gap:8px!important;min-height:48px!important}.virtual-player-title{display:flex!important;align-items:center!important;gap:8px!important;min-width:0!important}.virtual-player-title img{width:36px!important;height:36px!important;flex:0 0 36px!important}.virtual-player-copy{min-width:0!important}.virtual-player-copy p,.virtual-player-copy h2{margin:0!important}.virtual-player-copy p{color:var(--vg-muted)!important;font-size:.7rem!important;font-weight:900!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}.virtual-player-copy h2{margin-top:2px!important;font:850 1.12rem/1.05 Georgia,serif!important;letter-spacing:-.015em!important;white-space:nowrap!important}.virtual-player-copy h2 [data-turn-text],.virtual-player-copy h2 [aria-hidden="true"]{display:none!important}.virtual-top-actions{display:flex!important;gap:5px!important}.virtual-icon-button{display:grid!important;place-items:center!important;width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;padding:0!important;color:var(--vg-ink)!important;background:var(--vg-panel)!important;border:1px solid var(--vg-line)!important;border-radius:13px!important;font-size:1rem!important;font-weight:900!important}.virtual-menu-button{width:52px!important;min-width:52px!important}.virtual-menu-button span{font-size:.66rem!important;font-weight:950!important}.virtual-turn-rail{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important;margin:0!important;padding:0!important;list-style:none!important}.virtual-turn-rail li{display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;align-items:center!important;gap:5px!important;height:29px!important;padding:2px 6px!important;color:var(--vg-muted)!important;background:transparent!important;border:0!important;border-bottom:3px solid var(--vg-line)!important;border-radius:0!important;font-size:.66rem!important}.virtual-turn-rail li span{display:grid!important;place-items:center!important;width:19px!important;height:19px!important;border:1px solid currentColor!important;border-radius:50%!important;font-size:.56rem!important}.virtual-turn-rail li.current{color:var(--vg-ink)!important;border-color:var(--vg-amber)!important}.virtual-turn-rail li.current span{color:#211a12!important;background:var(--vg-amber)!important;border-color:var(--vg-amber)!important}.virtual-turn-rail li.done{color:var(--vg-amber)!important}.virtual-table{position:relative!important;display:grid!important;grid-template-rows:auto minmax(0,1fr)!important;gap:7px!important;min-height:0!important;padding:8px!important;background:linear-gradient(145deg,var(--vg-table),var(--vg-table-deep))!important;border:1px solid var(--vg-line)!important;border-radius:17px!important;overflow:hidden!important;isolation:isolate!important}.virtual-table:before{content:"";position:absolute;inset:6px;z-index:-1;border:1px solid color-mix(in srgb,var(--vg-amber) 19%,var(--vg-line));border-radius:13px;pointer-events:none}.virtual-story-stage{display:grid!important;grid-template-columns:42px minmax(0,1fr) auto!important;align-items:center!important;gap:8px!important;min-width:0!important;min-height:70px!important;padding:7px 8px!important;background:color-mix(in srgb,var(--vg-panel) 92%,transparent)!important;border:1px solid var(--vg-line)!important;border-radius:12px!important}.virtual-story-icon{display:grid!important;place-items:center!important;width:42px!important;height:42px!important;color:var(--vg-amber)!important;background:color-mix(in srgb,var(--vg-amber) 15%,var(--vg-panel))!important;border-radius:11px!important;font-size:1.25rem!important}.virtual-story-copy{min-width:0!important}.virtual-story-copy p,.virtual-story-copy h3,.virtual-story-copy small{margin:0!important}.virtual-story-copy p{color:var(--vg-amber)!important;font-size:.56rem!important;font-weight:950!important;letter-spacing:.08em!important;text-transform:uppercase!important}.virtual-story-copy h3{display:-webkit-box!important;margin-top:2px!important;font:850 clamp(.96rem,4vw,1.12rem)/1.04 Georgia,serif!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important}.virtual-story-copy small{display:block!important;margin-top:3px!important;color:var(--vg-muted)!important;font-size:.61rem!important;line-height:1.15!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}.virtual-party{display:flex!important;padding-left:3px!important}.virtual-party-person{display:grid!important;place-items:center!important;width:24px!important;height:24px!important;margin-left:-5px!important;color:var(--vg-ink)!important;background:var(--vg-panel)!important;border:2px solid var(--vg-table)!important;border-radius:50%!important;font-size:.45rem!important;font-weight:950!important;box-shadow:0 3px 7px rgba(0,0,0,.1)!important}.virtual-party-person:first-child{margin-left:0!important}.virtual-party-person.active{z-index:2!important;border-color:var(--vg-amber)!important;transform:translateY(-2px)!important}.virtual-table-board{position:relative!important;display:grid!important;grid-template-columns:58px 84px!important;align-items:center!important;justify-content:center!important;gap:24px!important;width:100%!important;min-height:0!important;margin:0!important}.virtual-table-board:before{content:"";position:absolute;left:50%;top:50%;width:min(260px,86%);height:min(150px,72%);transform:translate(-50%,-50%);border:1px solid color-mix(in srgb,var(--vg-amber) 18%,transparent);border-radius:50%;pointer-events:none}.virtual-table-board:after{content:none!important}.virtual-deck-card{position:relative!important;z-index:2!important;align-self:center!important;justify-self:center!important;width:52px!important;height:74px!important;min-width:52px!important;padding:0!important;background:transparent!important;border:0!important}.virtual-deck-layer{position:absolute!important;inset:3px!important;background:var(--vg-panel)!important;border:1px solid var(--vg-card-edge)!important;border-radius:8px!important}.virtual-deck-layer:nth-child(1){transform:translate(6px,-4px) rotate(4deg)!important}.virtual-deck-layer:nth-child(2){transform:translate(4px,-3px) rotate(2deg)!important}.virtual-deck-layer:nth-child(3){transform:translate(2px,-2px)!important}.virtual-deck-face{position:absolute!important;inset:3px!important;display:grid!important;grid-template-rows:1fr auto!important;place-items:center!important;padding:5px 4px!important;background:var(--vg-card)!important;border:2px solid var(--vg-amber)!important;border-radius:8px!important;box-shadow:var(--vg-shadow)!important}.virtual-deck-face img{width:65%!important;height:65%!important;object-fit:contain!important}.virtual-deck-face small{color:var(--vg-amber)!important;font-size:.42rem!important;font-weight:950!important;letter-spacing:.06em!important}.virtual-deck-card.can-draw .virtual-deck-face{box-shadow:0 0 0 5px color-mix(in srgb,var(--vg-amber) 20%,transparent),var(--vg-shadow)!important}.virtual-deck-card:active .virtual-deck-face{transform:translateY(2px) scale(.98)!important}.virtual-card-focus{position:relative!important;z-index:2!important;display:grid!important;place-items:center!important;align-self:center!important;justify-self:center!important;width:84px!important;min-height:104px!important;padding-top:17px!important}.virtual-focus-label{position:absolute!important;top:0!important;left:50%!important;transform:translateX(-50%)!important;width:max-content!important;max-width:118px!important;padding:3px 7px!important;color:var(--vg-muted)!important;background:var(--vg-panel)!important;border:1px solid var(--vg-line)!important;border-radius:999px!important;font-size:.47rem!important;font-weight:950!important;letter-spacing:.06em!important;text-transform:uppercase!important;white-space:nowrap!important}.virtual-card-focus.is-played .virtual-focus-label{color:#211a12!important;background:var(--vg-amber)!important;border-color:var(--vg-amber)!important}.virtual-table-card[hidden],.virtual-focus-placeholder[hidden]{display:none!important}.virtual-focus-placeholder{display:grid!important;place-items:center!important;align-content:center!important;gap:3px!important;width:74px!important;height:90px!important;color:var(--vg-muted)!important;background:color-mix(in srgb,var(--vg-panel) 58%,transparent)!important;border:1px dashed color-mix(in srgb,var(--vg-amber) 72%,var(--vg-line))!important;border-radius:10px!important;text-align:center!important}.virtual-focus-placeholder i{color:var(--vg-amber)!important;font-size:1.45rem!important;font-style:normal!important;line-height:1!important}.virtual-focus-placeholder b{width:62px!important;font-size:.45rem!important;line-height:1.1!important}.virtual-hand-section{position:relative!important;display:grid!important;grid-template-rows:25px auto 18px!important;align-content:start!important;gap:2px!important;min-height:0!important;overflow:visible!important}.virtual-hand-heading{display:flex!important;align-items:center!important;justify-content:space-between!important;color:var(--vg-muted)!important;font-size:.62rem!important;font-weight:950!important;letter-spacing:.06em!important}.virtual-hand-heading>div{display:flex!important;align-items:center!important;gap:7px!important}.virtual-hand-heading button{min-height:24px!important;padding:2px 8px!important;color:var(--vg-ink)!important;background:var(--vg-panel)!important;border:1px solid var(--vg-line)!important;border-radius:999px!important;font-size:.57rem!important;font-weight:900!important}.virtual-hand{display:flex!important;flex-wrap:wrap!important;align-content:center!important;align-items:center!important;justify-content:center!important;gap:7px 8px!important;min-height:0!important;padding:2px 0!important;overflow:visible!important}.virtual-card-slot,.virtual-table-card,.virtual-drag-ghost{position:relative!important;box-sizing:border-box!important;display:grid!important;grid-template-rows:auto 1fr auto!important;width:clamp(96px,28vw,108px)!important;max-width:108px!important;height:clamp(116px,15dvh,130px)!important;min-height:116px!important;padding:7px!important;color:var(--vg-ink)!important;background:var(--vg-card)!important;border:1.5px solid var(--vg-card-edge)!important;border-radius:11px!important;box-shadow:var(--vg-shadow)!important;text-align:left!important;overflow:hidden!important;user-select:none!important;-webkit-user-select:none!important;-webkit-touch-callout:none!important}.virtual-card-slot{touch-action:none!important;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease!important}.virtual-card-slot.empty{display:none!important}.virtual-card-slot.selected{z-index:5!important;transform:translateY(-4px)!important;border-color:var(--vg-amber)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--vg-amber) 24%,transparent),0 11px 22px rgba(45,31,16,.2)!important}.virtual-card-slot.selected:after{content:"✓";position:absolute;top:4px;left:50%;transform:translateX(-50%);display:grid;place-items:center;width:16px;height:16px;color:#211a12;background:var(--vg-amber);border-radius:50%;font-size:.55rem;font-weight:950}.virtual-card-slot.is-drag-source,.virtual-card-slot.is-flight-source,.virtual-card-slot.is-draw-target{visibility:hidden!important;opacity:1!important}.virtual-card-corner{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;line-height:1!important}.virtual-card-corner b{font:900 1rem/1 Georgia,serif!important}.virtual-card-corner i{font-style:normal!important;font-size:.86rem!important}.virtual-card-symbol{display:grid!important;place-items:center!important;color:currentColor!important;font-size:2.55rem!important;line-height:1!important;opacity:.19!important}.virtual-card-effect{display:grid!important;gap:2px!important;align-self:end!important;min-width:0!important}.virtual-card-effect em{width:max-content!important;max-width:100%!important;padding:2px 4px!important;color:var(--vg-muted)!important;background:color-mix(in srgb,var(--vg-line) 45%,transparent)!important;border-radius:4px!important;font-size:.4rem!important;font-style:normal!important;font-weight:950!important;letter-spacing:.035em!important}.virtual-card-effect b{font:850 .7rem/1.02 Georgia,serif!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}.virtual-card-effect small{min-height:2.12em!important;color:var(--vg-muted)!important;font-size:.51rem!important;line-height:1.06!important;display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important}.red{color:var(--vg-red)!important}.virtual-gesture-hint{margin:0!important;color:var(--vg-muted)!important;font-size:.56rem!important;line-height:1.1!important;text-align:center!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}.virtual-hand.needs-selection{animation:virtualHandNudge .32s ease!important}.virtual-hand-cover{position:absolute!important;inset:28px 0 18px!important;z-index:12!important;display:grid!important;place-items:center!important;align-content:center!important;gap:5px!important;width:100%!important;color:var(--vg-ink)!important;background:var(--vg-panel-2)!important;border:1px dashed var(--vg-amber)!important;border-radius:14px!important}.virtual-hand-cover[hidden]{display:none!important}.virtual-hand-cover span{font-size:1.45rem!important}.virtual-hand-cover b{font:850 1rem/1 Georgia,serif!important}.virtual-hand-cover small{color:var(--vg-muted)!important;font-size:.65rem!important}.cards-hidden .virtual-card-slot{visibility:hidden!important}.virtual-table-card{width:72px!important;max-width:72px!important;height:100px!important;min-height:100px!important;padding:6px!important}.virtual-table-card .virtual-card-corner b{font-size:.86rem!important}.virtual-table-card .virtual-card-corner i{font-size:.72rem!important}.virtual-table-card .virtual-card-symbol{font-size:2.1rem!important}.virtual-table-card .virtual-card-effect em{font-size:.32rem!important;padding:2px 3px!important}.virtual-table-card .virtual-card-effect b{font-size:.55rem!important}.virtual-table-card .virtual-card-effect small{font-size:.42rem!important;min-height:2em!important}.virtual-drag-overlay{position:fixed!important;inset:0!important;z-index:9998!important;pointer-events:none!important;overflow:visible!important}.virtual-drag-ghost{position:fixed!important;z-index:9999!important;margin:0!important;pointer-events:none!important;will-change:transform!important;transform-origin:center!important;filter:drop-shadow(0 16px 22px rgba(0,0,0,.26))!important}.virtual-drag-ghost.is-draw-flight{transform-origin:top left!important}.virtual-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:center!important;gap:8px!important;height:64px!important;min-height:64px!important;padding-top:5px!important;border-top:1px solid var(--vg-line)!important}.virtual-actions button{width:100%!important;height:54px!important;min-height:54px!important;margin:0!important;padding:8px 12px!important;border-radius:13px!important;font-size:.9rem!important;font-weight:950!important}.virtual-actions button:disabled{opacity:.38!important;filter:saturate(.42)!important;box-shadow:none!important}.virtual-actions[data-count="1"] button:not([hidden]){grid-column:1/-1!important}.virtual-actions button[hidden]{display:none!important}.virtual-actions button.drag-preview,.virtual-actions button.drag-suggested{animation:virtualActionPulse .66s ease!important;box-shadow:0 0 0 4px color-mix(in srgb,var(--vg-amber) 22%,transparent)!important}.virtual-menu-sheet{--vg-panel:#fffaf1;--vg-panel-2:#eadfcf;--vg-ink:#241d15;--vg-line:#c7b397;--vg-amber:#d99b18;position:fixed!important;inset:0!important;z-index:10000!important;display:flex!important;align-items:flex-end!important;padding:12px max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))!important;background:rgba(0,0,0,.58)!important;touch-action:none!important}html[data-theme="dark"] .virtual-menu-sheet{--vg-panel:#17181e;--vg-panel-2:#22232b;--vg-ink:#fff8eb;--vg-line:#393a45;--vg-amber:#fbbf24}.virtual-menu-panel{width:100%!important;padding:13px!important;color:var(--vg-ink)!important;background:var(--vg-panel)!important;border:1px solid var(--vg-line)!important;border-radius:18px!important;box-shadow:0 22px 55px rgba(0,0,0,.3)!important}.virtual-menu-head{display:flex!important;align-items:center!important;justify-content:space-between!important}.virtual-menu-head h2{margin:0!important;font:850 1.35rem/1 Georgia,serif!important}.virtual-menu-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;margin-top:11px!important}.virtual-menu-grid button{display:flex!important;align-items:center!important;gap:9px!important;height:58px!important;padding:9px 11px!important;color:var(--vg-ink)!important;background:var(--vg-panel-2)!important;border:1px solid var(--vg-line)!important;border-radius:13px!important;text-align:left!important}.virtual-menu-grid button span{display:grid!important;place-items:center!important;width:32px!important;height:32px!important;color:var(--vg-amber)!important;background:color-mix(in srgb,var(--vg-amber) 12%,transparent)!important;border:1px solid color-mix(in srgb,var(--vg-amber) 45%,transparent)!important;border-radius:9px!important;font-size:.95rem!important}.virtual-menu-grid button b{font-size:.86rem!important}.virtual-popup-scroll{max-height:min(76dvh,680px)!important;overflow:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important}.virtual-confetti{position:fixed!important;inset:0!important;z-index:10010!important;pointer-events:none!important;overflow:hidden!important}.virtual-confetti i{position:absolute!important;left:50%!important;top:46%!important;width:9px!important;height:15px!important;background:var(--vg-amber)!important;border-radius:2px!important;opacity:0!important}.virtual-confetti i:nth-child(3n){background:var(--vg-red)!important}.virtual-confetti i:nth-child(4n){background:var(--vg-panel)!important;border:1px solid var(--vg-amber)!important}.virtual-confetti.show i{animation:virtualConfetti 1.45s cubic-bezier(.12,.72,.18,1) forwards!important;animation-delay:calc(var(--i) * 9ms)!important}.rule-card-mini-sections{display:grid!important;gap:9px!important}.rule-card-mini-sections>details{overflow:hidden!important;background:var(--panel-2)!important;border:1px solid var(--line-soft)!important;border-radius:12px!important}.rule-card-mini-sections>details>summary{padding:14px 15px!important;font:850 .96rem/1.2 Georgia,serif!important;cursor:pointer!important}.rule-card-mini-sections>details>.rule-mini-body{padding:0 11px 13px!important}@keyframes virtualHandNudge{0%,100%{transform:translateX(0)}30%{transform:translateX(-4px)}65%{transform:translateX(4px)}}@keyframes virtualActionPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.018)}}@keyframes virtualConfetti{0%{opacity:0;transform:translate3d(0,0,0) rotate(0)}10%{opacity:1}100%{opacity:0;transform:translate3d(calc(var(--x) * 28px),calc(250px + (var(--i) % 5) * 24px),0) rotate(var(--r))}}@keyframes drawCardIn{0%{transform:translateY(-7px) scale(.97);opacity:.45}100%{transform:none;opacity:1}}.card-enter{animation:drawCardIn .3s ease!important}@media(max-width:380px){.virtual-game{padding-left:max(7px,env(safe-area-inset-left))!important;padding-right:max(7px,env(safe-area-inset-right))!important}.virtual-player-title img{width:34px!important;height:34px!important;flex-basis:34px!important}.virtual-icon-button{width:40px!important;min-width:40px!important;height:40px!important;min-height:40px!important}.virtual-menu-button{width:49px!important;min-width:49px!important}.virtual-card-slot,.virtual-drag-ghost{width:calc((100vw - 42px)/3)!important}.virtual-table-board{gap:18px!important}}@media(max-height:780px){.virtual-game{grid-template-rows:auto auto minmax(184px,1fr) auto 60px!important;gap:4px!important}.virtual-game-header{min-height:44px!important}.virtual-story-stage{min-height:64px!important;padding:6px 7px!important}.virtual-story-icon{width:38px!important;height:38px!important}.virtual-card-slot,.virtual-drag-ghost{height:112px!important;min-height:112px!important}.virtual-card-symbol{font-size:2.35rem!important}.virtual-card-effect small{font-size:.49rem!important}.virtual-actions{height:60px!important;min-height:60px!important}.virtual-actions button{height:50px!important;min-height:50px!important}}@media(max-height:700px){.virtual-game{grid-template-rows:auto auto minmax(170px,1fr) auto 58px!important}.virtual-turn-rail li{height:27px!important}.virtual-story-copy small{display:none!important}.virtual-card-slot,.virtual-drag-ghost{height:104px!important;min-height:104px!important;padding:6px!important}.virtual-card-symbol{font-size:2.15rem!important}.virtual-card-effect small{font-size:.47rem!important;-webkit-line-clamp:1!important;min-height:1.05em!important}.virtual-hand-section{grid-template-rows:24px minmax(0,1fr) 15px!important}.virtual-gesture-hint{display:none!important}.virtual-actions{height:58px!important;min-height:58px!important}.virtual-actions button{height:48px!important;min-height:48px!important}}@media(min-width:410px){.virtual-hand{gap:8px 10px!important}.virtual-table-board{gap:28px!important}}@media(prefers-reduced-motion:reduce){.virtual-card-slot,.virtual-drag-ghost,.virtual-actions button,.virtual-confetti i{transition:none!important;animation:none!important}}
+/* E POI? — tavolo virtuale mobile. Un solo layout, nessun override versionato. */
+html:has(body.virtual-table-active),
+html body.virtual-table-active{
+  width:100%!important;
+  height:100%!important;
+  min-height:100%!important;
+  overflow:hidden!important;
+  overscroll-behavior:none!important;
+  background:#0d0e12!important
+}
+html body.virtual-table-active{
+  position:fixed!important;
+  inset:0!important;
+  height:100vh!important;
+  height:100dvh!important;
+  touch-action:none!important
+}
+html body.virtual-table-active .app-shell,
+html body.virtual-table-active main,
+html body.virtual-table-active #play,
+html body.virtual-table-active .page.active,
+html body.virtual-table-active .screen{
+  position:fixed!important;
+  inset:0!important;
+  display:block!important;
+  width:100%!important;
+  max-width:none!important;
+  height:100vh!important;
+  height:100dvh!important;
+  min-width:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  overscroll-behavior:none!important;
+  touch-action:none!important
+}
+html body.virtual-table-active .site-header,
+html body.virtual-table-active .site-footer{display:none!important}
+html body.virtual-table-active .modal,
+html body.virtual-table-active .modal-card,
+html body.virtual-table-active .virtual-popup-scroll,
+html body.virtual-table-active .rulebook{
+  touch-action:pan-y!important;
+  overscroll-behavior:contain!important
+}
+
+.virtual-game{
+  --vg-bg:#f2eadf;
+  --vg-panel:#fffaf1;
+  --vg-panel-2:#eadfcf;
+  --vg-table:#d8c7ad;
+  --vg-table-deep:#c9b696;
+  --vg-ink:#241d15;
+  --vg-muted:#746756;
+  --vg-line:#c7b397;
+  --vg-amber:#d99b18;
+  --vg-red:#b03937;
+  --vg-card:#fffdf7;
+  --vg-card-edge:#766957;
+  --vg-shadow:0 8px 18px rgba(45,31,16,.15);
+  position:fixed!important;
+  inset:0!important;
+  display:grid!important;
+  grid-template-rows:auto auto auto minmax(188px,1fr) auto 64px!important;
+  gap:5px!important;
+  width:100%!important;
+  height:100vh!important;
+  height:100dvh!important;
+  min-height:0!important;
+  padding:max(10px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(7px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))!important;
+  color:var(--vg-ink)!important;
+  background:var(--vg-bg)!important;
+  border:0!important;
+  border-radius:0!important;
+  overflow:hidden!important;
+  overscroll-behavior:none!important;
+  touch-action:none!important;
+  contain:layout paint style
+}
+html[data-theme="dark"] .virtual-game{
+  --vg-bg:#0d0e12;
+  --vg-panel:#17181e;
+  --vg-panel-2:#22232b;
+  --vg-table:#17181d;
+  --vg-table-deep:#0f1014;
+  --vg-ink:#fff8eb;
+  --vg-muted:#bcb4a8;
+  --vg-line:#393a45;
+  --vg-amber:#fbbf24;
+  --vg-red:#ff8d87;
+  --vg-card:#202128;
+  --vg-card-edge:#77737d;
+  --vg-shadow:0 10px 22px rgba(0,0,0,.34)
+}
+
+/* Barra di gioco: il turno resta leggibile, l'istruzione vive nel tavolo. */
+.virtual-game-header{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:8px!important;
+  min-height:48px!important
+}
+.virtual-player-title{display:flex!important;align-items:center!important;gap:8px!important;min-width:0!important}
+.virtual-player-title img{width:36px!important;height:36px!important;flex:0 0 36px!important}
+.virtual-player-copy{min-width:0!important}
+.virtual-player-copy p,.virtual-player-copy h2{margin:0!important}
+.virtual-player-copy p{
+  color:var(--vg-muted)!important;
+  font-size:.7rem!important;
+  font-weight:900!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important
+}
+.virtual-player-copy h2{
+  margin-top:2px!important;
+  font:850 1.12rem/1.05 Georgia,serif!important;
+  letter-spacing:-.015em!important;
+  white-space:nowrap!important
+}
+.virtual-player-copy h2 [data-turn-text],
+.virtual-player-copy h2 [aria-hidden="true"]{display:none!important}
+.virtual-top-actions{display:flex!important;gap:5px!important}
+.virtual-icon-button{
+  display:grid!important;
+  place-items:center!important;
+  width:42px!important;
+  height:42px!important;
+  min-width:42px!important;
+  min-height:42px!important;
+  padding:0!important;
+  color:var(--vg-ink)!important;
+  background:var(--vg-panel)!important;
+  border:1px solid var(--vg-line)!important;
+  border-radius:13px!important;
+  font-size:1rem!important;
+  font-weight:900!important
+}
+.virtual-menu-button{width:52px!important;min-width:52px!important}
+.virtual-menu-button span{font-size:.66rem!important;font-weight:950!important}
+
+/* Indicatore di fase compatto. */
+.virtual-turn-rail{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:6px!important;
+  margin:0!important;
+  padding:0!important;
+  list-style:none!important
+}
+.virtual-turn-rail li{
+  display:grid!important;
+  grid-template-columns:auto minmax(0,1fr)!important;
+  align-items:center!important;
+  gap:5px!important;
+  height:29px!important;
+  padding:2px 6px!important;
+  color:var(--vg-muted)!important;
+  background:transparent!important;
+  border:0!important;
+  border-bottom:3px solid var(--vg-line)!important;
+  border-radius:0!important;
+  font-size:.66rem!important
+}
+.virtual-turn-rail li span{
+  display:grid!important;
+  place-items:center!important;
+  width:19px!important;
+  height:19px!important;
+  border:1px solid currentColor!important;
+  border-radius:50%!important;
+  font-size:.56rem!important
+}
+.virtual-turn-rail li.current{color:var(--vg-ink)!important;border-color:var(--vg-amber)!important}
+.virtual-turn-rail li.current span{color:#211a12!important;background:var(--vg-amber)!important;border-color:var(--vg-amber)!important}
+.virtual-turn-rail li.done{color:var(--vg-amber)!important}
+
+/* L'azione corrente deve essere impossibile da confondere con le altre fasi. */
+.virtual-phase-callout{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  align-items:center!important;
+  gap:2px!important;
+  min-height:42px!important;
+  padding:6px 10px!important;
+  text-align:center!important;
+  color:var(--vg-ink)!important;
+  background:color-mix(in srgb,var(--vg-amber) 13%,var(--vg-panel))!important;
+  border:1px solid color-mix(in srgb,var(--vg-amber) 62%,var(--vg-line))!important;
+  border-radius:11px!important
+}
+.virtual-phase-callout b{font-size:.72rem!important;letter-spacing:.06em!important;white-space:nowrap!important}
+.virtual-phase-callout span{min-width:0!important;color:var(--vg-muted)!important;font-size:.58rem!important;line-height:1.15!important;white-space:normal!important}
+.virtual-phase-callout[data-phase="afterPlay"],.virtual-phase-callout[data-phase="final"],.virtual-phase-callout[data-phase="completed"]{background:var(--vg-panel)!important;border-color:var(--vg-line)!important}
+
+/* Tavolo: storia e zona carta devono stare sempre interamente nel pannello. */
+.virtual-table{
+  position:relative!important;
+  display:grid!important;
+  grid-template-rows:auto minmax(0,1fr)!important;
+  gap:7px!important;
+  min-height:0!important;
+  padding:8px!important;
+  background:linear-gradient(145deg,var(--vg-table),var(--vg-table-deep))!important;
+  border:1px solid var(--vg-line)!important;
+  border-radius:17px!important;
+  overflow:hidden!important;
+  isolation:isolate!important
+}
+.virtual-table:before{
+  content:"";
+  position:absolute;
+  inset:6px;
+  z-index:-1;
+  border:1px solid color-mix(in srgb,var(--vg-amber) 19%,var(--vg-line));
+  border-radius:13px;
+  pointer-events:none
+}
+.virtual-story-stage{
+  display:grid!important;
+  grid-template-columns:42px minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:8px!important;
+  min-width:0!important;
+  min-height:82px!important;
+  padding:7px 8px!important;
+  background:color-mix(in srgb,var(--vg-panel) 92%,transparent)!important;
+  border:1px solid var(--vg-line)!important;
+  border-radius:12px!important
+}
+.virtual-story-icon{
+  display:grid!important;
+  place-items:center!important;
+  width:42px!important;
+  height:42px!important;
+  color:var(--vg-amber)!important;
+  background:color-mix(in srgb,var(--vg-amber) 15%,var(--vg-panel))!important;
+  border-radius:11px!important;
+  font-size:1.25rem!important
+}
+.virtual-story-copy{min-width:0!important}
+.virtual-story-copy p,.virtual-story-copy h3,.virtual-story-copy small{margin:0!important}
+.virtual-story-copy p{
+  color:var(--vg-amber)!important;
+  font-size:.56rem!important;
+  font-weight:950!important;
+  letter-spacing:.08em!important;
+  text-transform:uppercase!important
+}
+.virtual-story-copy h3{
+  display:-webkit-box!important;
+  margin-top:2px!important;
+  font:850 clamp(.96rem,4vw,1.12rem)/1.04 Georgia,serif!important;
+  -webkit-line-clamp:2!important;
+  -webkit-box-orient:vertical!important;
+  overflow:hidden!important
+}
+.virtual-story-copy small{
+  display:block!important;
+  margin-top:3px!important;
+  color:var(--vg-muted)!important;
+  font-size:.63rem!important;
+  line-height:1.18!important;
+  display:-webkit-box!important;
+  -webkit-line-clamp:2!important;
+  -webkit-box-orient:vertical!important;
+  overflow:hidden!important
+}
+.virtual-party{display:flex!important;padding-left:3px!important}
+.virtual-party-person{
+  display:grid!important;
+  place-items:center!important;
+  width:24px!important;
+  height:24px!important;
+  margin-left:-5px!important;
+  color:var(--vg-ink)!important;
+  background:var(--vg-panel)!important;
+  border:2px solid var(--vg-table)!important;
+  border-radius:50%!important;
+  font-size:.45rem!important;
+  font-weight:950!important;
+  box-shadow:0 3px 7px rgba(0,0,0,.1)!important
+}
+.virtual-party-person:first-child{margin-left:0!important}
+.virtual-party-person.active{z-index:2!important;border-color:var(--vg-amber)!important;transform:translateY(-2px)!important}
+
+.virtual-table-board{
+  position:relative!important;
+  display:grid!important;
+  grid-template-columns:58px 84px!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:24px!important;
+  width:100%!important;
+  min-height:0!important;
+  margin:0!important
+}
+.virtual-table-board:before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:min(260px,86%);
+  height:min(150px,72%);
+  transform:translate(-50%,-50%);
+  border:1px solid color-mix(in srgb,var(--vg-amber) 18%,transparent);
+  border-radius:50%;
+  pointer-events:none
+}
+.virtual-table-board:after{content:none!important}
+.virtual-deck-card{
+  position:relative!important;
+  z-index:2!important;
+  align-self:center!important;
+  justify-self:center!important;
+  width:52px!important;
+  height:74px!important;
+  min-width:52px!important;
+  padding:0!important;
+  background:transparent!important;
+  border:0!important
+}
+.virtual-deck-layer{
+  position:absolute!important;
+  inset:3px!important;
+  background:var(--vg-panel)!important;
+  border:1px solid var(--vg-card-edge)!important;
+  border-radius:8px!important
+}
+.virtual-deck-layer:nth-child(1){transform:translate(6px,-4px) rotate(4deg)!important}
+.virtual-deck-layer:nth-child(2){transform:translate(4px,-3px) rotate(2deg)!important}
+.virtual-deck-layer:nth-child(3){transform:translate(2px,-2px)!important}
+.virtual-deck-face{
+  position:absolute!important;
+  inset:3px!important;
+  display:grid!important;
+  grid-template-rows:1fr auto!important;
+  place-items:center!important;
+  padding:5px 4px!important;
+  background:var(--vg-card)!important;
+  border:2px solid var(--vg-amber)!important;
+  border-radius:8px!important;
+  box-shadow:var(--vg-shadow)!important
+}
+.virtual-deck-face img{width:65%!important;height:65%!important;object-fit:contain!important}
+.virtual-deck-face small{color:var(--vg-amber)!important;font-size:.42rem!important;font-weight:950!important;letter-spacing:.06em!important}
+.virtual-deck-card.can-draw .virtual-deck-face{box-shadow:0 0 0 5px color-mix(in srgb,var(--vg-amber) 20%,transparent),var(--vg-shadow)!important}
+.virtual-deck-card:active .virtual-deck-face{transform:translateY(2px) scale(.98)!important}
+
+.virtual-card-focus{
+  position:relative!important;
+  z-index:2!important;
+  display:grid!important;
+  place-items:center!important;
+  align-self:center!important;
+  justify-self:center!important;
+  width:84px!important;
+  min-height:104px!important;
+  padding-top:17px!important
+}
+.virtual-focus-label{
+  position:absolute!important;
+  top:0!important;
+  left:50%!important;
+  transform:translateX(-50%)!important;
+  width:max-content!important;
+  max-width:118px!important;
+  padding:3px 7px!important;
+  color:var(--vg-muted)!important;
+  background:var(--vg-panel)!important;
+  border:1px solid var(--vg-line)!important;
+  border-radius:999px!important;
+  font-size:.47rem!important;
+  font-weight:950!important;
+  letter-spacing:.06em!important;
+  text-transform:uppercase!important;
+  white-space:nowrap!important
+}
+.virtual-card-focus.is-played .virtual-focus-label{color:#211a12!important;background:var(--vg-amber)!important;border-color:var(--vg-amber)!important}
+.virtual-card-focus.drag-armed{transform:scale(1.045)!important}
+.virtual-card-focus.drag-armed .virtual-focus-placeholder{color:#211a12!important;background:color-mix(in srgb,var(--vg-amber) 68%,var(--vg-panel))!important;border-style:solid!important;box-shadow:0 0 0 6px color-mix(in srgb,var(--vg-amber) 22%,transparent)!important}
+.virtual-table-card[hidden],.virtual-focus-placeholder[hidden]{display:none!important}
+.virtual-focus-placeholder{
+  display:grid!important;
+  place-items:center!important;
+  align-content:center!important;
+  gap:3px!important;
+  width:74px!important;
+  height:90px!important;
+  color:var(--vg-muted)!important;
+  background:color-mix(in srgb,var(--vg-panel) 58%,transparent)!important;
+  border:1px dashed color-mix(in srgb,var(--vg-amber) 72%,var(--vg-line))!important;
+  border-radius:10px!important;
+  text-align:center!important
+}
+.virtual-focus-placeholder i{color:var(--vg-amber)!important;font-size:1.45rem!important;font-style:normal!important;line-height:1!important}
+.virtual-focus-placeholder b{width:62px!important;font-size:.45rem!important;line-height:1.1!important}
+
+/* Mano: tre carte sopra e due centrate sotto, senza trasformarla nel contenuto dominante. */
+.virtual-hand-section{
+  position:relative!important;
+  display:grid!important;
+  grid-template-rows:25px auto 18px!important;
+  align-content:start!important;
+  gap:2px!important;
+  min-height:0!important;
+  overflow:visible!important
+}
+.virtual-hand-heading{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  color:var(--vg-muted)!important;
+  font-size:.62rem!important;
+  font-weight:950!important;
+  letter-spacing:.06em!important
+}
+.virtual-hand-heading>div{display:flex!important;align-items:center!important;gap:7px!important}
+.virtual-hand-heading button{
+  min-height:24px!important;
+  padding:2px 8px!important;
+  color:var(--vg-ink)!important;
+  background:var(--vg-panel)!important;
+  border:1px solid var(--vg-line)!important;
+  border-radius:999px!important;
+  font-size:.57rem!important;
+  font-weight:900!important
+}
+.virtual-hand{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-content:center!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px 8px!important;
+  min-height:0!important;
+  padding:2px 0!important;
+  overflow:visible!important
+}
+.virtual-card-slot,.virtual-table-card,.virtual-drag-ghost{
+  position:relative!important;
+  box-sizing:border-box!important;
+  display:grid!important;
+  grid-template-rows:auto 1fr auto!important;
+  width:clamp(92px,27vw,104px)!important;
+  max-width:104px!important;
+  height:clamp(110px,14dvh,124px)!important;
+  min-height:110px!important;
+  padding:7px!important;
+  color:var(--vg-ink)!important;
+  background:var(--vg-card)!important;
+  border:1.5px solid var(--vg-card-edge)!important;
+  border-radius:11px!important;
+  box-shadow:var(--vg-shadow)!important;
+  text-align:left!important;
+  overflow:hidden!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+  -webkit-touch-callout:none!important
+}
+.virtual-card-slot{touch-action:none!important;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease!important}
+.virtual-card-slot.empty{display:none!important}
+.virtual-card-slot.selected{
+  z-index:5!important;
+  transform:translateY(-4px)!important;
+  border-color:var(--vg-amber)!important;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--vg-amber) 24%,transparent),0 11px 22px rgba(45,31,16,.2)!important
+}
+.virtual-card-slot.selected:after{
+  content:"SCELTA";
+  position:absolute;
+  top:5px;
+  left:50%;
+  z-index:3;
+  transform:translateX(-50%);
+  width:max-content;
+  padding:2px 5px;
+  color:#211a12;
+  background:var(--vg-amber);
+  border-radius:999px;
+  font-size:.36rem;
+  font-weight:950;
+  letter-spacing:.045em
+}
+.virtual-game[data-phase="exchange"] .virtual-card-slot.selected:after{content:"DA CAMBIARE"}
+.virtual-game[data-phase="play"] .virtual-card-slot.selected:after{content:"DA GIOCARE"}
+.virtual-card-slot.is-drag-source,.virtual-card-slot.is-flight-source,.virtual-card-slot.is-draw-target{visibility:hidden!important;opacity:1!important}
+.virtual-card-corner{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;line-height:1!important}
+.virtual-card-corner b{font:900 1rem/1 Georgia,serif!important}
+.virtual-card-corner i{font-style:normal!important;font-size:.86rem!important}
+.virtual-card-symbol{display:grid!important;place-items:center!important;color:currentColor!important;font-size:2.25rem!important;line-height:1!important;opacity:1!important}
+.virtual-card-effect{display:grid!important;gap:2px!important;align-self:end!important;min-width:0!important}
+.virtual-card-effect em{
+  width:max-content!important;
+  max-width:100%!important;
+  padding:2px 4px!important;
+  color:var(--vg-muted)!important;
+  background:color-mix(in srgb,var(--vg-line) 45%,transparent)!important;
+  border-radius:4px!important;
+  font-size:.4rem!important;
+  font-style:normal!important;
+  font-weight:950!important;
+  letter-spacing:.035em!important
+}
+.virtual-card-effect b{
+  font:850 .7rem/1.02 Georgia,serif!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important
+}
+.virtual-card-effect small{
+  min-height:2.12em!important;
+  color:var(--vg-muted)!important;
+  font-size:.51rem!important;
+  line-height:1.06!important;
+  display:-webkit-box!important;
+  -webkit-line-clamp:2!important;
+  -webkit-box-orient:vertical!important;
+  overflow:hidden!important
+}
+.red{color:var(--vg-red)!important}
+.virtual-gesture-hint{
+  margin:0!important;
+  color:var(--vg-muted)!important;
+  font-size:.56rem!important;
+  line-height:1.1!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important
+}
+.virtual-hand.needs-selection{animation:virtualHandNudge .32s ease!important}
+.virtual-hand-cover{
+  position:absolute!important;
+  inset:28px 0 18px!important;
+  z-index:12!important;
+  display:grid!important;
+  place-items:center!important;
+  align-content:center!important;
+  gap:5px!important;
+  width:100%!important;
+  color:var(--vg-ink)!important;
+  background:var(--vg-panel-2)!important;
+  border:1px dashed var(--vg-amber)!important;
+  border-radius:14px!important
+}
+.virtual-hand-cover[hidden]{display:none!important}
+.virtual-hand-cover span{font-size:1.45rem!important}
+.virtual-hand-cover b{font:850 1rem/1 Georgia,serif!important}
+.virtual-hand-cover small{color:var(--vg-muted)!important;font-size:.65rem!important}
+.cards-hidden .virtual-card-slot{visibility:hidden!important}
+
+.virtual-table-card{
+  width:72px!important;
+  max-width:72px!important;
+  height:100px!important;
+  min-height:100px!important;
+  padding:6px!important
+}
+.virtual-table-card .virtual-card-corner b{font-size:.86rem!important}
+.virtual-table-card .virtual-card-corner i{font-size:.72rem!important}
+.virtual-table-card .virtual-card-symbol{font-size:2.1rem!important}
+.virtual-table-card .virtual-card-effect em{font-size:.32rem!important;padding:2px 3px!important}
+.virtual-table-card .virtual-card-effect b{font-size:.55rem!important}
+.virtual-table-card .virtual-card-effect small{font-size:.42rem!important;min-height:2em!important}
+
+.virtual-drag-overlay{position:fixed!important;inset:0!important;z-index:9998!important;pointer-events:none!important;overflow:visible!important}
+.virtual-drag-ghost{
+  position:fixed!important;
+  z-index:9999!important;
+  margin:0!important;
+  pointer-events:none!important;
+  will-change:transform!important;
+  transform-origin:center!important;
+  filter:drop-shadow(0 16px 22px rgba(0,0,0,.26))!important
+}
+.virtual-drag-ghost.is-draw-flight{transform-origin:top left!important}
+
+/* Barra azioni stabile e visivamente subordinata al gioco. */
+.virtual-actions{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  align-items:center!important;
+  gap:8px!important;
+  height:64px!important;
+  min-height:64px!important;
+  padding-top:5px!important;
+  border-top:1px solid var(--vg-line)!important
+}
+.virtual-actions button{
+  width:100%!important;
+  height:54px!important;
+  min-height:54px!important;
+  margin:0!important;
+  padding:8px 12px!important;
+  border-radius:13px!important;
+  font-size:.9rem!important;
+  font-weight:950!important
+}
+.virtual-actions button:disabled{opacity:.38!important;filter:saturate(.42)!important;box-shadow:none!important}
+.virtual-actions[data-count="1"] button:not([hidden]){grid-column:1/-1!important}
+.virtual-actions button[hidden]{display:none!important}
+.virtual-actions button.drag-preview,.virtual-actions button.drag-suggested{
+  animation:virtualActionPulse .66s ease!important;
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--vg-amber) 22%,transparent)!important
+}
+
+/* Menu, popup e regole. */
+.virtual-menu-sheet{
+  --vg-panel:#fffaf1;
+  --vg-panel-2:#eadfcf;
+  --vg-ink:#241d15;
+  --vg-line:#c7b397;
+  --vg-amber:#d99b18;
+  position:fixed!important;
+  inset:0!important;
+  z-index:10000!important;
+  display:flex!important;
+  align-items:flex-end!important;
+  padding:12px max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))!important;
+  background:rgba(0,0,0,.58)!important;
+  touch-action:none!important
+}
+html[data-theme="dark"] .virtual-menu-sheet{--vg-panel:#17181e;--vg-panel-2:#22232b;--vg-ink:#fff8eb;--vg-line:#393a45;--vg-amber:#fbbf24}
+.virtual-menu-panel{
+  width:100%!important;
+  padding:13px!important;
+  color:var(--vg-ink)!important;
+  background:var(--vg-panel)!important;
+  border:1px solid var(--vg-line)!important;
+  border-radius:18px!important;
+  box-shadow:0 22px 55px rgba(0,0,0,.3)!important
+}
+.virtual-menu-head{display:flex!important;align-items:center!important;justify-content:space-between!important}
+.virtual-menu-head h2{margin:0!important;font:850 1.35rem/1 Georgia,serif!important}
+.virtual-menu-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;margin-top:11px!important}
+.virtual-menu-grid button{
+  display:flex!important;
+  align-items:center!important;
+  gap:9px!important;
+  height:58px!important;
+  padding:9px 11px!important;
+  color:var(--vg-ink)!important;
+  background:var(--vg-panel-2)!important;
+  border:1px solid var(--vg-line)!important;
+  border-radius:13px!important;
+  text-align:left!important
+}
+.virtual-menu-grid button span{
+  display:grid!important;
+  place-items:center!important;
+  width:32px!important;
+  height:32px!important;
+  color:var(--vg-amber)!important;
+  background:color-mix(in srgb,var(--vg-amber) 12%,transparent)!important;
+  border:1px solid color-mix(in srgb,var(--vg-amber) 45%,transparent)!important;
+  border-radius:9px!important;
+  font-size:.95rem!important
+}
+.virtual-menu-grid button b{font-size:.86rem!important}
+.virtual-popup-scroll{max-height:min(76dvh,680px)!important;overflow:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important}
+
+.virtual-confetti{position:fixed!important;inset:0!important;z-index:10010!important;pointer-events:none!important;overflow:hidden!important}
+.virtual-confetti i{position:absolute!important;left:50%!important;top:46%!important;width:9px!important;height:15px!important;background:var(--vg-amber)!important;border-radius:2px!important;opacity:0!important}
+.virtual-confetti i:nth-child(3n){background:var(--vg-red)!important}
+.virtual-confetti i:nth-child(4n){background:var(--vg-panel)!important;border:1px solid var(--vg-amber)!important}
+.virtual-confetti.show i{animation:virtualConfetti 1.45s cubic-bezier(.12,.72,.18,1) forwards!important;animation-delay:calc(var(--i) * 9ms)!important}
+
+.rule-card-mini-sections{display:grid!important;gap:9px!important}
+.rule-card-mini-sections>details{overflow:hidden!important;background:var(--panel-2)!important;border:1px solid var(--line-soft)!important;border-radius:12px!important}
+.rule-card-mini-sections>details>summary{padding:14px 15px!important;font:850 .96rem/1.2 Georgia,serif!important;cursor:pointer!important}
+.rule-card-mini-sections>details>.rule-mini-body{padding:0 11px 13px!important}
+
+@keyframes virtualHandNudge{0%,100%{transform:translateX(0)}30%{transform:translateX(-4px)}65%{transform:translateX(4px)}}
+@keyframes virtualActionPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.018)}}
+@keyframes virtualConfetti{0%{opacity:0;transform:translate3d(0,0,0) rotate(0)}10%{opacity:1}100%{opacity:0;transform:translate3d(calc(var(--x) * 28px),calc(250px + (var(--i) % 5) * 24px),0) rotate(var(--r))}}
+@keyframes drawCardIn{0%{transform:translateY(-7px) scale(.97);opacity:.45}100%{transform:none;opacity:1}}
+.card-enter{animation:drawCardIn .3s ease!important}
+
+@media(max-width:380px){
+  .virtual-game{padding-left:max(7px,env(safe-area-inset-left))!important;padding-right:max(7px,env(safe-area-inset-right))!important}
+  .virtual-player-title img{width:34px!important;height:34px!important;flex-basis:34px!important}
+  .virtual-icon-button{width:40px!important;min-width:40px!important;height:40px!important;min-height:40px!important}
+  .virtual-menu-button{width:49px!important;min-width:49px!important}
+  .virtual-card-slot,.virtual-drag-ghost{width:calc((100vw - 42px)/3)!important}
+  .virtual-table-board{gap:18px!important}
+}
+@media(max-height:780px){
+  .virtual-game{grid-template-rows:auto auto auto minmax(174px,1fr) auto 60px!important;gap:4px!important}
+  .virtual-game-header{min-height:44px!important}
+  .virtual-story-stage{min-height:64px!important;padding:6px 7px!important}
+  .virtual-story-icon{width:38px!important;height:38px!important}
+  .virtual-card-slot,.virtual-drag-ghost{height:108px!important;min-height:108px!important}
+  .virtual-card-symbol{font-size:2.05rem!important}
+  .virtual-card-effect small{font-size:.49rem!important}
+  .virtual-actions{height:60px!important;min-height:60px!important}
+  .virtual-actions button{height:50px!important;min-height:50px!important}
+}
+@media(max-height:700px){
+  .virtual-game{grid-template-rows:auto auto auto minmax(154px,1fr) auto 58px!important}
+  .virtual-turn-rail li{height:27px!important}
+  .virtual-phase-callout span{display:none!important}
+  .virtual-phase-callout{grid-template-columns:1fr!important;min-height:30px!important;text-align:center!important}
+  .virtual-story-copy small{-webkit-line-clamp:1!important}
+  .virtual-card-slot,.virtual-drag-ghost{height:102px!important;min-height:102px!important;padding:6px!important}
+  .virtual-card-symbol{font-size:1.95rem!important}
+  .virtual-card-effect small{font-size:.47rem!important;-webkit-line-clamp:1!important;min-height:1.05em!important}
+  .virtual-hand-section{grid-template-rows:24px auto 15px!important}
+  .virtual-gesture-hint{display:none!important}
+  .virtual-actions{height:58px!important;min-height:58px!important}
+  .virtual-actions button{height:48px!important;min-height:48px!important}
+}
+
+@media(min-height:850px){
+  .virtual-story-stage{min-height:104px!important;align-items:start!important;padding-top:10px!important;padding-bottom:10px!important}
+  .virtual-story-copy small{-webkit-line-clamp:3!important;font-size:.64rem!important;line-height:1.22!important}
+}
+@media(min-width:410px){
+  .virtual-hand{gap:8px 10px!important}
+  .virtual-table-board{gap:28px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .virtual-card-slot,.virtual-drag-ghost,.virtual-actions button,.virtual-confetti i{transition:none!important;animation:none!important}
+}

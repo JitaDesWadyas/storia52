@@ -23,12 +23,12 @@ const scripts = [...index.matchAll(/<script src="([^"?]+)/g)].map(match => match
 const styles = [...index.matchAll(/<link rel="stylesheet" href="([^"?]+)/g)].map(match => match[1]);
 check(new Set(scripts).size === scripts.length, 'index.html: script duplicati');
 check(new Set(styles).size === styles.length, 'index.html: stili duplicati');
-check(index.includes('virtual-cards.js?v=37'), 'index.html: motore virtuale v37 non caricato');
-check(index.includes('virtual-cards.css?v=37'), 'index.html: stile virtuale v37 non caricato');
+check(index.includes('virtual-cards.js?v=38'), 'index.html: motore virtuale v38 non caricato');
+check(index.includes('virtual-cards.css?v=38'), 'index.html: stile virtuale v38 non caricato');
 check(index.includes('clean-rules.js?v=32'), 'index.html: regole aggiornate non caricate');
 check(index.includes('clean-objectives.js?v=20'), 'index.html: fix obiettivo in partita non caricato');
 check(!index.includes('virtual-cards-mobile-v35.css') && !index.includes('virtual-table-redesign-v35.js'), 'index.html: vecchi override v35 ancora caricati');
-check(index.includes('pwa-refresh.js?v=37'), 'index.html: refresh PWA v37 non caricato');
+check(index.includes('pwa-refresh.js?v=38'), 'index.html: refresh PWA v38 non caricato');
 
 const virtualSource = read('virtual-cards.js');
 const virtualCss = read('virtual-cards.css');
@@ -37,9 +37,12 @@ const objectivesSource = read('clean-objectives.js');
 check(virtualSource.includes("phase: 'exchange'"), 'Il turno non parte dal cambio');
 check(virtualSource.includes('mazzo-condiviso'), 'La distribuzione non usa il mazzo condiviso');
 check(virtualSource.includes('virtual-card-symbol'), 'Le carte non hanno il simbolo centrale reale');
+check(virtualSource.includes('data-phase-callout') && virtualSource.includes('CAMBIA UNA CARTA'), 'La fase corrente non è mostrata in modo evidente');
+check(virtualSource.includes('Carta da cambiare') && !virtualSource.includes('La carta apparirà qui'), 'Il tavolo usa ancora un testo generico o rivolto allo sviluppatore');
+check(virtualSource.includes('Una relazione si incrina') && virtualSource.includes('Un personaggio tenta un’azione'), 'Le descrizioni delle carte non spiegano chiaramente l’effetto narrativo');
 check(virtualSource.includes('data-toggle-cards'), 'Manca il comando per nascondere le carte');
 check(virtualSource.includes('S.openRulesModal?.()'), 'Il menu virtuale non apre le stesse regole della home');
-check(virtualSource.includes('drag-suggested') && virtualSource.includes('selectCard(current.id, true)'), 'Il drag non seleziona la carta e non evidenzia l’azione');
+check(virtualSource.includes('const valid = !cancelled && action && (overlaps || thrownUp)') && virtualSource.includes('await commitOutcome(outcome, action)'), 'Il drag non esegue direttamente Cambia o Gioca');
 check(virtualSource.includes('setPointerCapture') && virtualSource.includes('requestAnimationFrame'), 'Il drag non usa Pointer Events e requestAnimationFrame');
 check(virtualSource.includes('virtual-drag-overlay'), 'Il drag non usa un overlay fullscreen');
 check(virtualSource.includes('virtual-confetti') && virtualSource.includes('burstConfetti'), 'Manca la celebrazione del finale accettato');
@@ -54,8 +57,8 @@ check(virtualCss.includes('position:fixed!important;') && virtualCss.includes('h
 check(virtualCss.includes('html body.virtual-table-active .site-header') && virtualCss.includes('.site-footer{display:none!important}'), 'Header o footer restano visibili');
 check(virtualCss.includes('env(safe-area-inset-bottom)'), 'Mancano le safe area');
 check(virtualCss.includes('flex-wrap:wrap!important'), 'La mano non dispone le carte su più righe');
-check(virtualCss.includes('width:clamp(96px,28vw,108px)') && virtualCss.includes('height:clamp(116px,15dvh,130px)'), 'Le carte della mano non hanno dimensioni mobili bilanciate');
-check(virtualCss.includes('grid-template-rows:auto auto minmax(196px,1fr) auto 64px'), 'Il tavolo non assorbe correttamente lo spazio disponibile');
+check(virtualCss.includes('opacity:1!important') && virtualCss.includes('DA CAMBIARE') && virtualCss.includes('DA GIOCARE'), 'Simbolo o stato della carta selezionata non sono abbastanza evidenti');
+check(virtualCss.includes('width:clamp(92px,27vw,104px)') && virtualCss.includes('height:clamp(110px,14dvh,124px)'), 'Le carte non hanno dimensioni mobili bilanciate');
 check(virtualCss.includes('.virtual-table-card[hidden],.virtual-focus-placeholder[hidden]{display:none!important}'), 'Le carte nascoste del tavolo possono ancora occupare spazio e tagliare il layout');
 check(virtualCss.includes('touch-action:none!important'), 'Le carte non bloccano il pan del browser');
 check(virtualCss.includes('visibility:hidden!important'), 'La carta originale non viene nascosta correttamente durante il drag');
@@ -66,10 +69,10 @@ check(virtualCss.includes('@media(max-height:700px)'), 'Manca l’adattamento pe
 check(virtualCss.includes('.rule-card-mini-sections>details'), 'Le mini sezioni delle regole non hanno uno stile dedicato');
 
 const sw = read('sw.js');
-check(sw.includes('shell-v37') && sw.includes('runtime-v37'), 'Cache PWA v37 non attiva');
+check(sw.includes('shell-v38') && sw.includes('runtime-v38'), 'Cache PWA v38 non attiva');
 check(sw.includes("'./virtual-cards.css'") && sw.includes("'./virtual-cards.js'"), 'Carte virtuali non precacheate');
 check(!sw.includes('virtual-cards-mobile-v35.css') && !sw.includes('virtual-table-redesign-v35.js'), 'Vecchi file v35 ancora nella cache');
-check(read('pwa-refresh.js').includes('epoi_sw_reload_v37'), 'Refresh PWA v37 non attivo');
+check(read('pwa-refresh.js').includes('epoi_sw_reload_v38'), 'Refresh PWA v38 non attivo');
 const coreBlock = sw.match(/const CORE_FILES = \[([\s\S]*?)\];/)?.[1] || '';
 for (const match of coreBlock.matchAll(/['"]\.\/([^'"]*)['"]/g)) check(exists(match[1]), `sw.js: file mancante ${match[1]}`);
 
@@ -112,4 +115,4 @@ if (failures.length) {
   console.error('\nRelease check fallito:\n- ' + failures.join('\n- '));
   process.exit(1);
 }
-console.log('Release check completato: modalità virtuale v37, proporzioni mobili bilanciate, selezione/drag, regole, privacy, finale e cache verificati.');
+console.log('Release check completato: modalità virtuale v38, carte bilanciate, drag diretto, descrizioni, fase evidente e cache verificati.');
