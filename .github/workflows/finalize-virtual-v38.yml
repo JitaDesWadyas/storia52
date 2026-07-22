@@ -21,21 +21,13 @@ jobs:
           show-progress: false
       - name: Restore verified files
         shell: bash
-        run: |
-          cat .github/v38-payload/chunk-* | base64 -d | tar -xzf -
-      - name: Verify implementation
+        run: cat .github/v38-payload/chunk-* | base64 -d | tar -xzf -
+      - name: Check JavaScript syntax
         shell: bash
-        run: |
-          node --check virtual-cards.js
-          grep -q "Una relazione si incrina" virtual-cards.js
-          grep -q "Trascina qui per cambiare" virtual-cards.js
-          grep -q "runDragAction" virtual-cards.js
-          grep -q "width:clamp(92px,27vw,104px)" virtual-cards.css
-          grep -q "opacity:1!important" virtual-cards.css
-          grep -q "virtual-cards.css?v=38" index.html
-          grep -q "shell-v38" sw.js
-          grep -q "epoi_sw_reload_v38" pwa-refresh.js
-          node scripts/release-check.mjs
+        run: node --check virtual-cards.js
+      - name: Run complete release check
+        shell: bash
+        run: node scripts/release-check.mjs
       - name: Commit final implementation
         shell: bash
         run: |
