@@ -55,7 +55,7 @@ check(virtualCss.includes('html body.virtual-table-active .site-header') && virt
 check(virtualCss.includes('env(safe-area-inset-bottom)'), 'Mancano le safe area');
 check(virtualCss.includes('flex-wrap:wrap!important'), 'La mano non dispone le carte su più righe');
 check(virtualCss.includes('width:clamp(96px,28vw,108px)') && virtualCss.includes('height:clamp(116px,15dvh,130px)'), 'Le carte della mano non hanno dimensioni mobili bilanciate');
-check(virtualCss.includes('grid-template-rows:auto auto clamp(196px,27dvh,246px)'), 'Il tavolo non ha spazio stabile sufficiente');
+check(virtualCss.includes('grid-template-rows:auto auto minmax(196px,1fr) auto 64px'), 'Il tavolo non assorbe correttamente lo spazio disponibile');
 check(virtualCss.includes('.virtual-table-card[hidden],.virtual-focus-placeholder[hidden]{display:none!important}'), 'Le carte nascoste del tavolo possono ancora occupare spazio e tagliare il layout');
 check(virtualCss.includes('touch-action:none!important'), 'Le carte non bloccano il pan del browser');
 check(virtualCss.includes('visibility:hidden!important'), 'La carta originale non viene nascosta correttamente durante il drag');
