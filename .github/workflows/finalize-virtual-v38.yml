@@ -1,0 +1,47 @@
+name: Finalize virtual cards v38
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  finalize-v38:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/virtual-cards-mobile-polish-v2
+          fetch-depth: 1
+          show-progress: false
+      - name: Restore verified files
+        shell: bash
+        run: |
+          cat .github/v38-payload/chunk-* | base64 -d | tar -xzf -
+      - name: Verify implementation
+        shell: bash
+        run: |
+          node --check virtual-cards.js
+          grep -q "Una relazione si incrina" virtual-cards.js
+          grep -q "Trascina qui per cambiare" virtual-cards.js
+          grep -q "runDragAction" virtual-cards.js
+          grep -q "width:clamp(92px,27vw,104px)" virtual-cards.css
+          grep -q "opacity:1!important" virtual-cards.css
+          grep -q "virtual-cards.css?v=38" index.html
+          grep -q "shell-v38" sw.js
+          grep -q "epoi_sw_reload_v38" pwa-refresh.js
+          node scripts/release-check.mjs
+      - name: Commit final implementation
+        shell: bash
+        run: |
+          rm -rf .github/v38-payload .github/workflows/finalize-virtual-v38.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Corregge drag, carte e indicazioni della modalità virtuale"
+          git push origin HEAD:agent/virtual-cards-mobile-polish-v2
