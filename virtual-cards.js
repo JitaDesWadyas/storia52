@@ -98,9 +98,8 @@
     };
   };
 
-  // Un solo mazzo da 52 carte viene mescolato e spartito fra i giocatori.
-  // Ogni carta appartiene a un solo telefono: mani, pescate e rimescolamenti
-  // non possono creare doppioni con gli altri giocatori.
+  // Un mazzo deterministico viene diviso fra tutti i telefoni. Ogni carta
+  // appartiene a un solo giocatore, anche dopo pescate e rimescolamenti.
   const buildAssignments = (seed, count) => {
     const playerCount = Math.max(2, Math.min(8, Number(count) || 2));
     const deck = shuffle(CARD_IDS, `${seed}|mazzo-condiviso`);
@@ -266,15 +265,7 @@
     return result(source, false, 'Azione non riconosciuta.');
   };
 
-  const engine = Object.freeze({
-    cardIds: CARD_IDS,
-    cardFromId,
-    meaningFor,
-    buildAssignments,
-    createState,
-    isValidState,
-    apply
-  });
+  const engine = Object.freeze({ cardIds: CARD_IDS, cardFromId, meaningFor, buildAssignments, createState, isValidState, apply });
   window.EpoiVirtualCardsEngine = engine;
 
   const S = window.S52;
@@ -309,14 +300,14 @@
     return `<span class="virtual-card-corner"><b>${S.esc(card.rank)}</b><i>${card.symbol}</i></span><span class="virtual-card-effect"><em>${S.esc(meaning.badge)}</em><b>${S.esc(meaning.short)}</b><small>${S.esc(meaning.text)}</small></span>`;
   };
 
-  const cardSlotMarkup = index => `<button type="button" class="virtual-card-slot" data-card-slot="${index}" aria-pressed="false" aria-label="Carta ${index + 1}"><span class="virtual-card-corner"><b>—</b><i></i></span><span class="virtual-card-effect"><em></em><b></b><small></small></span></button>`;
+  const cardSlotMarkup = index => `<button type="button" class="virtual-card-slot empty" data-card-slot="${index}" aria-pressed="false" aria-label="Carta ${index + 1}"><span class="virtual-empty-slot" aria-hidden="true"></span></button>`;
 
   const phaseIndex = phase => ({ exchange: 0, play: 1, afterPlay: 2, final: 2, completed: 2 }[phase] || 0);
   const instructionFor = state => {
     if (state.phase === 'exchange') return state.hand.length > 1
-      ? { title: `Turno ${state.turn}`, text: 'Cambia una carta' }
+      ? { title: `Turno ${state.turn}`, text: 'Trascina in alto una carta da cambiare' }
       : { title: `Turno ${state.turn}`, text: 'Cambia o tieni l’ultima carta' };
-    if (state.phase === 'play') return { title: `Turno ${state.turn}`, text: 'Gioca una carta' };
+    if (state.phase === 'play') return { title: `Turno ${state.turn}`, text: 'Trascina in alto la carta da giocare' };
     if (state.phase === 'afterPlay') return { title: `Turno ${state.turn}`, text: state.hand.length ? 'Racconta, poi pesca o non pescare' : 'Racconta, poi pesca o vai al finale' };
     if (state.phase === 'final') return { title: 'Finale', text: 'Collega questa scena al tuo obiettivo' };
     return { title: 'Partita conclusa', text: 'Il finale è stato accettato' };
@@ -336,7 +327,7 @@
 
   const shellMarkup = (session, playerIndex) => `<section class="surface virtual-game" data-virtual-root data-phase="exchange">
     <header class="virtual-game-header">
-      <div class="virtual-player-title"><p class="eyebrow">${S.esc(S.playerName(session, playerIndex))}</p><div><h2 data-turn-title>Turno 1</h2><p data-turn-text>Cambia una carta</p></div></div>
+      <div class="virtual-player-title"><p class="eyebrow">${S.esc(S.playerName(session, playerIndex))}</p><div><h2 data-turn-title>Turno 1</h2><p data-turn-text>Trascina in alto una carta</p></div></div>
       <nav class="virtual-header-actions" aria-label="Strumenti partita">
         <button type="button" class="secondary compact" data-virtual-story>Storia</button>
         <button type="button" class="secondary compact" data-virtual-rules>Regole</button>
@@ -350,50 +341,76 @@
       <li data-rail-step="2"><span>3</span><b>Chiudi</b></li>
     </ol>
     <section class="virtual-table" aria-label="Tavolo di gioco">
-      <div class="virtual-piles">
-        <button type="button" class="virtual-deck-card" data-virtual-deck aria-label="Mazzo">
-          <span class="virtual-deck-layer layer-three"></span><span class="virtual-deck-layer layer-two"></span><span class="virtual-deck-layer layer-one"></span>
-          <span class="virtual-deck-face"><img src="storia52-cards-logo.svg" alt=""><small data-deck-action>MAZZO</small><b data-deck-count>0</b></span>
-        </button>
-        <div class="virtual-discard-stack" data-virtual-discard aria-label="Scarti">
-          <span class="virtual-discard-card" data-discard-card><b>—</b><i></i><small>SCARTI</small></span><em data-discard-count>0</em>
-        </div>
-      </div>
+      <button type="button" class="virtual-deck-card" data-virtual-deck aria-label="Mazzo">
+        <span class="virtual-deck-layer layer-four"></span><span class="virtual-deck-layer layer-three"></span><span class="virtual-deck-layer layer-two"></span><span class="virtual-deck-layer layer-one"></span>
+        <span class="virtual-deck-face"><img src="storia52-cards-logo.svg" alt=""><small data-deck-action>MAZZO</small></span>
+      </button>
       <article class="virtual-play-zone empty" data-play-zone>
-        <span class="virtual-table-card" data-table-card><b>—</b><i></i><em></em></span>
-        <div><small data-zone-label>CARTA GIOCATA</small><h3 data-zone-title>Trascina qui una carta</h3><p data-zone-text>La carta resterà sul tavolo mentre racconti.</p></div>
+        <div class="virtual-drop-visual" data-drop-visual aria-hidden="true"><span>↑</span><i></i></div>
+        <span class="virtual-table-card" data-table-card hidden><span class="virtual-card-corner"><b></b><i></i></span><span class="virtual-card-effect"><em></em><b></b><small></small></span></span>
+        <div class="virtual-zone-copy"><small data-zone-label>TAVOLO</small><h3 data-zone-title>Trascina una carta verso l’alto</h3><p data-zone-text>La vedrai arrivare qui e resterà sul tavolo mentre racconti.</p></div>
       </article>
+      <div class="virtual-discard-stack" data-virtual-discard aria-label="Scarti">
+        <span class="virtual-discard-card empty" data-discard-card><img src="storia52-cards-logo.svg" alt=""><small>SCARTI</small></span>
+      </div>
     </section>
     <section class="virtual-hand-section">
       <div class="virtual-hand-heading"><span>LA TUA MANO</span><b data-hand-count>5 carte</b></div>
       <div class="virtual-hand" data-virtual-hand>${Array.from({ length: 5 }, (_, index) => cardSlotMarkup(index)).join('')}</div>
-      <p class="virtual-gesture-hint" data-gesture-hint>Trascina di lato per cambiare.</p>
+      <p class="virtual-gesture-hint" data-gesture-hint>Trascina sempre verso l’alto.</p>
     </section>
     <div class="virtual-actions" data-virtual-actions>${actionShellMarkup()}</div>
   </section>`;
 
   const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const animateFlight = async (element, target, kind) => {
-    if (!element || !target || reducedMotion()) return;
-    const from = element.getBoundingClientRect();
-    const to = target.getBoundingClientRect();
-    const ghost = element.cloneNode(true);
-    ghost.classList.add('virtual-card-flight');
+  const freezeGhostAtRect = (ghost, rect) => {
     Object.assign(ghost.style, {
-      position: 'fixed', left: `${from.left}px`, top: `${from.top}px`, width: `${from.width}px`, height: `${from.height}px`, margin: '0', zIndex: '9999', pointerEvents: 'none'
+      left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px`, transform: 'none'
     });
-    document.body.appendChild(ghost);
-    element.classList.add('is-flight-source');
+  };
+
+  const animateGhostTo = async (ghost, target, kind) => {
+    if (!ghost || !target) return;
+    const from = ghost.getBoundingClientRect();
+    const to = target.getBoundingClientRect();
+    freezeGhostAtRect(ghost, from);
+    if (reducedMotion()) return;
     const dx = to.left + to.width / 2 - (from.left + from.width / 2);
     const dy = to.top + to.height / 2 - (from.top + from.height / 2);
-    const rotate = kind === 'exchange' ? 9 : -3;
+    const rotate = kind === 'exchange' ? 7 : -2;
     try {
       await ghost.animate([
         { transform: 'translate3d(0,0,0) scale(1) rotate(0)', opacity: 1 },
-        { transform: `translate3d(${dx}px,${dy}px,0) scale(.62) rotate(${rotate}deg)`, opacity: .12 }
-      ], { duration: 230, easing: 'cubic-bezier(.2,.78,.25,1)' }).finished;
+        { transform: `translate3d(${dx}px,${dy}px,0) scale(.72) rotate(${rotate}deg)`, opacity: .94 }
+      ], { duration: 260, easing: 'cubic-bezier(.18,.78,.22,1)', fill: 'forwards' }).finished;
     } catch { /* L’azione continua. */ }
+  };
+
+  const animateGhostBack = async (ghost, sourceRect) => {
+    if (!ghost) return;
+    const from = ghost.getBoundingClientRect();
+    freezeGhostAtRect(ghost, from);
+    if (reducedMotion()) return;
+    const dx = sourceRect.left - from.left;
+    const dy = sourceRect.top - from.top;
+    try {
+      await ghost.animate([
+        { transform: 'translate3d(0,0,0) scale(1.03)', opacity: 1 },
+        { transform: `translate3d(${dx}px,${dy}px,0) scale(1)`, opacity: 1 }
+      ], { duration: 180, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' }).finished;
+    } catch { /* Il rilascio continua. */ }
+  };
+
+  const animateFlight = async (element, target, kind) => {
+    if (!element || !target) return;
+    const from = element.getBoundingClientRect();
+    const ghost = element.cloneNode(true);
+    ghost.classList.add('virtual-drag-ghost', 'is-button-flight');
+    Object.assign(ghost.style, { position: 'fixed', left: `${from.left}px`, top: `${from.top}px`, width: `${from.width}px`, height: `${from.height}px`, zIndex: '9999', pointerEvents: 'none' });
+    document.body.appendChild(ghost);
+    element.classList.add('is-flight-source');
+    await animateGhostTo(ghost, target, kind);
     ghost.remove();
     element.classList.remove('is-flight-source');
   };
@@ -446,12 +463,11 @@
       handCount: root.querySelector('[data-hand-count]'),
       hint: root.querySelector('[data-gesture-hint]'),
       deck: root.querySelector('[data-virtual-deck]'),
-      deckCount: root.querySelector('[data-deck-count]'),
       deckAction: root.querySelector('[data-deck-action]'),
       discard: root.querySelector('[data-virtual-discard]'),
       discardCard: root.querySelector('[data-discard-card]'),
-      discardCount: root.querySelector('[data-discard-count]'),
       zone: root.querySelector('[data-play-zone]'),
+      dropVisual: root.querySelector('[data-drop-visual]'),
       tableCard: root.querySelector('[data-table-card]'),
       zoneLabel: root.querySelector('[data-zone-label]'),
       zoneTitle: root.querySelector('[data-zone-title]'),
@@ -499,54 +515,58 @@
     };
 
     const updateDeck = () => {
-      refs.deckCount.textContent = String(state.drawPile.length);
       refs.deckAction.textContent = state.phase === 'afterPlay' ? 'PESCA' : 'MAZZO';
       refs.deck.classList.toggle('can-draw', state.phase === 'afterPlay');
-      refs.deck.disabled = busy || state.phase === 'completed';
+      refs.deck.disabled = busy || state.phase !== 'afterPlay';
       refs.deck.setAttribute('aria-label', state.phase === 'afterPlay'
         ? `Pesca una carta. ${state.drawPile.length} carte disponibili.`
-        : `Mazzo: ${state.drawPile.length} carte disponibili.`);
+        : `Mazzo. ${state.drawPile.length} carte disponibili.`);
     };
 
     const updateDiscard = () => {
       const id = state.discard[state.discard.length - 1] || '';
-      refs.discardCount.textContent = String(state.discard.length);
       refs.discardCard.className = 'virtual-discard-card';
       if (!id) {
-        refs.discardCard.innerHTML = '<b>—</b><i></i><small>SCARTI</small>';
+        refs.discardCard.classList.add('empty');
+        refs.discardCard.innerHTML = '<img src="storia52-cards-logo.svg" alt=""><small>SCARTI</small>';
         return;
       }
       const card = engine.cardFromId(id);
       const meaning = engine.meaningFor(id);
       refs.discardCard.classList.add(meaning.tone);
       if (card.red) refs.discardCard.classList.add('red');
-      refs.discardCard.innerHTML = `<b>${S.esc(card.rank)}</b><i>${card.symbol}</i><small>${S.esc(meaning.short)}</small>`;
+      refs.discardCard.innerHTML = `<span class="virtual-card-corner"><b>${S.esc(card.rank)}</b><i>${card.symbol}</i></span><span class="virtual-card-effect"><em>${S.esc(meaning.badge)}</em><b>${S.esc(meaning.short)}</b><small>${S.esc(meaning.text)}</small></span>`;
     };
 
     const updateZone = () => {
-      const id = state.playedCard || selectedId;
+      const id = state.playedCard;
       refs.zone.className = 'virtual-play-zone';
       refs.tableCard.className = 'virtual-table-card';
       if (!id) {
         refs.zone.classList.add('empty');
-        refs.tableCard.innerHTML = '<b>—</b><i></i><em></em>';
-        refs.zoneLabel.textContent = 'TAVOLO';
-        refs.zoneTitle.textContent = state.phase === 'exchange' ? 'Scegli la carta da cambiare' : 'Trascina qui una carta';
-        refs.zoneText.textContent = state.phase === 'exchange' ? 'Scorri una carta di lato.' : 'Scorri una carta verso l’alto.';
+        refs.dropVisual.hidden = false;
+        refs.tableCard.hidden = true;
+        refs.zoneLabel.textContent = state.phase === 'exchange' ? 'CAMBIO' : 'TAVOLO';
+        refs.zoneTitle.textContent = state.phase === 'exchange' ? 'Trascina in alto verso gli scarti' : 'Trascina in alto verso il tavolo';
+        refs.zoneText.textContent = state.phase === 'exchange'
+          ? 'La carta salirà dalla mano e verrà sostituita.'
+          : 'La carta salirà dalla mano e resterà qui mentre racconti.';
         return;
       }
       const card = engine.cardFromId(id);
       const meaning = engine.meaningFor(id);
-      refs.zone.classList.add(meaning.tone, state.playedCard ? 'played' : 'preview');
+      refs.zone.classList.add(meaning.tone, 'played');
       refs.tableCard.classList.add(meaning.tone);
       if (card.red) {
         refs.zone.classList.add('red');
         refs.tableCard.classList.add('red');
       }
-      refs.tableCard.innerHTML = `<b>${S.esc(card.rank)}</b><i>${card.symbol}</i><em>${S.esc(meaning.badge)}</em>`;
-      refs.zoneLabel.textContent = state.playedCard ? 'CARTA GIOCATA' : 'CARTA SELEZIONATA';
+      refs.dropVisual.hidden = true;
+      refs.tableCard.hidden = false;
+      refs.tableCard.innerHTML = cardFaceMarkup(id);
+      refs.zoneLabel.textContent = 'CARTA GIOCATA';
       refs.zoneTitle.textContent = meaning.title;
-      refs.zoneText.textContent = state.playedCard ? `${meaning.text}. Racconta la scena.` : meaning.text;
+      refs.zoneText.textContent = `${meaning.text}. Racconta la scena.`;
     };
 
     const showAction = (action, visible, enabled = true) => {
@@ -575,15 +595,20 @@
       if (home) home.hidden = state.phase !== 'completed';
     };
 
+    const updateTargets = () => {
+      refs.discard.classList.toggle('is-drop-target', state.phase === 'exchange');
+      refs.zone.classList.toggle('is-drop-target', state.phase === 'play');
+    };
+
     const update = () => {
       const instruction = instructionFor(state);
       root.dataset.phase = state.phase;
       refs.title.textContent = instruction.title;
       refs.text.textContent = instruction.text;
       refs.hint.textContent = state.phase === 'exchange'
-        ? 'Trascina di lato per cambiare.'
+        ? 'Trascina una carta verso l’alto per cambiarla.'
         : state.phase === 'play'
-          ? 'Trascina verso l’alto per giocare.'
+          ? 'Trascina una carta verso l’alto per giocarla.'
           : state.phase === 'afterPlay'
             ? 'Tocca il mazzo per pescare.'
             : 'Usa i pulsanti per continuare.';
@@ -592,6 +617,7 @@
       updateDeck();
       updateDiscard();
       updateZone();
+      updateTargets();
       updateActions();
       incomingId = '';
     };
@@ -600,8 +626,22 @@
       if (busy || !['exchange', 'play'].includes(state.phase) || !state.hand.includes(id)) return;
       selectedId = selectedId === id ? '' : id;
       updateHand();
-      updateZone();
       updateActions();
+    };
+
+    const commitOutcome = outcome => {
+      state = outcome.state;
+      selectedId = '';
+      incomingId = outcome.drawn || '';
+      busy = false;
+      save();
+      update();
+      if (outcome.reshuffled) {
+        refs.deck.classList.remove('is-shuffling');
+        void refs.deck.offsetWidth;
+        refs.deck.classList.add('is-shuffling');
+        S.toast('Scarti rimescolati');
+      }
     };
 
     const run = async (action, id = selectedId) => {
@@ -617,82 +657,100 @@
       if (['draw-end', 'skip-draw', 'continue'].includes(action) && state.playedCard) {
         await animateFlight(refs.tableCard, refs.discard, 'exchange');
       }
-
-      state = outcome.state;
-      selectedId = '';
-      incomingId = outcome.drawn || '';
-      busy = false;
-      save();
-      update();
-
-      if (outcome.reshuffled) {
-        refs.deck.classList.remove('is-shuffling');
-        void refs.deck.offsetWidth;
-        refs.deck.classList.add('is-shuffling');
-        S.toast('Scarti rimescolati');
-      }
+      commitOutcome(outcome);
     };
 
-    const resetDragVisual = slot => {
-      slot.classList.remove('is-dragging');
-      slot.style.removeProperty('--drag-x');
-      slot.style.removeProperty('--drag-y');
-      slot.style.removeProperty('--drag-rotate');
+    const createDragGhost = slot => {
+      const rect = slot.getBoundingClientRect();
+      const ghost = slot.cloneNode(true);
+      ghost.classList.add('virtual-drag-ghost');
+      ghost.classList.remove('selected', 'card-enter');
+      Object.assign(ghost.style, {
+        position: 'fixed', left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px`, margin: '0', zIndex: '9999', pointerEvents: 'none', transform: 'translate3d(0,0,0)'
+      });
+      document.body.appendChild(ghost);
+      slot.classList.add('is-drag-source');
+      return { ghost, rect };
     };
 
     const applyDragFrame = () => {
       dragFrame = 0;
       if (!drag) return;
-      const { slot, dx, dy } = drag;
-      slot.style.setProperty('--drag-x', `${Math.max(-90, Math.min(90, dx))}px`);
-      slot.style.setProperty('--drag-y', `${Math.max(-105, Math.min(40, dy))}px`);
-      slot.style.setProperty('--drag-rotate', `${Math.max(-7, Math.min(7, dx / 16))}deg`);
+      const x = drag.dx;
+      const y = Math.min(18, drag.dy);
+      const rotate = Math.max(-7, Math.min(7, x / 18));
+      drag.ghost.style.transform = `translate3d(${x}px,${y}px,0) rotate(${rotate}deg) scale(1.035)`;
+      const armed = y <= -54;
+      refs.discard.classList.toggle('drag-armed', armed && state.phase === 'exchange');
+      refs.zone.classList.toggle('drag-armed', armed && state.phase === 'play');
+    };
+
+    const clearDragTargets = () => {
+      refs.discard.classList.remove('drag-armed');
+      refs.zone.classList.remove('drag-armed');
+    };
+
+    const finishDrag = async (event, cancelled = false) => {
+      if (!drag || drag.pointerId !== event.pointerId) return;
+      const current = drag;
+      drag = null;
+      if (dragFrame) cancelAnimationFrame(dragFrame);
+      dragFrame = 0;
+      clearDragTargets();
+
+      const valid = !cancelled && current.dy <= -72 && Math.abs(current.dy) > Math.abs(current.dx) * .55;
+      const action = state.phase === 'exchange' ? 'exchange' : state.phase === 'play' ? 'play' : '';
+      const target = action === 'exchange' ? refs.discard : refs.zone;
+      current.slot.dataset.ignoreClickUntil = String(performance.now() + 500);
+
+      if (!valid || !action) {
+        await animateGhostBack(current.ghost, current.sourceRect);
+        current.ghost.remove();
+        current.slot.classList.remove('is-drag-source');
+        return;
+      }
+
+      const outcome = engine.apply(state, action, session.cardSeed, playerIndex, current.id);
+      if (!outcome.ok) {
+        await animateGhostBack(current.ghost, current.sourceRect);
+        current.ghost.remove();
+        current.slot.classList.remove('is-drag-source');
+        S.toast(outcome.message);
+        return;
+      }
+
+      busy = true;
+      selectedId = current.id;
+      updateActions();
+      await animateGhostTo(current.ghost, target, action);
+      current.ghost.remove();
+      current.slot.classList.remove('is-drag-source');
+      commitOutcome(outcome);
     };
 
     refs.slots.forEach(slot => {
       slot.addEventListener('pointerdown', event => {
         const id = slot.dataset.virtualCard;
         if (!id || busy || !['exchange', 'play'].includes(state.phase)) return;
-        drag = { slot, id, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, dx: 0, dy: 0, moved: false };
+        event.preventDefault();
+        const { ghost, rect } = createDragGhost(slot);
+        drag = {
+          slot, ghost, sourceRect: rect, id, pointerId: event.pointerId,
+          startX: event.clientX, startY: event.clientY, dx: 0, dy: 0
+        };
         slot.setPointerCapture?.(event.pointerId);
       });
 
       slot.addEventListener('pointermove', event => {
         if (!drag || drag.slot !== slot || drag.pointerId !== event.pointerId) return;
+        event.preventDefault();
         drag.dx = event.clientX - drag.startX;
         drag.dy = event.clientY - drag.startY;
-        if (Math.abs(drag.dx) + Math.abs(drag.dy) > 10) {
-          drag.moved = true;
-          slot.classList.add('is-dragging');
-        }
         if (!dragFrame) dragFrame = requestAnimationFrame(applyDragFrame);
       });
 
-      const finishDrag = event => {
-        if (!drag || drag.slot !== slot || drag.pointerId !== event.pointerId) return;
-        const current = drag;
-        drag = null;
-        if (dragFrame) cancelAnimationFrame(dragFrame);
-        dragFrame = 0;
-        const exchangeGesture = state.phase === 'exchange' && Math.abs(current.dx) >= 64 && Math.abs(current.dx) > Math.abs(current.dy) * 1.05;
-        const playGesture = state.phase === 'play' && current.dy <= -64 && Math.abs(current.dy) > Math.abs(current.dx) * .8;
-        if (exchangeGesture || playGesture) {
-          slot.dataset.ignoreClickUntil = String(performance.now() + 450);
-          selectedId = current.id;
-          run(exchangeGesture ? 'exchange' : 'play', current.id).finally(() => resetDragVisual(slot));
-        } else {
-          resetDragVisual(slot);
-        }
-      };
-
-      slot.addEventListener('pointerup', finishDrag);
-      slot.addEventListener('pointercancel', event => {
-        if (!drag || drag.slot !== slot || drag.pointerId !== event.pointerId) return;
-        drag = null;
-        if (dragFrame) cancelAnimationFrame(dragFrame);
-        dragFrame = 0;
-        resetDragVisual(slot);
-      });
+      slot.addEventListener('pointerup', event => finishDrag(event));
+      slot.addEventListener('pointercancel', event => finishDrag(event, true));
       slot.addEventListener('click', () => {
         const ignoreUntil = Number(slot.dataset.ignoreClickUntil || 0);
         if (performance.now() < ignoreUntil) return;
@@ -715,12 +773,12 @@
     root.querySelector('[data-virtual-home]')?.addEventListener('click', S.renderHome);
     refs.deck.addEventListener('click', () => {
       if (state.phase === 'afterPlay') run('draw-end');
-      else S.toast('Puoi pescare dopo aver giocato.');
     });
 
     const cleanupObserver = new MutationObserver(() => {
       if (S.play.querySelector('[data-virtual-root]')) return;
       document.body.classList.remove('virtual-table-active');
+      document.querySelectorAll('.virtual-drag-ghost').forEach(node => node.remove());
       cleanupObserver.disconnect();
     });
     cleanupObserver.observe(S.play, { childList: true, subtree: false });
