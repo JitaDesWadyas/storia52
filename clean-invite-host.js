@@ -77,7 +77,12 @@
     await qrPromise.catch(() => null);
 
     const qrAvailable = Boolean(window.EpoiQr);
-    S.mount(`<section class="surface invite-ready-screen"><div class="screen-heading invite-ready-heading"><p class="eyebrow">INVITA GLI ALTRI</p><h2>Un QR per tutta la partita.</h2><p>Mostralo agli altri oppure condividi il link. Ognuno sceglie il proprio nome e vede solo il suo obiettivo.</p></div><div class="invite-ready-card"><button type="button" class="shared-qr-button" data-open-shared-qr aria-label="Ingrandisci il QR della partita"${qrAvailable ? '' : ' disabled'}>${qrMarkup('E POI?', url, true)}</button><div class="invite-ready-copy"><p class="eyebrow">ENTRA NELLA PARTITA</p><h3>Scansiona o condividi.</h3><p>${session.count} giocatori useranno lo stesso invito.</p><div class="invite-actions"><button type="button" class="primary" data-share-game>Condividi link</button><button type="button" class="secondary" data-copy-game>Copia link</button></div></div></div><button type="button" class="primary invite-continue" data-start-shared-game>Inizia</button><details class="invite-story-details"><summary>Rivedi l’incipit</summary><div>${S.storyContextMarkup(session)}</div></details></section>`, { session: true });
+    const virtual = session.cardMode === 'virtual';
+    const intro = virtual
+      ? 'Ognuno sceglie il proprio nome e apre obiettivo e mano privata sul proprio telefono.'
+      : 'Ognuno sceglie il proprio nome e vede soltanto il proprio obiettivo.';
+    const modeLabel = virtual ? '<span class="join-mode-badge">CARTE VIRTUALI</span>' : '';
+    S.mount(`<section class="surface invite-ready-screen"><div class="screen-heading invite-ready-heading"><p class="eyebrow">INVITA GLI ALTRI</p><h2>Un QR per tutta la partita.</h2><p>${intro}</p>${modeLabel}</div><div class="invite-ready-card"><button type="button" class="shared-qr-button" data-open-shared-qr aria-label="Ingrandisci il QR della partita"${qrAvailable ? '' : ' disabled'}>${qrMarkup('E POI?', url, true)}</button><div class="invite-ready-copy"><p class="eyebrow">ENTRA NELLA PARTITA</p><h3>Scansiona o condividi.</h3><p>${session.count} giocatori useranno lo stesso invito.</p><div class="invite-actions"><button type="button" class="primary" data-share-game>Condividi link</button><button type="button" class="secondary" data-copy-game>Copia link</button></div></div></div><button type="button" class="primary invite-continue" data-start-shared-game>Inizia</button><details class="invite-story-details"><summary>Rivedi l’incipit</summary><div>${S.storyContextMarkup(session)}</div></details></section>`, { session: true });
 
     S.play.querySelector('[data-open-shared-qr]')?.addEventListener('click', () => S.openInviteQr('E POI?', url));
     S.play.querySelector('[data-copy-game]')?.addEventListener('click', () => S.copy(url, 'Link copiato'));
@@ -86,7 +91,9 @@
       try {
         await navigator.share({
           title: 'E POI?',
-          text: 'Apri l’invito alla nostra partita di E POI? e scegli il tuo giocatore.',
+          text: virtual
+            ? 'Apri la nostra partita di E POI?, scegli il tuo giocatore e ricevi la tua mano virtuale.'
+            : 'Apri l’invito alla nostra partita di E POI? e scegli il tuo giocatore.',
           url
         });
       } catch { /* Condivisione annullata. */ }
@@ -95,8 +102,8 @@
   };
 
   S.renderHostPlayerChoice = session => {
-    const players = session.names.map((_, index) => `<button type="button" class="player-button" data-host-player="${index}"><span>${index + 1}</span><div><b>${S.esc(S.playerName(session, index))}</b><small>Gioca da questo telefono</small></div><i>→</i></button>`).join('');
-    S.mount(`<section class="surface host-player-choice"><div class="screen-heading"><p class="eyebrow">QUESTO TELEFONO</p><h2>Chi gioca da qui?</h2><p>Scegli il tuo giocatore per vedere anche il tuo obiettivo, oppure apri soltanto la guida.</p></div><div class="join-player-list">${players}</div><div class="actions"><button type="button" class="secondary" data-host-guide>Solo guida</button><button type="button" class="secondary" data-host-back-qr>Torna al QR</button></div></section>`, { session: true });
+    const players = session.names.map((_, index) => `<button type="button" class="player-button" data-host-player="${index}"><span>${index + 1}</span><div><b>${S.esc(S.playerName(session, index))}</b><small>${session.cardMode === 'virtual' ? 'Apri la mano su questo telefono' : 'Gioca da questo telefono'}</small></div><i>→</i></button>`).join('');
+    S.mount(`<section class="surface host-player-choice"><div class="screen-heading"><p class="eyebrow">QUESTO TELEFONO</p><h2>Chi gioca da qui?</h2><p>Scegli il tuo giocatore${session.cardMode === 'virtual' ? ' per aprire la sua mano privata' : ' per vedere anche il suo obiettivo'}, oppure apri soltanto la guida.</p></div><div class="join-player-list">${players}</div><div class="actions"><button type="button" class="secondary" data-host-guide>Solo guida</button><button type="button" class="secondary" data-host-back-qr>Torna al QR</button></div></section>`, { session: true });
     S.play.querySelectorAll('[data-host-player]').forEach(button => button.addEventListener('click', () => {
       S.renderSharedPlayer(session, Number(button.dataset.hostPlayer));
     }));
@@ -107,7 +114,10 @@
   S.renderHostGame = session => {
     session.stage = 'game';
     S.save(session);
-    S.mount(`<section class="surface"><div class="screen-heading"><p class="eyebrow">PARTITA IN CORSO</p><h2>Continuate la storia.</h2></div>${copyableStoryContext(session)}${S.turnGuideMarkup()}<details class="accordion"><summary>Significato delle carte</summary><div class="accordion-body">${S.cardRulesMarkup()}</div></details><details class="accordion"><summary>Come si chiude la storia</summary><div class="accordion-body">${S.finalRulesMarkup()}</div></details><div class="actions one"><button type="button" class="secondary" data-return-invites>Torna al QR</button></div>${scrollTopButton()}</section>`, { session: true });
+    const virtualHint = session.cardMode === 'virtual'
+      ? '<div class="hint"><b>Le mani sono sui telefoni dei giocatori.</b> Ogni telefono guida cambio, giocata e pesca senza mostrare le carte agli altri.</div>'
+      : '';
+    S.mount(`<section class="surface"><div class="screen-heading"><p class="eyebrow">PARTITA IN CORSO</p><h2>Continuate la storia.</h2></div>${copyableStoryContext(session)}${virtualHint}${S.turnGuideMarkup()}<details class="accordion"><summary>Significato delle carte</summary><div class="accordion-body">${S.cardRulesMarkup()}</div></details><details class="accordion"><summary>Come si chiude la storia</summary><div class="accordion-body">${S.finalRulesMarkup()}</div></details><div class="actions one"><button type="button" class="secondary" data-return-invites>Torna al QR</button></div>${scrollTopButton()}</section>`, { session: true });
     S.play.querySelector('[data-return-invites]')?.addEventListener('click', () => S.renderInvites(session));
     bindGameUtilities(session);
   };
