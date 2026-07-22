@@ -22,9 +22,9 @@
     {
       player: 'Luca',
       card: '♦ 6',
-      meaning: 'Scoperta positiva',
+      meaning: 'Scoperta',
       said: 'Dietro la cornice vuota, Luca trova una polizza assicurativa firmata dal padrone della villa.',
-      why: 'Il 6 è pari, quindi la scoperta deve essere utile. La polizza continua direttamente il mistero del quadro.',
+      why: 'La carta impone una scoperta. La polizza continua direttamente il mistero del quadro e diventa utile per i turni successivi.',
       tone: 'diamonds'
     },
     {
@@ -40,7 +40,7 @@
 
   const tutorialSteps = [
     { kind: 'goal', eyebrow: '1 · COSA STATE FACENDO', title: 'Costruite la stessa storia, ma ognuno prepara un finale diverso.', body: 'A turno aggiungete nuovi fatti. Nel frattempo provate a rendere possibile il vostro obiettivo segreto senza rivelarlo agli altri.' },
-    { kind: 'setup', eyebrow: '2 · PRIMA DI INIZIARE', title: 'Preparate storia, mazzo e obiettivi.', body: 'La web app fornisce l’incipit e gli obiettivi. Il mazzo fisico stabilisce che tipo di scena potete aggiungere.' },
+    { kind: 'setup', eyebrow: '2 · PRIMA DI INIZIARE', title: 'Preparate storia, carte e obiettivi.', body: 'Potete usare un normale mazzo da 52 carte oppure, con telefoni separati, ricevere una mano virtuale privata.' },
     { kind: 'turn', eyebrow: '3 · IL TUO TURNO', title: 'Cambia una carta, gioca e racconta una scena.', body: 'Con 2 o più carte il cambio iniziale è obbligatorio. Con una sola carta puoi cambiarla oppure tenerla.' },
     { kind: 'meaning', eyebrow: '4 · COME LEGGERE LE CARTE', title: 'Numeri: leggi il seme. Figure e Asso: ignora il seme.', body: 'Le carte da 2 a 10 seguono il seme. J, Q, K e A usano soltanto valore e colore: il loro seme non aggiunge nessun altro effetto.' },
     { kind: 'example', sceneIndex: 0, eyebrow: '5 · PRIMO TURNO', title: 'Marta aggiunge la prima scena.' },
@@ -66,7 +66,7 @@
 
   const stepContent = step => {
     if (step.kind === 'goal') return `<div class="tutorial-goal"><div><span>INCIPIT COMUNE</span><b>${S.esc(opening)}</b></div>${objectiveCards()}</div>`;
-    if (step.kind === 'setup') return `<div class="tutorial-setup"><article><span>1</span><div><b>Scegliete una storia</b><p>Leggete l’incipit ad alta voce. È il punto di partenza comune.</p></div></article><article><span>2</span><div><b>Preparate il mazzo</b><p>Togliete i jolly, mescolate e date 5 carte a ogni giocatore.</p></div></article><article><span>3</span><div><b>Leggete gli obiettivi</b><p>Passate il telefono. Ognuno legge soltanto il proprio obiettivo segreto.</p></div></article><article><span>4</span><div><b>Scegliete chi inizia</b><p>Dopo ogni turno si continua in ordine, una persona alla volta.</p></div></article></div>`;
+    if (step.kind === 'setup') return `<div class="tutorial-setup"><article><span>1</span><div><b>Scegliete una storia</b><p>Leggete l’incipit ad alta voce. È il punto di partenza comune.</p></div></article><article><span>2</span><div><b>Scegliete le carte</b><p>Usate un mazzo francese da 52 carte senza jolly oppure, con telefoni separati, attivate le carte virtuali.</p></div></article><article><span>3</span><div><b>Leggete gli obiettivi</b><p>Ognuno apre soltanto il proprio obiettivo segreto.</p></div></article><article><span>4</span><div><b>Scegliete chi inizia</b><p>Dopo ogni turno si continua in ordine, una persona alla volta.</p></div></article></div>`;
     if (step.kind === 'turn') return `<div class="tutorial-turn"><article><span>1</span><div><b>Cambia una carta</b><p>Con 2 o più carte è obbligatorio: scartane 1 e pescane 1. Con una sola carta puoi cambiarla oppure tenerla.</p></div></article><article><span>2</span><div><b>Gioca una carta</b><p>Scegli una sola carta e racconta la scena seguendo il suo significato.</p></div></article><article><span>3</span><div><b>Dì una sola scena</b><p>Aggiungi un fatto chiaro che continua ciò che è già successo. Non raccontare anche la reazione successiva.</p></div></article><article><span>4</span><div><b>Pesca, se vuoi, e termina</b><p>Dopo la scena puoi pescare 1 carta. Poi il turno è finito comunque.</p></div></article></div><aside class="tutorial-core-rule"><strong>Formula pratica:</strong><span>“Gioco questa carta, quindi nella storia succede che…”</span></aside>`;
     if (step.kind === 'meaning') return cardRules();
     if (step.kind === 'example') return exampleMarkup(step.sceneIndex);
