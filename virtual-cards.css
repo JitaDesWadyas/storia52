@@ -203,7 +203,7 @@ html[data-theme="dark"] .virtual-game{
   gap:7px!important;
   flex:1 1 250px!important;
   min-height:210px!important;
-  max-height:440px!important;
+  max-height:480px!important;
   padding:8px!important;
   background:linear-gradient(145deg,var(--vg-table),var(--vg-table-deep))!important;
   border:1px solid var(--vg-line)!important;
@@ -409,7 +409,6 @@ html[data-theme="dark"] .virtual-game{
 .virtual-hand-section{
   position:relative!important;
   flex:0 0 auto!important;
-  margin-top:auto!important;
   display:grid!important;
   grid-template-rows:25px auto 18px!important;
   align-content:start!important;
@@ -604,6 +603,7 @@ html[data-theme="dark"] .virtual-game{
 .virtual-actions{
   display:grid!important;
   flex:0 0 64px!important;
+  margin-top:auto!important;
   grid-template-columns:repeat(2,minmax(0,1fr))!important;
   align-items:center!important;
   gap:8px!important;
