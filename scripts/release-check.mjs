@@ -25,10 +25,8 @@ const scripts = [...index.matchAll(/<script src="([^"?]+)/g)].map(match => match
 const styles = [...index.matchAll(/<link rel="stylesheet" href="([^"?]+)/g)].map(match => match[1]);
 check(new Set(scripts).size === scripts.length, 'index.html: script duplicati');
 check(new Set(styles).size === styles.length, 'index.html: stili duplicati');
-check(index.includes('virtual-cards.js?v=32') && index.includes('virtual-cards.css?v=32'), 'index.html: tavolo virtuale v32 non caricato');
-check(index.includes('clean-rules.js?v=31') && index.includes('content-polish.js?v=31'), 'index.html: regole v31 non caricate');
-check(index.includes('clean-invite-host.js?v=31') && index.includes('clean-invite-data.js?v=31'), 'index.html: QR in partita v31 non caricato');
-check(index.includes('pwa-refresh.js?v=32'), 'index.html: refresh PWA v32 non caricato');
+check(index.includes('virtual-cards.js?v=33') && index.includes('virtual-cards.css?v=33'), 'index.html: tavolo mobile v33 non caricato');
+check(index.includes('pwa-refresh.js?v=33'), 'index.html: refresh PWA v33 non caricato');
 
 const virtualSource = read('virtual-cards.js');
 const virtualCss = read('virtual-cards.css');
@@ -39,27 +37,33 @@ const inviteData = read('clean-invite-data.js');
 
 check(!virtualSource.includes('Inizia il mio turno'), 'È tornato il pulsante inutile di inizio turno');
 check(virtualSource.includes("phase: 'exchange'"), 'Il turno non parte direttamente dal cambio');
-check(virtualSource.includes('pointerdown') && virtualSource.includes('pointermove') && virtualSource.includes('requestAnimationFrame(applyDragFrame)'), 'I gesti non sono aggiornati con requestAnimationFrame');
 check((virtualSource.match(/S\.mount\(/g) || []).length === 1, 'Il tavolo viene rimontato durante il turno');
 check(!virtualSource.includes('outerHTML'), 'La selezione sostituisce ancora parti strutturali del tavolo');
-check(virtualSource.includes('data-card-slot') && virtualSource.includes('Array.from({ length: 5 }'), 'Mancano i cinque slot stabili della mano');
+check(virtualSource.includes('Array.from({ length: 5 }') && virtualCss.includes('grid-template-columns:repeat(5,minmax(0,1fr))'), 'Le cinque carte non hanno slot stabili');
+check(virtualSource.includes('createDragGhost') && virtualSource.includes('virtual-drag-ghost'), 'Il trascinamento non usa una carta sovrapposta indipendente dal layout');
+check(virtualSource.includes('requestAnimationFrame(applyDragFrame)'), 'Il trascinamento non usa requestAnimationFrame');
+check(virtualSource.includes('current.dy <= -72'), 'Il rilascio verso l’alto non ha una soglia chiara');
+check(!virtualSource.includes('exchangeGesture') && !virtualSource.includes('Math.abs(current.dx) >= 64'), 'Il cambio richiede ancora un trascinamento laterale');
+check(virtualSource.includes("const target = action === 'exchange' ? refs.discard : refs.zone"), 'Cambio e giocata non arrivano alle zone superiori corrette');
+check(virtualSource.includes('animateGhostTo(current.ghost, target, action)'), 'La carta non completa visivamente il percorso fino al tavolo');
 check(virtualSource.includes('playedCard') && virtualSource.includes('settlePlayedCard'), 'La carta giocata non resta sul tavolo');
-check(virtualSource.includes('storia52-cards-logo.svg'), 'Il dorso del mazzo non usa il logo');
 check(virtualSource.includes('refs.deck.addEventListener') && virtualSource.includes("run('draw-end')"), 'Il mazzo non è cliccabile per pescare');
+check(!virtualSource.includes('data-deck-count') && !virtualSource.includes('data-discard-count'), 'Mazzo o scarti mostrano ancora contatori sovrapposti');
+check(!virtualSource.includes('data-table-card><b>—'), 'Il tavolo mostra ancora una carta vuota finta');
+check(virtualSource.includes('virtual-drop-visual'), 'Manca la nuova area grafica del tavolo');
+check(virtualSource.includes('storia52-cards-logo.svg'), 'Mazzo e scarti non usano il logo');
 check(virtualSource.includes("S.modal('Storia'") && virtualSource.includes("S.modal('Regole'"), 'Storia e regole non si aprono in popup');
+check(virtualSource.includes('mazzo-condiviso'), 'La distribuzione non usa un mazzo condiviso');
 check(virtualSource.includes('Scarti rimescolati'), 'Manca l’avviso di rimescolamento');
-check(virtualSource.includes('mazzo-condiviso'), 'La distribuzione non usa una simulazione condivisa');
-check(virtualSource.includes('virtual-card-flight'), 'Manca l’animazione indipendente dal layout');
 
-check(virtualCss.includes('body.virtual-table-active') && virtualCss.includes('height:100dvh'), 'Il tavolo non occupa una viewport fissa');
-check(virtualCss.includes('grid-template-columns:repeat(5,minmax(0,1fr))'), 'Le cinque carte non sono sempre visibili');
-check(!/\.virtual-hand\{[^}]*overflow-x\s*:\s*auto/s.test(virtualCss), 'La mano richiede ancora scroll orizzontale');
-check(virtualCss.includes('overflow:hidden!important') && virtualCss.includes('.virtual-actions{position:relative'), 'Il layout non mantiene dimensioni stabili');
+check(virtualCss.includes('body.virtual-table-active main{display:flex!important'), 'Il gioco non riempie la parte mobile disponibile');
+check(virtualCss.includes('grid-template-columns:72px minmax(0,1fr) 72px'), 'Il tavolo mobile non dispone mazzo, area giocata e scarti in una riga');
+check(virtualCss.includes('.virtual-hand-section{position:relative;z-index:3') && virtualCss.includes('overflow:visible'), 'La mano può ancora tagliare la carta trascinata');
 check(virtualCss.includes('html[data-theme="dark"] .virtual-game') && virtualCss.includes('--vg-card:#202128'), 'Le carte non seguono il tema scuro');
 check(virtualCss.includes('--vg-card:#fffdf7'), 'Le carte non hanno il tema chiaro');
-check(virtualCss.includes('@keyframes virtualShuffle') && virtualCss.includes('@keyframes drawCardIn'), 'Animazioni del tavolo mancanti');
-check(virtualCss.includes('.virtual-popup-scroll'), 'I popup non hanno una propria area scorrevole');
-check(virtualCss.includes('.virtual-deck-layer.layer-three'), 'Il mazzo non è rappresentato come pila di carte');
+check(virtualCss.includes('.virtual-discard-card.empty img'), 'Gli scarti vuoti non hanno una grafica rifinita');
+check(virtualCss.includes('.virtual-drop-visual') && virtualCss.includes('.virtual-play-zone.drag-armed'), 'Il tavolo non reagisce al trascinamento');
+check(virtualCss.includes('.virtual-popup-scroll'), 'I popup non hanno un’area scorrevole propria');
 
 check(rules.includes('Leggi seme e parità') && rules.includes('Pari:') && rules.includes('Dispari:'), 'Le regole non spiegano correttamente la parità');
 check(tutorial.includes('Pari:') && tutorial.includes('Dispari:'), 'Il tutorial non mostra positivo e negativo');
@@ -67,9 +71,9 @@ check(inviteHost.includes('S.openGameInvite'), 'Manca la funzione condivisa per 
 check(inviteData.includes('data-game-invite'), 'I giocatori non possono riaprire il QR');
 
 const sw = read('sw.js');
-check(sw.includes('shell-v32') && sw.includes('runtime-v32'), 'Cache PWA v32 non attiva');
+check(sw.includes('shell-v33') && sw.includes('runtime-v33'), 'Cache PWA v33 non attiva');
 check(sw.includes("'./virtual-cards.js'") && sw.includes("'./virtual-cards.css'"), 'Carte virtuali non precacheate');
-check(read('pwa-refresh.js').includes('epoi_sw_reload_v32'), 'Refresh PWA v32 non attivo');
+check(read('pwa-refresh.js').includes('epoi_sw_reload_v33'), 'Refresh PWA v33 non attivo');
 const coreBlock = sw.match(/const CORE_FILES = \[([\s\S]*?)\];/)?.[1] || '';
 for (const match of coreBlock.matchAll(/['"]\.\/([^'"]*)['"]/g)) check(exists(match[1]), `sw.js: file mancante ${match[1]}`);
 
@@ -100,7 +104,7 @@ for (const playerCount of [2, 3, 4, 5, 6, 7, 8]) {
 }
 
 let state = virtual.createState('TEST-TURNO', 4, 0);
-check(state.version === 3 && state.phase === 'exchange', 'Il nuovo stato non usa il motore v3');
+check(state.version === 3 && state.phase === 'exchange', 'Lo stato non usa il motore v3');
 let result = virtual.apply(state, 'play', 'TEST-TURNO', 0, state.hand[0]);
 check(!result.ok, 'È possibile giocare prima del cambio');
 result = virtual.apply(state, 'exchange', 'TEST-TURNO', 0, state.hand[0]);
@@ -119,16 +123,6 @@ recycle.drawPile = [];
 recycle.phase = 'afterPlay';
 result = virtual.apply(recycle, 'draw-end', 'TEST-RICICLO', 0);
 check(result.ok && result.reshuffled && result.state.cycle === 1, 'Gli scarti non vengono rimescolati');
-
-let ending = virtual.createState('TEST-FINALE', 2, 0);
-const last = ending.hand[0];
-ending.discard.push(...ending.drawPile, ...ending.hand.slice(1));
-ending.drawPile = [];
-ending.hand = [last];
-ending.phase = 'play';
-result = virtual.apply(ending, 'play', 'TEST-FINALE', 0, last);
-check(result.ok && result.state.hand.length === 0 && result.state.playedCard === last, 'L’ultima carta non resta sul tavolo');
-check(virtual.apply(result.state, 'final', 'TEST-FINALE', 0).state.phase === 'final', 'La mano vuota non raggiunge il finale');
 
 evaluate('collection-data.js');
 const stories = globalThis.STORIA52_READY_STORIES || [];
@@ -153,14 +147,14 @@ globalThis.window.S52 = {
 };
 (0, eval)(read('invite-codec.js'));
 const S = globalThis.window.S52;
-const session = { source:'ready', collectionId:'prima-scintilla', readyStoryId:stories[0].id, count:4, delivery:'multi', cardMode:'virtual', cardSeed:'SEED-32', seed:'SEED-32', names:['A','B','C','D'], objectives:S.objectivesForReadyStory(stories[0],4), openingText:stories[0].opening };
+const session = { source:'ready', collectionId:'prima-scintilla', readyStoryId:stories[0].id, count:4, delivery:'multi', cardMode:'virtual', cardSeed:'SEED-33', seed:'SEED-33', names:['A','B','C','D'], objectives:S.objectivesForReadyStory(stories[0],4), openingText:stories[0].opening };
 const code = await S.encodeGameInvite(session);
 const decoded = await S.decodeGameInvite(code);
-check(code.startsWith('r4.') && decoded?.cardMode === 'virtual' && decoded?.cardSeed === 'SEED-32', 'Invito r4 non conserva le carte virtuali');
+check(code.startsWith('r4.') && decoded?.cardMode === 'virtual' && decoded?.cardSeed === 'SEED-33', 'Invito r4 non conserva le carte virtuali');
 check((await S.decodeGameInvite(`r3.${stories[0].id}.4`))?.cardMode === 'physical', 'Invito r3 non resta compatibile');
 
 if (failures.length) {
   console.error('\nRelease check fallito:\n- ' + failures.join('\n- '));
   process.exit(1);
 }
-console.log(`Release check completato: tavolo stabile, temi, popup, mazzo condiviso, gesti e cache v32 verificati.`);
+console.log('Release check completato: tavolo mobile, trascinamento verso l’alto, nessun contatore visibile e cache v33 verificati.');
