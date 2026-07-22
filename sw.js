@@ -1,14 +1,14 @@
 'use strict';
 
 const CACHE_PREFIX = 'epoi-';
-const SHELL_CACHE = `${CACHE_PREFIX}shell-v33`;
-const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v33`;
+const SHELL_CACHE = `${CACHE_PREFIX}shell-v34`;
+const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v34`;
 const CORE_FILES = [
   './', './index.html', './privacy.html', './copyright.html',
   './clean-app.css', './refine-flow.css', './home-product.css', './app-polish.css', './home-fixes.css',
   './tutorial-game.css', './interaction-polish.css', './invite-polish.css', './release-ready.css',
   './loading-skeleton.css', './ux-rework.css', './scroll-fix.css', './content-polish.css',
-  './collection-prima-scintilla.css', './public-release-polish.css', './virtual-cards.css', './release-polish.css',
+  './collection-prima-scintilla.css', './public-release-polish.css', './virtual-cards.css', './virtual-cards-mobile-v34.css', './release-polish.css',
   './app.js', './ui-core.js', './collection-data.js', './clean-core.js', './clean-rules.js',
   './virtual-cards.js', './clean-home.js', './content-polish.js', './public-release-fixes.js', './clean-config.js',
   './clean-stories-model.js',
