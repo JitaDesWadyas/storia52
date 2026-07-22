@@ -19,11 +19,15 @@ jobs:
           ref: agent/virtual-cards-mobile-polish-v2
           fetch-depth: 1
           show-progress: false
-      - name: Extract and apply patch
+      - name: Decode patch
+        shell: bash
+        run: awk '/PATCH64/{getline; print; exit}' .github/workflows/apply-virtual-v38.yml | base64 -d | gzip -d > scripts/apply-virtual-v38.py
+      - name: Apply patch
+        shell: bash
+        run: python scripts/apply-virtual-v38.py
+      - name: Verify patched files
         shell: bash
         run: |
-          awk '/PATCH64/{getline; print; exit}' .github/workflows/apply-virtual-v38.yml | base64 -d | gzip -d > scripts/apply-virtual-v38.py
-          python scripts/apply-virtual-v38.py
           node --check virtual-cards.js
           grep -q "Una relazione si incrina" virtual-cards.js
           grep -q "Trascina qui per cambiare" virtual-cards.js
