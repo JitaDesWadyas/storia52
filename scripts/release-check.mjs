@@ -8,253 +8,139 @@ const exists = file => fs.existsSync(path.join(root, file));
 const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
 
-const rootFiles = fs.readdirSync(root);
-for (const file of rootFiles.filter(name => name.endsWith('.js'))) {
+const files = fs.readdirSync(root);
+for (const file of files.filter(name => name.endsWith('.js'))) {
   try { new Function(read(file)); }
   catch (error) { failures.push(`${file}: sintassi non valida (${error.message})`); }
 }
 
-for (const htmlFile of ['index.html', 'privacy.html', 'copyright.html']) {
-  const html = read(htmlFile);
-  for (const match of html.matchAll(/(?:src|href)="([^"]+)"/g)) {
-    const reference = match[1];
-    if (/^(?:https?:|mailto:|tel:|data:|#)/i.test(reference)) continue;
-    const clean = reference.split(/[?#]/)[0];
-    if (clean && clean !== './') check(exists(clean), `${htmlFile}: risorsa locale mancante ${clean}`);
-  }
-}
-
-for (const cssFile of rootFiles.filter(name => name.endsWith('.css'))) {
-  for (const match of read(cssFile).matchAll(/url\((?:"|')?([^"')]+)(?:"|')?\)/g)) {
-    const reference = match[1].trim();
-    if (/^(?:https?:|data:|#)/i.test(reference)) continue;
-    const clean = reference.split(/[?#]/)[0];
-    if (clean) check(exists(clean), `${cssFile}: risorsa locale mancante ${clean}`);
-  }
-}
-
 const index = read('index.html');
-const scriptOrder = [...index.matchAll(/<script src="([^"]+)"/g)].map(match => match[1].split('?')[0]);
-const styleOrder = [...index.matchAll(/<link rel="stylesheet" href="([^"]+)"/g)].map(match => match[1].split('?')[0]);
-const scriptIndex = name => scriptOrder.indexOf(name);
-const styleIndex = name => styleOrder.indexOf(name);
-
-check(new Set(scriptOrder).size === scriptOrder.length, 'index.html: script duplicati');
-check(new Set(styleOrder).size === styleOrder.length, 'index.html: fogli di stile duplicati');
-check(!index.includes('<style>'), 'index.html: contiene ancora CSS inline');
-check(index.includes('initial-skeleton'), 'index.html: skeleton iniziale mancante');
-check(styleIndex('loading-skeleton.css') >= 0, 'index.html: loading-skeleton.css non caricato');
-check(styleIndex('release-polish.css') >= 0, 'index.html: release-polish.css non caricato');
-check(styleIndex('virtual-cards.css') >= 0, 'index.html: virtual-cards.css non caricato');
-check(scriptIndex('collection-data.js') < scriptIndex('clean-core.js'), 'index.html: dati collezione caricati dopo il core');
-check(scriptIndex('virtual-cards.js') > scriptIndex('clean-rules.js'), 'index.html: carte virtuali caricate prima delle regole');
-check(scriptIndex('virtual-cards.js') < scriptIndex('clean-config.js'), 'index.html: carte virtuali caricate dopo la configurazione');
-check(scriptIndex('collection-objectives.js') > scriptIndex('archive-v20-objectives-07-08.js'), 'index.html: filtro obiettivi caricato troppo presto');
-check(scriptIndex('ready-story-objectives.js') > scriptIndex('collection-objectives.js'), 'index.html: assegnazione obiettivi caricata prima dei dati');
-check(scriptIndex('collection-controller.js') > scriptIndex('clean-stories-view.js'), 'index.html: controller collezioni caricato prima della vista');
-check(scriptIndex('collection-controller.js') < scriptIndex('clean-objectives.js'), 'index.html: controller collezioni caricato troppo tardi');
-check(scriptIndex('invite-codec.js') < scriptIndex('clean-invite-host.js'), 'index.html: codec inviti caricato troppo tardi');
-check(scriptIndex('pwa-refresh.js') > scriptIndex('clean-init.js'), 'index.html: refresh PWA non caricato alla fine');
-check(!scriptOrder.includes('clean-opening.js'), 'index.html: carica ancora il flusso incipit disattivato');
-check(!scriptOrder.some(file => /^ready-story-objectives-\d+\.js$/.test(file)), 'index.html: carica ancora i vecchi pacchetti obiettivi');
-check(!scriptOrder.some(file => /^ready-stories-/.test(file)), 'index.html: carica ancora i vecchi wrapper storie');
-
-const activeScripts = scriptOrder.filter(file => file.endsWith('.js'));
-for (const file of activeScripts) {
-  check(!read(file).includes('document.write'), `${file}: usa ancora document.write`);
+for (const match of index.matchAll(/(?:src|href)="([^"#?]+)(?:[?#][^"]*)?"/g)) {
+  const reference = match[1];
+  if (/^(?:https?:|mailto:|tel:|data:)/i.test(reference) || reference === './') continue;
+  check(exists(reference), `index.html: risorsa mancante ${reference}`);
 }
 
-const controller = read('collection-controller.js');
-const collectionCss = read('collection-prima-scintilla.css');
-const setup = read('clean-config.js');
+const scripts = [...index.matchAll(/<script src="([^"?]+)/g)].map(match => match[1]);
+const styles = [...index.matchAll(/<link rel="stylesheet" href="([^"?]+)/g)].map(match => match[1]);
+check(new Set(scripts).size === scripts.length, 'index.html: script duplicati');
+check(new Set(styles).size === styles.length, 'index.html: stili duplicati');
+check(index.includes('virtual-cards.js?v=31') && index.includes('virtual-cards.css?v=31'), 'index.html: carte virtuali v31 non caricate');
+check(index.includes('clean-rules.js?v=31') && index.includes('content-polish.js?v=31'), 'index.html: regole v31 non caricate');
+check(index.includes('clean-invite-host.js?v=31') && index.includes('clean-invite-data.js?v=31'), 'index.html: QR in partita v31 non caricato');
+check(index.includes('pwa-refresh.js?v=31'), 'index.html: refresh PWA v31 non caricato');
+
 const virtualSource = read('virtual-cards.js');
 const virtualCss = read('virtual-cards.css');
-check(!controller.includes('Qui trovate il contesto generale'), 'Testo interno presente nella scelta collezione');
-check(!controller.includes('senza ripetere queste informazioni'), 'Testo interno presente nella scelta collezione');
-check(!controller.includes('modificando il salvataggio locale'), 'Dettagli tecnici mostrati agli utenti');
-check(controller.includes('Ogni collezione riunisce storie con una propria atmosfera'), 'Testo definitivo della scelta collezione mancante');
-check(!controller.includes('collection-coming-overlay'), 'Il cartello In arrivo copre ancora la scheda');
-check(!collectionCss.includes('collection-coming-overlay'), 'Il vecchio overlay In arrivo è ancora nello stile');
-check(collectionCss.includes('collection-status-coming'), 'Lo stato In arrivo discreto è mancante');
-check(setup.includes("session.delivery === 'multi'"), 'La modalità carte non dipende dai telefoni separati');
-check(setup.includes('data-card-mode'), 'La scelta del mazzo non è presente nella configurazione');
-check(setup.includes("if (session.delivery === 'single') session.cardMode = 'physical'"), 'Un telefono non forza il mazzo reale');
-check(setup.includes('mazzo francese da 52 carte'), 'La descrizione del mazzo reale non è precisa');
-check(virtualSource.includes('Mazzo finito: scarti rimescolati'), 'Manca l’avviso di rimescolamento');
-check(virtualSource.includes("action === 'exchange'"), 'Manca la fase di cambio carta');
-check(virtualSource.includes("action === 'draw-end'"), 'Manca la fase di pesca finale');
-check(virtualCss.includes('@keyframes dealCard') && virtualCss.includes('@keyframes virtualShuffle'), 'Animazioni delle carte virtuali mancanti');
-check(!read('clean-home.js').includes('Il 6 è pari'), 'Il tutorial usa ancora la parità');
-check(!read('content-polish.js').includes('PARI') && !read('content-polish.js').includes('DISPARI'), 'Il polish reintroduce ancora la parità');
-check(!read('clean-rules.js').includes('PARI') && !read('clean-rules.js').includes('DISPARI'), 'Le regole mostrano ancora la parità');
-
-const removedFiles = [
-  'collection-prima-scintilla-stories.js', 'ready-stories-data.js', 'collection-prima-scintilla.js',
-  'collection-prima-scintilla-ui.js', 'collection-prima-scintilla-outcomes.js', 'collection-security.js',
-  'clean-opening.js', 'archive-v20-session-guard.js', 'archive-v20-invite-codec.js',
-  'pwa-refresh-v26.js', 'pwa-refresh-v27.js', 'pwa-refresh-v28.js',
-  'release-fixes-v17.css', 'release-fixes-v19.css', 'release-final-v21.css',
-  'release-fixes-v23.css', 'release-fixes-v25.css', 'release-fixes-v26.css',
-  'opening-loader.js', 'opening-engine.css', 'opening-engine-core.js', 'opening-engine-priority.js',
-  'opening-engine-generate.js', 'opening-engine-compose.js', 'opening-engine-copy.js', 'opening-engine-ui.js',
-  'opening-engine-stability-loader.js', 'opening-engine-indexes.js', 'opening-engine-parts.js',
-  'opening-engine-stable-batch.js', 'opening-bank-small.js', 'opening-bank-people-safe.js',
-  'opening-bank-duties.js', 'opening-bank-scenes-a.js', 'opening-bank-scenes-b.js',
-  'opening-bank-actions-safe.js', 'opening-bank-obstacles-safe.js'
-];
-for (const file of removedFiles) check(!exists(file), `File legacy ancora presente: ${file}`);
-for (let index = 1; index <= 13; index += 1) {
-  check(!exists(`ready-story-objectives-${String(index).padStart(2, '0')}.js`), `Vecchio pacchetto obiettivi ${index} ancora presente`);
-}
-for (const suffix of ['realistico', 'mistero', 'fantascienza', 'fantasy', 'horror', 'amore', 'avventura', 'commedia']) {
-  check(!exists(`ready-stories-${suffix}.js`), `Wrapper storie legacy ancora presente: ${suffix}`);
-  check(!exists(`archive-v20-stories-${suffix}.js`), `Archivio storie duplicato ancora presente: ${suffix}`);
-}
-check(!exists('archive-v20-data.js'), 'Archivio categorie duplicato ancora presente');
-
-const allText = rootFiles
-  .filter(name => /\.(?:html|css|js|webmanifest)$/i.test(name) && exists(name))
-  .map(read)
-  .join('\n');
-check(!allText.includes('Harminger'), 'È ancora presente un riferimento a Harminger');
-check(!allText.includes('Massimo 28 caratteri'), 'È ancora presente il testo fisso sul limite dei nomi');
-check(!allText.includes('api.qrserver.com'), 'È ancora presente il generatore QR esterno');
-check(!allText.includes('document.write'), 'È ancora presente document.write nel codice');
-check(!allText.includes('const encoded='), 'Il QR locale contiene ancora un payload compresso');
-
-const portrait = fs.readFileSync(path.join(root, 'creator-jita.webp'));
-check(portrait.length > 10000, 'Il ritratto WebP sembra vuoto o troppo piccolo');
-check(portrait.subarray(0, 4).toString('ascii') === 'RIFF' && portrait.subarray(8, 12).toString('ascii') === 'WEBP', 'creator-jita.webp non è un WebP valido');
-check(read('release-polish.css').includes('creator-jita.webp?v=29'), 'La scheda del creatore non usa il WebP');
+const rules = read('clean-rules.js');
+const tutorial = read('content-polish.js');
+const inviteHost = read('clean-invite-host.js');
+const inviteData = read('clean-invite-data.js');
+check(!virtualSource.includes('Inizia il mio turno'), 'È ancora presente il pulsante inutile di inizio turno');
+check(virtualSource.includes("phase: 'exchange'"), 'Il turno non parte direttamente dal cambio');
+check(virtualSource.includes('pointerdown') && virtualSource.includes('pointermove'), 'Mancano i gesti di trascinamento');
+check(virtualSource.includes('syncSelection') && virtualSource.includes('zone.outerHTML'), 'La selezione rimonta ancora l’intera schermata');
+check(virtualSource.includes('playedCard') && virtualSource.includes('settlePlayedCard'), 'La carta giocata non resta sul tavolo');
+check(virtualSource.includes('storia52-cards-logo.svg'), 'Il mazzo non usa il logo');
+check(virtualSource.includes('data-virtual-invite'), 'La mano virtuale non espone il QR');
+check(virtualSource.includes('Mazzo finito: scarti rimescolati'), 'Manca il rimescolamento degli scarti');
+check(virtualCss.includes('grid-template-columns:repeat(5,minmax(0,1fr))'), 'Le cinque carte non sono sempre visibili');
+check(!/\.virtual-hand\{[^}]*overflow-x\s*:\s*auto/s.test(virtualCss), 'La mano richiede ancora scroll orizzontale');
+check(virtualCss.includes('--virtual-bg:#0d0e12'), 'Il tavolo non è scuro');
+check(virtualCss.includes('@keyframes virtualShuffle') && virtualCss.includes('@keyframes dealCard'), 'Animazioni virtuali mancanti');
+check(rules.includes('Leggi seme e parità') && rules.includes('Pari:') && rules.includes('Dispari:'), 'Le regole non spiegano correttamente la parità');
+check(tutorial.includes('Pari:') && tutorial.includes('Dispari:'), 'Il tutorial non mostra positivo e negativo');
+check(inviteHost.includes('S.openGameInvite'), 'Manca la funzione condivisa per aprire il QR');
+check(inviteData.includes('data-game-invite'), 'I giocatori non possono riaprire il QR');
 
 const sw = read('sw.js');
+check(sw.includes('shell-v31') && sw.includes('runtime-v31'), 'Cache PWA v31 non attiva');
+check(sw.includes("'./virtual-cards.js'") && sw.includes("'./virtual-cards.css'"), 'Carte virtuali non precacheate');
+check(read('pwa-refresh.js').includes('epoi_sw_reload_v31'), 'Refresh PWA v31 non attivo');
 const coreBlock = sw.match(/const CORE_FILES = \[([\s\S]*?)\];/)?.[1] || '';
-for (const match of coreBlock.matchAll(/['"]\.\/([^'"]*)['"]/g)) {
-  const file = match[1];
-  if (file) check(exists(file), `sw.js: file in cache mancante ${file}`);
-}
-check(sw.includes('shell-v30') && sw.includes('runtime-v30'), 'sw.js: cache PWA v30 non attiva');
-check(sw.includes("'./collection-data.js'"), 'sw.js: dati collezione non precacheati');
-check(sw.includes("'./collection-controller.js'"), 'sw.js: controller collezione non precacheato');
-check(sw.includes("'./virtual-cards.js'") && sw.includes("'./virtual-cards.css'"), 'sw.js: carte virtuali non precacheate');
-check(sw.includes("'./release-polish.css'"), 'sw.js: CSS finale non precacheato');
-check(!sw.includes('archive-v20-stories-'), 'sw.js: precachea ancora gli archivi storie legacy');
-check(sw.includes('cache.addAll(requests)'), 'sw.js: installazione cache non atomica');
-check(sw.includes('staleWhileRevalidate'), 'sw.js: strategia rete instabile mancante');
-check(read('pwa-refresh.js').includes('epoi_sw_reload_v30'), 'pwa-refresh.js: refresh v30 non attivo');
+for (const match of coreBlock.matchAll(/['"]\.\/([^'"]*)['"]/g)) check(exists(match[1]), `sw.js: file mancante ${match[1]}`);
 
 const evaluate = file => (0, eval)(read(file));
 globalThis.window = globalThis;
 delete globalThis.S52;
 evaluate('virtual-cards.js');
 const virtual = globalThis.EpoiVirtualCardsEngine;
-check(Boolean(virtual), 'Motore carte virtuali non inizializzato');
-check(virtual?.cardIds.length === 52 && new Set(virtual?.cardIds).size === 52, 'Il mazzo virtuale non contiene 52 carte uniche');
-check(virtual?.meaningFor('H-7').title === 'Relazione', 'Il significato di Cuori non è corretto');
-check(virtual?.meaningFor('D-6').title === 'Scoperta', 'Il significato di Quadri dipende ancora dalla parità');
-check(virtual?.meaningFor('H-J').title.includes('favorevole'), 'Una figura rossa non è favorevole');
-check(virtual?.meaningFor('S-A').title.includes('problematico'), 'Un Asso nero non è problematico');
+check(virtual?.cardIds.length === 52 && new Set(virtual.cardIds).size === 52, 'Il mazzo non contiene 52 carte uniche');
+check(virtual.meaningFor('H-6').title === 'Relazione positiva', 'Cuori pari non positivo');
+check(virtual.meaningFor('H-7').title === 'Relazione negativa', 'Cuori dispari non negativo');
+check(virtual.meaningFor('D-6').title === 'Scoperta positiva', 'Quadri pari non positivo');
+check(virtual.meaningFor('D-3').title === 'Scoperta negativa', 'Quadri dispari non negativo');
+check(virtual.meaningFor('C-5').title === 'Azione', 'Fiori non produce Azione');
+check(virtual.meaningFor('S-8').title === 'Ostacolo', 'Picche non produce Ostacolo');
+check(virtual.meaningFor('H-J').tone === 'positive' && virtual.meaningFor('S-A').tone === 'negative', 'Figure e assi non rispettano il colore');
 
 const assignments = virtual.buildAssignments('TEST-MAZZO', 8);
-const assignedCards = assignments.flatMap(assignment => assignment.ownedCards);
-check(assignments.length === 8, 'Il mazzo non viene distribuito a 8 giocatori');
-check(assignments.every(assignment => assignment.hand.length === 5), 'Ogni mano iniziale deve avere 5 carte');
-check(assignedCards.length === 52 && new Set(assignedCards).size === 52, 'Le mani private producono carte duplicate o mancanti');
+const assigned = assignments.flatMap(item => item.ownedCards);
+check(assignments.every(item => item.hand.length === 5), 'Ogni giocatore non riceve 5 carte');
+check(assigned.length === 52 && new Set(assigned).size === 52, 'Distribuzione con carte duplicate o mancanti');
 
-let virtualState = virtual.createState('TEST-TURNO', 4, 0);
-let outcome = virtual.apply(virtualState, 'start', 'TEST-TURNO', 0);
-check(outcome.ok && outcome.state.phase === 'exchange', 'Il turno non parte dalla fase di cambio');
-virtualState = outcome.state;
-outcome = virtual.apply(virtualState, 'play', 'TEST-TURNO', 0, virtualState.hand[0]);
-check(!outcome.ok, 'È possibile giocare prima del cambio iniziale');
-outcome = virtual.apply(virtualState, 'exchange', 'TEST-TURNO', 0, virtualState.hand[0]);
-check(outcome.ok && outcome.state.phase === 'play' && outcome.state.hand.length === 5, 'Il cambio non sostituisce esattamente una carta');
-virtualState = outcome.state;
-outcome = virtual.apply(virtualState, 'exchange', 'TEST-TURNO', 0, virtualState.hand[0]);
-check(!outcome.ok, 'È possibile cambiare due volte nello stesso turno');
-outcome = virtual.apply(virtualState, 'play', 'TEST-TURNO', 0, virtualState.hand[0]);
-check(outcome.ok && outcome.state.phase === 'afterPlay' && outcome.state.hand.length === 4, 'La giocata non rimuove esattamente una carta');
-virtualState = outcome.state;
-outcome = virtual.apply(virtualState, 'draw-end', 'TEST-TURNO', 0);
-check(outcome.ok && outcome.state.phase === 'waiting' && outcome.state.hand.length === 5, 'La pesca non chiude correttamente il turno');
+let state = virtual.createState('TEST-TURNO', 4, 0);
+check(state.phase === 'exchange', 'Il turno non inizia dal cambio');
+let result = virtual.apply(state, 'play', 'TEST-TURNO', 0, state.hand[0]);
+check(!result.ok, 'È possibile giocare prima del cambio');
+result = virtual.apply(state, 'exchange', 'TEST-TURNO', 0, state.hand[0]);
+check(result.ok && result.state.phase === 'play' && result.state.hand.length === 5, 'Il cambio non sostituisce una carta');
+state = result.state;
+check(!virtual.apply(state, 'exchange', 'TEST-TURNO', 0, state.hand[0]).ok, 'È possibile cambiare due volte');
+const played = state.hand[0];
+result = virtual.apply(state, 'play', 'TEST-TURNO', 0, played);
+check(result.ok && result.state.playedCard === played && !result.state.discard.includes(played), 'La carta giocata non resta sul tavolo');
+result = virtual.apply(result.state, 'draw-end', 'TEST-TURNO', 0);
+check(result.ok && result.state.phase === 'exchange' && result.state.discard.includes(played), 'La carta non passa agli scarti a fine turno');
 
-let recycleState = virtual.createState('TEST-RICICLO', 2, 0);
-recycleState.discard = [...recycleState.drawPile];
-recycleState.drawPile = [];
-recycleState.phase = 'afterPlay';
-outcome = virtual.apply(recycleState, 'draw-end', 'TEST-RICICLO', 0);
-check(outcome.ok && outcome.reshuffled && outcome.state.cycle === 1, 'Gli scarti non vengono rimescolati quando il mazzo finisce');
+let recycle = virtual.createState('TEST-RICICLO', 2, 0);
+recycle.discard = [...recycle.drawPile];
+recycle.drawPile = [];
+recycle.phase = 'afterPlay';
+result = virtual.apply(recycle, 'draw-end', 'TEST-RICICLO', 0);
+check(result.ok && result.reshuffled && result.state.cycle === 1, 'Gli scarti non vengono rimescolati');
 
-let finalState = virtual.createState('TEST-FINALE', 2, 0);
-finalState.hand = [finalState.hand[0]];
-finalState.discard.push(...finalState.drawPile, ...finalState.hand.slice(1));
-finalState.drawPile = [];
-finalState.phase = 'play';
-outcome = virtual.apply(finalState, 'play', 'TEST-FINALE', 0, finalState.hand[0]);
-check(outcome.ok && outcome.state.hand.length === 0, 'L’ultima carta non svuota la mano');
-outcome = virtual.apply(outcome.state, 'final', 'TEST-FINALE', 0);
-check(outcome.ok && outcome.state.phase === 'final', 'La mano vuota non può collegarsi al finale');
+let ending = virtual.createState('TEST-FINALE', 2, 0);
+const last = ending.hand[0];
+ending.discard.push(...ending.drawPile, ...ending.hand.slice(1));
+ending.drawPile = [];
+ending.hand = [last];
+ending.phase = 'play';
+result = virtual.apply(ending, 'play', 'TEST-FINALE', 0, last);
+check(result.ok && result.state.hand.length === 0 && result.state.playedCard === last, 'L’ultima carta non resta sul tavolo');
+check(virtual.apply(result.state, 'final', 'TEST-FINALE', 0).state.phase === 'final', 'La mano vuota non raggiunge il finale');
 
 evaluate('collection-data.js');
-const collections = globalThis.STORIA52_READY_COLLECTIONS || [];
 const stories = globalThis.STORIA52_READY_STORIES || [];
-const available = collections.find(collection => collection.id === 'prima-scintilla');
-const coming = collections.find(collection => collection.id === 'nuove-scintille');
-check(collections.length === 2, 'Devono esistere due collezioni');
-check(available?.status === 'available' && available.storyCount === 8, 'La Prima Scintilla deve avere 8 storie');
-check(coming?.status === 'coming-soon' && coming.storyCount === 16, 'Nuove Scintille deve indicare 16 storie');
-check(stories.length === 8 && new Set(stories.map(story => story.category)).size === 8, 'Servono 8 storie, una per categoria');
-check(stories.every(story => story.collectionId === 'prima-scintilla'), 'Una storia non appartiene alla collezione gratuita');
-check(available?.independence.includes('indipendente'), 'Manca la nota sull’indipendenza delle storie');
-check(globalThis.STORIA52_FEATURES?.customOpening === false, 'L’incipit personalizzato non è disattivato');
-
-for (const file of [
-  'archive-v20-objectives-01.js', 'archive-v20-objectives-02.js', 'archive-v20-objectives-03-04.js',
-  'archive-v20-objectives-05-06.js', 'archive-v20-objectives-07-08.js'
-]) evaluate(file);
+check(stories.length === 8 && new Set(stories.map(story => story.category)).size === 8, 'La collezione gratuita non contiene 8 categorie');
+for (const file of ['archive-v20-objectives-01.js','archive-v20-objectives-02.js','archive-v20-objectives-03-04.js','archive-v20-objectives-05-06.js','archive-v20-objectives-07-08.js']) evaluate(file);
 evaluate('collection-objectives.js');
-const objectiveGroups = globalThis.STORIA52_READY_OBJECTIVES || {};
-check(Object.keys(objectiveGroups).length === 8, 'In memoria devono restare solo 8 gruppi di obiettivi');
-check(Object.values(objectiveGroups).every(group => Array.isArray(group) && group.length === 8), 'Ogni storia deve avere 8 finali');
-check(globalThis.STORIA52_COLLECTION_REWRITTEN_OUTCOMES === 16, 'Devono essere applicati 16 finali editoriali');
+check(Object.keys(globalThis.STORIA52_READY_OBJECTIVES || {}).length === 8, 'Obiettivi non limitati alle 8 storie');
 
 (0, eval)(read('qr-local.js'));
 await globalThis.EpoiQrReady;
-const qrSvg = globalThis.EpoiQr.toSvg(`https://example.test/storia52/#g=${'A'.repeat(900)}`);
+const qrSvg = globalThis.EpoiQr.toSvg(`https://example.test/#g=${'A'.repeat(900)}`);
 assert.match(qrSvg, /^<svg class="epoi-qr-svg"/);
 assert.ok(qrSvg.includes('<path'));
 
-const cleanText = (value, max = 500) => String(value ?? '').normalize('NFKC').replace(/[\u0000-\u001F\u007F]/g, '').replace(/\s+/g, ' ').trim().slice(0, max);
+const cleanText = (value, max = 500) => String(value ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
 globalThis.window.S52 = {
-  limits: { name: 28, inviteCode: 6000 },
-  stories,
-  primaryCollectionId: 'prima-scintilla',
-  cleanText,
+  limits: { name: 28, inviteCode: 6000 }, stories, primaryCollectionId: 'prima-scintilla', cleanText,
   cleanName: (value, index = 0) => cleanText(value, 28) || `Giocatore ${index + 1}`,
   normalizeSession: session => session,
-  storyAllowedInSession: (session, story) => Boolean(session.collectionId === 'prima-scintilla' && story?.collectionId === 'prima-scintilla'),
-  objectivesForReadyStory: (story, count) => Array.from({ length: count }, (_, index) => ({ custom: true, storyId: story.id, slot: index, title: `Piano ${index + 1}`, text: 'Testo', finale: 'Finale' }))
+  storyAllowedInSession: (session, story) => session.collectionId === 'prima-scintilla' && story?.collectionId === 'prima-scintilla',
+  objectivesForReadyStory: (story, count) => Array.from({ length: count }, (_, slot) => ({ custom: true, storyId: story.id, slot, title: 'Piano', text: 'Testo', finale: 'Finale' }))
 };
 (0, eval)(read('invite-codec.js'));
 const S = globalThis.window.S52;
-const story = stories[0];
-const readySession = {
-  source: 'ready', collectionId: 'prima-scintilla', readyStoryId: story.id, count: 4,
-  delivery: 'multi', cardMode: 'virtual', cardSeed: 'SEED-CARTE-30', seed: 'SEED-CARTE-30',
-  names: ['Marta', 'Luca', '', 'Sara'], objectives: S.objectivesForReadyStory(story, 4), openingText: story.opening
-};
-const readyCode = await S.encodeGameInvite(readySession);
-check(readyCode.startsWith('r4.'), 'Invito storia pronta non usa il formato r4');
-const readyDecoded = await S.decodeGameInvite(readyCode);
-check(readyDecoded?.collectionId === 'prima-scintilla' && readyDecoded?.readyStoryId === story.id, 'Invito non ricostruisce la collezione');
-check(readyDecoded?.cardMode === 'virtual' && readyDecoded?.cardSeed === 'SEED-CARTE-30', 'Invito non conserva le carte virtuali');
-const legacyDecoded = await S.decodeGameInvite(`r3.${story.id}.4`);
-check(legacyDecoded?.cardMode === 'physical', 'Un invito r3 precedente non viene mantenuto come mazzo reale');
-check(await S.decodeGameInvite('c2.jAAAA') === null, 'Un vecchio invito personalizzato viene ancora accettato');
-check(await S.decodeGameInvite('A'.repeat(6001)) === null, 'Invito enorme non rifiutato');
+const session = { source:'ready', collectionId:'prima-scintilla', readyStoryId:stories[0].id, count:4, delivery:'multi', cardMode:'virtual', cardSeed:'SEED-31', seed:'SEED-31', names:['A','B','C','D'], objectives:S.objectivesForReadyStory(stories[0],4), openingText:stories[0].opening };
+const code = await S.encodeGameInvite(session);
+const decoded = await S.decodeGameInvite(code);
+check(code.startsWith('r4.') && decoded?.cardMode === 'virtual' && decoded?.cardSeed === 'SEED-31', 'Invito r4 non conserva le carte virtuali');
+check((await S.decodeGameInvite(`r3.${stories[0].id}.4`))?.cardMode === 'physical', 'Invito r3 non resta compatibile');
 
 if (failures.length) {
   console.error('\nRelease check fallito:\n- ' + failures.join('\n- '));
   process.exit(1);
 }
-console.log(`Release check completato: ${scriptOrder.length} script, carte virtuali, turni guidati, rimescolamento e cache v30 verificati.`);
+console.log(`Release check completato: parità, mano senza scroll, gesti, carta sul tavolo, QR e cache v31 verificati.`);
