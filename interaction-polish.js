@@ -44,6 +44,7 @@
         { height: `${targetHeight}px`, opacity: 1, transform: 'translateY(0)' }
       ], { duration, easing: 'cubic-bezier(.16,.72,.18,1)', fill: 'both' });
       await animation.finished.catch(() => {});
+      animation.cancel();
       body.style.height = 'auto';
       body.style.opacity = '1';
       body.style.transform = '';
@@ -73,6 +74,7 @@
       { height: '0px', opacity: 0, transform: 'translateY(-8px)' }
     ], { duration, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'both' });
     await animation.finished.catch(() => {});
+    animation.cancel();
     body.style.height = '0px';
     body.style.opacity = '0';
     body.style.transform = '';
@@ -168,6 +170,22 @@
     };
   }
 
+  const clearPreviousVirtualDrag = event => {
+    if (!(event.target instanceof Element)) return;
+    const slot = event.target.closest('.virtual-card-slot[data-virtual-card]');
+    const root = slot?.closest('[data-virtual-root]');
+    if (!root) return;
+    const overlay = root.querySelector('[data-drag-overlay]');
+    const ghosts = overlay ? [...overlay.querySelectorAll('.virtual-drag-ghost')] : [];
+    const sources = [...root.querySelectorAll('.virtual-card-slot.is-drag-source')];
+    if (!ghosts.length && !sources.length) return;
+    ghosts.forEach(ghost => ghost.remove());
+    sources.forEach(source => source.classList.remove('is-drag-source'));
+    root.querySelector('[data-card-focus]')?.classList.remove('drag-armed');
+    root.querySelectorAll('.drag-preview').forEach(button => button.classList.remove('drag-preview'));
+  };
+
+  document.addEventListener('pointerdown', clearPreviousVirtualDrag, { capture: true, passive: true });
   document.addEventListener('dragstart', event => {
     if (event.target instanceof HTMLImageElement) event.preventDefault();
   });
