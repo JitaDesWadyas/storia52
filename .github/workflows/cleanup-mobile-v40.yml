@@ -1,0 +1,27 @@
+name: Cleanup mobile v40 artifacts
+
+on:
+  pull_request:
+    types: [synchronize]
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    if: github.head_ref == 'agent/virtual-cards-mobile-layout-v40'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Remove test dependencies and screenshots
+        run: |
+          rm -rf node_modules v40-screenshots
+          rm -f .github/workflows/cleanup-mobile-v40.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: rimuove artefatti Playwright dal branch"
+          git push origin HEAD:${{ github.head_ref }}
