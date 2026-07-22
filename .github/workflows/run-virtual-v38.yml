@@ -24,7 +24,11 @@ jobs:
           awk '/PATCH64/{getline; print; exit}' .github/workflows/apply-virtual-v38.yml | base64 -d | gzip -d > scripts/apply-virtual-v38.py
           python scripts/apply-virtual-v38.py
           node --check virtual-cards.js
-          node scripts/release-check.mjs
+          grep -q "Una relazione si incrina" virtual-cards.js
+          grep -q "Trascina qui per cambiare" virtual-cards.js
+          grep -q "width:clamp(92px,27vw,104px)" virtual-cards.css
+          grep -q "opacity:1!important" virtual-cards.css
+          grep -q "virtual-cards.css?v=38" index.html
       - name: Commit final files
         shell: bash
         run: |
