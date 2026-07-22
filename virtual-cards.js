@@ -320,20 +320,16 @@
         <li data-rail-step="1"><span>2</span><b>Gioca</b></li>
         <li data-rail-step="2"><span>3</span><b>Chiudi</b></li>
       </ol>
-      <div class="virtual-phase-callout" data-phase-callout>
-        <b data-phase-title>CAMBIA UNA CARTA</b>
-        <span data-phase-help>Tocca per selezionarla oppure trascinala sul tavolo.</span>
-      </div>
       <section class="virtual-table">
-        <section class="virtual-story-stage">
+        <button type="button" class="virtual-story-stage" data-open-story aria-label="Apri la storia completa">
           <span class="virtual-story-icon" aria-hidden="true">${S.esc(category.symbol || '✦')}</span>
           <div class="virtual-story-copy">
             <p>${S.esc(category.label || 'Storia')}</p>
             <h3>${S.esc(story.title || 'La storia di questa partita')}</h3>
-            <small>${S.esc(shortText(opening))}</small>
+            <small>${S.esc(shortText(opening, 340))}</small>
           </div>
           <div class="virtual-party" aria-label="Giocatori">${partyMarkup(session, playerIndex)}</div>
-        </section>
+        </button>
         <div class="virtual-table-board">
           <button type="button" class="virtual-deck-card" data-virtual-deck aria-label="Mazzo">
             <span class="virtual-deck-layer"></span><span class="virtual-deck-layer"></span><span class="virtual-deck-layer"></span>
@@ -346,6 +342,10 @@
           </article>
         </div>
       </section>
+      <div class="virtual-phase-callout" data-phase-callout>
+        <b data-phase-title>CAMBIA UNA CARTA</b>
+        <span data-phase-help>Tocca per selezionarla oppure trascinala sul tavolo.</span>
+      </div>
       <section class="virtual-hand-section">
         <div class="virtual-hand-heading">
           <span>LA TUA MANO</span>
@@ -426,7 +426,8 @@
       overlay: root.querySelector('[data-drag-overlay]'),
       confetti: root.querySelector('[data-confetti]'),
       toggleCards: root.querySelector('[data-toggle-cards]'),
-      handCover: root.querySelector('[data-hand-cover]')
+      handCover: root.querySelector('[data-hand-cover]'),
+      storyStage: root.querySelector('[data-open-story]')
     };
 
     const cardElement = id => refs.slots.find(slot => slot.dataset.virtualCard === id) || null;
@@ -449,10 +450,11 @@
       refs.tableCard.hidden = !id;
       refs.focusPlaceholder.hidden = Boolean(id);
 
+      refs.focusLabel.hidden = !id && state.phase !== 'completed';
       if (state.phase === 'completed') refs.focusLabel.textContent = 'Finale accettato';
       else if (played) refs.focusLabel.textContent = 'Carta giocata';
       else if (id) refs.focusLabel.textContent = 'Carta scartata';
-      else refs.focusLabel.textContent = state.phase === 'exchange' ? 'Trascina qui per cambiare' : 'Trascina qui per giocare';
+      else refs.focusLabel.textContent = '';
       if (refs.focusHelp) refs.focusHelp.textContent = state.phase === 'exchange' ? 'Carta da cambiare' : 'Carta da giocare';
 
       refs.tableCard.className = 'virtual-table-card';
@@ -474,15 +476,21 @@
           slot.removeAttribute('aria-label');
           return;
         }
-        slot.classList.add(...cardClasses(id).split(' '));
-        if (id === selectedId) slot.classList.add('selected');
         const card = engine.cardFromId(id);
         const meaning = engine.meaningFor(id);
+        if (cardsHidden) {
+          slot.classList.add('card-back');
+          slot.innerHTML = '<span class="virtual-card-back-mark"><img src="storia52-cards-logo.svg" alt=""><small>E POI?</small></span>';
+          slot.setAttribute('aria-label', 'Carta coperta');
+          return;
+        }
+        slot.classList.add(...cardClasses(id).split(' '));
+        if (id === selectedId) slot.classList.add('selected');
         slot.innerHTML = cardFaceMarkup(id);
         slot.setAttribute('aria-label', `${card.rank} di ${card.name}. ${meaning.title}. ${meaning.text}`);
       });
       root.classList.toggle('cards-hidden', cardsHidden);
-      refs.handCover.hidden = !cardsHidden;
+      refs.handCover.hidden = true;
       refs.toggleCards.textContent = cardsHidden ? 'Mostra' : 'Nascondi';
       refs.toggleCards.setAttribute('aria-pressed', String(cardsHidden));
     };
@@ -800,6 +808,7 @@
       cardsHidden = false;
       update();
     });
+    refs.storyStage.addEventListener('click', () => openStoryPopup(session));
     root.querySelector('[data-virtual-menu]').addEventListener('click', () => openMenu(session, playerIndex, {
       invite: async () => {
         try { await S.openGameInvite(session); }

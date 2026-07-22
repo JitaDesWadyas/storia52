@@ -2,7 +2,8 @@
 
 (() => {
   if (!('serviceWorker' in navigator)) return;
-  const reloadKey = 'epoi_sw_reload_v38';
+  // La v39 forza il passaggio al tavolo compatto con mano singola e retri delle carte.
+  const reloadKey = 'epoi_sw_reload_v39';
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     try {
       if (sessionStorage.getItem(reloadKey) === '1') return;
