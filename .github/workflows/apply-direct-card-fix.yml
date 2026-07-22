@@ -1,0 +1,51 @@
+name: Apply direct selected card fix
+
+on:
+  pull_request:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  apply:
+    if: github.head_ref == 'agent/direct-card-drag-rules-fix'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Apply and verify
+        run: |
+          python3 .github/scripts/apply-card-drag-fix.py
+          python3 .github/scripts/apply-card-rules-cache-fix.py
+          node --check virtual-cards.js
+          node --check clean-rules.js
+          node --check interaction-polish.js
+          node scripts/release-check.mjs
+          grep -q "ghost.classList.remove('selected'" virtual-cards.js
+          grep -q "distance >= 76" virtual-cards.js
+          grep -q "Solo J, Q, K e A" clean-rules.js
+          ! grep -q '<summary>Positivo e negativo</summary>' clean-rules.js
+
+      - name: Commit directly to main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          rm .github/workflows/apply-direct-card-fix.yml
+          rm .github/scripts/apply-card-drag-fix.py
+          rm .github/scripts/apply-card-rules-cache-fix.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          base="$(git merge-base HEAD origin/main)"
+          git reset --soft "$base"
+          git commit -m "Fix selected card drag and figure color rules"
+          git push origin HEAD:main
+          gh api -X PATCH "repos/${{ github.repository }}/pulls/${PR_NUMBER}" -f state=closed >/dev/null
+          git push origin --delete "$HEAD_REF"
