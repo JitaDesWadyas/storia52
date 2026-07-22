@@ -23,7 +23,16 @@
   const personalInviteMarkup = (session, index) => {
     const objectiveButton = session.confirmed?.[index] ? 'Obiettivo letto · Riapri' : 'Mostra il mio obiettivo';
     const changePlayer = session.count > 1 ? '<button type="button" class="text-button" data-change-player>Cambia giocatore</button>' : '';
-    return `<section class="surface"><div class="screen-heading"><p class="eyebrow">${S.esc(S.playerName(session, index))}</p><h2>La storia e il tuo obiettivo.</h2><p>Apri la carta soltanto quando gli altri non stanno guardando.</p></div>${copyableStoryContext(session)}<div class="actions one"><button type="button" class="primary" data-show-card>${objectiveButton}</button>${changePlayer}</div>${S.turnGuideMarkup()}<details class="accordion"><summary>Significato delle carte</summary><div class="accordion-body">${S.cardRulesMarkup()}</div></details><details class="accordion"><summary>Come si chiude la storia</summary><div class="accordion-body">${S.finalRulesMarkup()}</div></details>${scrollTopButton()}</section>`;
+    return `<section class="surface"><div class="screen-heading game-heading-with-action"><div><p class="eyebrow">${S.esc(S.playerName(session, index))}</p><h2>La storia e il tuo obiettivo.</h2><p>Apri la carta soltanto quando gli altri non stanno guardando.</p></div><button type="button" class="secondary compact" data-game-invite>QR invito</button></div>${copyableStoryContext(session)}<div class="actions one"><button type="button" class="primary" data-show-card>${objectiveButton}</button>${changePlayer}</div>${S.turnGuideMarkup()}<details class="accordion"><summary>Significato delle carte</summary><div class="accordion-body">${S.cardRulesMarkup()}</div></details><details class="accordion"><summary>Come si chiude la storia</summary><div class="accordion-body">${S.finalRulesMarkup()}</div></details>${scrollTopButton()}</section>`;
+  };
+
+  const bindInviteButton = session => {
+    S.play.querySelectorAll('[data-game-invite]').forEach(button => button.addEventListener('click', async () => {
+      button.disabled = true;
+      try { await S.openGameInvite(session); }
+      catch (error) { S.toast(error?.message || 'Invito non disponibile.'); }
+      finally { button.disabled = false; }
+    }));
   };
 
   S.renderSharedPlayer = (session, index) => {
@@ -40,6 +49,7 @@
     S.mount(personalInviteMarkup(session, index), { session: true, preserveHash: true });
     S.play.querySelector('[data-show-card]')?.addEventListener('click', () => S.openObjective(session, index, true));
     S.play.querySelector('[data-change-player]')?.addEventListener('click', () => S.renderSharedInvitePicker(session));
+    bindInviteButton(session);
 
     const opening = S.play.querySelector('[data-copy-opening]');
     const copyOpening = () => S.copy(S.storyText(session), 'Incipit copiato');
@@ -70,10 +80,11 @@
   S.renderSharedInvitePicker = session => {
     const modeBadge = session.cardMode === 'virtual' ? '<span class="join-mode-badge">CARTE VIRTUALI</span>' : '';
     const players = session.names.map((_, index) => `<button type="button" class="player-button" data-join-player="${index}"><span>${index + 1}</span><div><b>${S.esc(S.playerName(session, index))}</b><small>${session.cardMode === 'virtual' ? 'Apri obiettivo e mano privata' : 'Apri il tuo invito personale'}</small></div><i>→</i></button>`).join('');
-    S.mount(`<section class="surface join-surface"><div class="screen-heading"><p class="eyebrow">INVITO ALLA PARTITA</p><h2>Scegli il tuo giocatore.</h2><p>Tutti aprono lo stesso link. Seleziona soltanto il tuo nome: obiettivo${session.cardMode === 'virtual' ? ' e carte' : ''} restano privati.</p>${modeBadge}</div>${S.storyContextMarkup(session)}<div class="join-player-list">${players}</div><div class="privacy-inline"><span aria-hidden="true">i</span><p>I nomi servono solo per distinguere i giocatori. Non è necessario inserire nome e cognome reali.</p></div></section>`, { session: true, preserveHash: true });
+    S.mount(`<section class="surface join-surface"><div class="screen-heading game-heading-with-action"><div><p class="eyebrow">INVITO ALLA PARTITA</p><h2>Scegli il tuo giocatore.</h2><p>Tutti aprono lo stesso link. Seleziona soltanto il tuo nome: obiettivo${session.cardMode === 'virtual' ? ' e carte' : ''} restano privati.</p>${modeBadge}</div><button type="button" class="secondary compact" data-game-invite>Mostra QR</button></div>${S.storyContextMarkup(session)}<div class="join-player-list">${players}</div><div class="privacy-inline"><span aria-hidden="true">i</span><p>I nomi servono solo per distinguere i giocatori. Non è necessario inserire nome e cognome reali.</p></div></section>`, { session: true, preserveHash: true });
     S.play.querySelectorAll('[data-join-player]').forEach(button => button.addEventListener('click', () => {
       confirmPlayer(session, Number(button.dataset.joinPlayer));
     }));
+    bindInviteButton(session);
   };
 
   S.renderInviteFromUrl = async () => {
