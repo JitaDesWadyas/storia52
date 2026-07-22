@@ -2,12 +2,12 @@
 
 (() => {
   if (!('serviceWorker' in navigator)) return;
-  const reloadKey = 'epoi_sw_reload_v36';
+  const reloadKey = 'epoi_sw_reload_v38';
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     try {
       if (sessionStorage.getItem(reloadKey) === '1') return;
       sessionStorage.setItem(reloadKey, '1');
-    } catch {}
+    } catch { /* Il refresh funziona anche senza sessionStorage. */ }
     location.reload();
   });
   window.addEventListener('pageshow', () => {

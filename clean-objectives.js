@@ -27,9 +27,11 @@
     const card = host.querySelector('.modal-card');
     card.classList.add('objective-modal-card');
 
+    // Durante una partita la schermata dietro il popup non deve essere rimontata:
+    // il vecchio refresh sostituiva il tavolo virtuale con la pagina generale e faceva riapparire l'header.
     const refreshSource = () => {
-      if (duringGame) S.renderSharedPlayer?.(session, index);
-      else S.renderObjectives(session, false);
+      if (duringGame) return;
+      S.renderObjectives(session, false);
     };
 
     const finish = (forceRefresh = false) => {
@@ -40,7 +42,7 @@
       const changed = !wasConfirmed && Boolean(session.confirmed[index]);
       if (changed) S.save(session);
       close();
-      if (changed || forceRefresh) setTimeout(refreshSource, 160);
+      if (!duringGame && (changed || forceRefresh)) setTimeout(refreshSource, 160);
     };
 
     host.addEventListener('click', event => {
@@ -63,5 +65,4 @@
     };
     draw();
   };
-
 })();
