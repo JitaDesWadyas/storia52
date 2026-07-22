@@ -61,9 +61,10 @@ html body.virtual-table-active .rulebook{
   --vg-shadow:0 8px 18px rgba(45,31,16,.15);
   position:fixed!important;
   inset:0!important;
-  display:flex!important;
-  flex-direction:column!important;
-  gap:5px!important;
+  box-sizing:border-box!important;
+  display:grid!important;
+  grid-template-rows:auto auto minmax(0,1fr) auto auto auto!important;
+  gap:6px!important;
   width:100%!important;
   height:100vh!important;
   height:100dvh!important;
@@ -99,16 +100,16 @@ html[data-theme="dark"] .virtual-game{
   display:grid!important;
   grid-template-columns:minmax(0,1fr) auto!important;
   align-items:center!important;
-  gap:8px!important;
-  min-height:48px!important
+  gap:10px!important;
+  min-height:54px!important
 }
 .virtual-player-title{display:flex!important;align-items:center!important;gap:8px!important;min-width:0!important}
-.virtual-player-title img{width:36px!important;height:36px!important;flex:0 0 36px!important}
+.virtual-player-title img{width:42px!important;height:42px!important;flex:0 0 42px!important}
 .virtual-player-copy{min-width:0!important}
 .virtual-player-copy p,.virtual-player-copy h2{margin:0!important}
 .virtual-player-copy p{
   color:var(--vg-muted)!important;
-  font-size:.7rem!important;
+  font-size:.78rem!important;
   font-weight:900!important;
   white-space:nowrap!important;
   overflow:hidden!important;
@@ -116,7 +117,7 @@ html[data-theme="dark"] .virtual-game{
 }
 .virtual-player-copy h2{
   margin-top:2px!important;
-  font:850 1.12rem/1.05 Georgia,serif!important;
+  font:850 1.3rem/1.03 Georgia,serif!important;
   letter-spacing:-.015em!important;
   white-space:nowrap!important
 }
@@ -126,10 +127,10 @@ html[data-theme="dark"] .virtual-game{
 .virtual-icon-button{
   display:grid!important;
   place-items:center!important;
-  width:42px!important;
-  height:42px!important;
-  min-width:42px!important;
-  min-height:42px!important;
+  width:46px!important;
+  height:46px!important;
+  min-width:46px!important;
+  min-height:46px!important;
   padding:0!important;
   color:var(--vg-ink)!important;
   background:var(--vg-panel)!important;
@@ -138,8 +139,8 @@ html[data-theme="dark"] .virtual-game{
   font-size:1rem!important;
   font-weight:900!important
 }
-.virtual-menu-button{width:52px!important;min-width:52px!important}
-.virtual-menu-button span{font-size:.66rem!important;font-weight:950!important}
+.virtual-menu-button{width:58px!important;min-width:58px!important}
+.virtual-menu-button span{font-size:.74rem!important;font-weight:950!important}
 
 /* Indicatore di fase compatto. */
 .virtual-turn-rail{
@@ -155,23 +156,23 @@ html[data-theme="dark"] .virtual-game{
   grid-template-columns:auto minmax(0,1fr)!important;
   align-items:center!important;
   gap:5px!important;
-  height:29px!important;
-  padding:2px 6px!important;
+  height:35px!important;
+  padding:3px 7px!important;
   color:var(--vg-muted)!important;
   background:transparent!important;
   border:0!important;
   border-bottom:3px solid var(--vg-line)!important;
   border-radius:0!important;
-  font-size:.66rem!important
+  font-size:.75rem!important
 }
 .virtual-turn-rail li span{
   display:grid!important;
   place-items:center!important;
-  width:19px!important;
-  height:19px!important;
+  width:23px!important;
+  height:23px!important;
   border:1px solid currentColor!important;
   border-radius:50%!important;
-  font-size:.56rem!important
+  font-size:.64rem!important
 }
 .virtual-turn-rail li.current{color:var(--vg-ink)!important;border-color:var(--vg-amber)!important}
 .virtual-turn-rail li.current span{color:#211a12!important;background:var(--vg-amber)!important;border-color:var(--vg-amber)!important}
@@ -182,17 +183,17 @@ html[data-theme="dark"] .virtual-game{
   display:grid!important;
   grid-template-columns:1fr!important;
   align-items:center!important;
-  gap:2px!important;
-  min-height:42px!important;
-  padding:6px 10px!important;
+  gap:3px!important;
+  min-height:56px!important;
+  padding:8px 12px!important;
   text-align:center!important;
   color:var(--vg-ink)!important;
   background:color-mix(in srgb,var(--vg-amber) 13%,var(--vg-panel))!important;
   border:1px solid color-mix(in srgb,var(--vg-amber) 62%,var(--vg-line))!important;
-  border-radius:11px!important
+  border-radius:13px!important
 }
-.virtual-phase-callout b{font-size:.72rem!important;letter-spacing:.06em!important;white-space:nowrap!important}
-.virtual-phase-callout span{min-width:0!important;color:var(--vg-muted)!important;font-size:.58rem!important;line-height:1.15!important;white-space:normal!important}
+.virtual-phase-callout b{font-size:.86rem!important;letter-spacing:.06em!important;white-space:nowrap!important}
+.virtual-phase-callout span{min-width:0!important;color:var(--vg-muted)!important;font-size:.68rem!important;line-height:1.18!important;white-space:normal!important}
 .virtual-phase-callout[data-phase="afterPlay"],.virtual-phase-callout[data-phase="final"],.virtual-phase-callout[data-phase="completed"]{background:var(--vg-panel)!important;border-color:var(--vg-line)!important}
 
 /* Tavolo: storia e zona carta devono stare sempre interamente nel pannello. */
@@ -222,12 +223,12 @@ html[data-theme="dark"] .virtual-game{
 }
 .virtual-story-stage{
   display:grid!important;
-  grid-template-columns:42px minmax(0,1fr) auto!important;
+  grid-template-columns:52px minmax(0,1fr) auto!important;
   align-items:center!important;
   gap:8px!important;
   min-width:0!important;
-  min-height:118px!important;
-  padding:10px 10px!important;
+  min-height:144px!important;
+  padding:12px 12px!important;
   background:color-mix(in srgb,var(--vg-panel) 92%,transparent)!important;
   border:1px solid var(--vg-line)!important;
   border-radius:12px!important;
@@ -240,18 +241,18 @@ html[data-theme="dark"] .virtual-game{
 .virtual-story-icon{
   display:grid!important;
   place-items:center!important;
-  width:42px!important;
-  height:42px!important;
+  width:52px!important;
+  height:52px!important;
   color:var(--vg-amber)!important;
   background:color-mix(in srgb,var(--vg-amber) 15%,var(--vg-panel))!important;
   border-radius:11px!important;
-  font-size:1.25rem!important
+  font-size:1.5rem!important
 }
 .virtual-story-copy{min-width:0!important}
 .virtual-story-copy p,.virtual-story-copy h3,.virtual-story-copy small{margin:0!important}
 .virtual-story-copy p{
   color:var(--vg-amber)!important;
-  font-size:.56rem!important;
+  font-size:.66rem!important;
   font-weight:950!important;
   letter-spacing:.08em!important;
   text-transform:uppercase!important
@@ -259,7 +260,7 @@ html[data-theme="dark"] .virtual-game{
 .virtual-story-copy h3{
   display:-webkit-box!important;
   margin-top:2px!important;
-  font:850 clamp(.96rem,4vw,1.12rem)/1.04 Georgia,serif!important;
+  font:850 clamp(1.12rem,4.8vw,1.38rem)/1.02 Georgia,serif!important;
   -webkit-line-clamp:2!important;
   -webkit-box-orient:vertical!important;
   overflow:hidden!important
@@ -268,8 +269,8 @@ html[data-theme="dark"] .virtual-game{
   display:block!important;
   margin-top:3px!important;
   color:var(--vg-muted)!important;
-  font-size:.69rem!important;
-  line-height:1.22!important;
+  font-size:.8rem!important;
+  line-height:1.25!important;
   display:-webkit-box!important;
   -webkit-line-clamp:4!important;
   -webkit-box-orient:vertical!important;
@@ -279,14 +280,14 @@ html[data-theme="dark"] .virtual-game{
 .virtual-party-person{
   display:grid!important;
   place-items:center!important;
-  width:24px!important;
-  height:24px!important;
+  width:28px!important;
+  height:28px!important;
   margin-left:-5px!important;
   color:var(--vg-ink)!important;
   background:var(--vg-panel)!important;
   border:2px solid var(--vg-table)!important;
   border-radius:50%!important;
-  font-size:.45rem!important;
+  font-size:.52rem!important;
   font-weight:950!important;
   box-shadow:0 3px 7px rgba(0,0,0,.1)!important
 }
@@ -296,13 +297,13 @@ html[data-theme="dark"] .virtual-game{
 .virtual-table-board{
   position:relative!important;
   display:grid!important;
-  grid-template-columns:58px 84px!important;
+  grid-template-columns:76px 108px!important;
   align-items:center!important;
   justify-content:center!important;
-  gap:18px!important;
+  gap:30px!important;
   width:100%!important;
-  height:190px!important;
-  min-height:190px!important;
+  height:auto!important;
+  min-height:184px!important;
   margin:0!important
 }
 .virtual-table-board:before{
@@ -310,8 +311,8 @@ html[data-theme="dark"] .virtual-game{
   position:absolute;
   left:50%;
   top:50%;
-  width:min(226px,82%);
-  height:min(118px,58%);
+  width:min(286px,88%);
+  height:min(150px,70%);
   transform:translate(-50%,-50%);
   border:1px solid color-mix(in srgb,var(--vg-amber) 18%,transparent);
   border-radius:50%;
@@ -323,9 +324,9 @@ html[data-theme="dark"] .virtual-game{
   z-index:2!important;
   align-self:center!important;
   justify-self:center!important;
-  width:52px!important;
-  height:74px!important;
-  min-width:52px!important;
+  width:68px!important;
+  height:98px!important;
+  min-width:68px!important;
   padding:0!important;
   background:transparent!important;
   border:0!important
@@ -364,9 +365,9 @@ html[data-theme="dark"] .virtual-game{
   place-items:center!important;
   align-self:center!important;
   justify-self:center!important;
-  width:84px!important;
-  min-height:104px!important;
-  padding-top:17px!important
+  width:108px!important;
+  min-height:142px!important;
+  padding-top:22px!important
 }
 .virtual-focus-label{
   position:absolute!important;
@@ -374,13 +375,13 @@ html[data-theme="dark"] .virtual-game{
   left:50%!important;
   transform:translateX(-50%)!important;
   width:max-content!important;
-  max-width:118px!important;
+  max-width:148px!important;
   padding:3px 7px!important;
   color:var(--vg-muted)!important;
   background:var(--vg-panel)!important;
   border:1px solid var(--vg-line)!important;
   border-radius:999px!important;
-  font-size:.47rem!important;
+  font-size:.56rem!important;
   font-weight:950!important;
   letter-spacing:.06em!important;
   text-transform:uppercase!important;
@@ -395,25 +396,24 @@ html[data-theme="dark"] .virtual-game{
   place-items:center!important;
   align-content:center!important;
   gap:3px!important;
-  width:74px!important;
-  height:90px!important;
+  width:94px!important;
+  height:124px!important;
   color:var(--vg-muted)!important;
   background:color-mix(in srgb,var(--vg-panel) 58%,transparent)!important;
   border:1px dashed color-mix(in srgb,var(--vg-amber) 72%,var(--vg-line))!important;
   border-radius:10px!important;
   text-align:center!important
 }
-.virtual-focus-placeholder i{color:var(--vg-amber)!important;font-size:1.45rem!important;font-style:normal!important;line-height:1!important}
-.virtual-focus-placeholder b{width:62px!important;font-size:.45rem!important;line-height:1.1!important}
+.virtual-focus-placeholder i{color:var(--vg-amber)!important;font-size:1.9rem!important;font-style:normal!important;line-height:1!important}
+.virtual-focus-placeholder b{width:82px!important;font-size:.58rem!important;line-height:1.1!important}
 
-/* Mano: tre carte sopra e due centrate sotto, senza trasformarla nel contenuto dominante. */
+/* Mano mobile: cinque carte grandi, leggermente accavallate e sempre dentro la viewport. */
 .virtual-hand-section{
   position:relative!important;
-  flex:0 0 auto!important;
   display:grid!important;
-  grid-template-rows:25px auto 18px!important;
+  grid-template-rows:32px auto 22px!important;
   align-content:start!important;
-  gap:2px!important;
+  gap:4px!important;
   min-height:0!important;
   overflow:visible!important
 }
@@ -422,19 +422,19 @@ html[data-theme="dark"] .virtual-game{
   align-items:center!important;
   justify-content:space-between!important;
   color:var(--vg-muted)!important;
-  font-size:.62rem!important;
+  font-size:.74rem!important;
   font-weight:950!important;
   letter-spacing:.06em!important
 }
 .virtual-hand-heading>div{display:flex!important;align-items:center!important;gap:7px!important}
 .virtual-hand-heading button{
-  min-height:24px!important;
-  padding:2px 8px!important;
+  min-height:32px!important;
+  padding:4px 10px!important;
   color:var(--vg-ink)!important;
   background:var(--vg-panel)!important;
   border:1px solid var(--vg-line)!important;
   border-radius:999px!important;
-  font-size:.57rem!important;
+  font-size:.66rem!important;
   font-weight:900!important
 }
 .virtual-hand{
@@ -443,21 +443,22 @@ html[data-theme="dark"] .virtual-game{
   align-content:center!important;
   align-items:flex-start!important;
   justify-content:center!important;
-  gap:4px!important;
+  gap:0!important;
   min-height:0!important;
-  padding:1px 0!important;
+  padding:3px 0 1px!important;
   overflow:visible!important
 }
+.virtual-card-slot + .virtual-card-slot{margin-left:-9px!important}
 .virtual-card-slot,.virtual-table-card,.virtual-drag-ghost{
   position:relative!important;
   box-sizing:border-box!important;
   display:grid!important;
   grid-template-rows:auto 1fr auto!important;
-  width:clamp(62px,calc((100vw - 32px)/5),76px)!important;
-  max-width:76px!important;
-  height:clamp(104px,13.4dvh,116px)!important;
-  min-height:104px!important;
-  padding:6px!important;
+  width:clamp(72px,20.8vw,88px)!important;
+  max-width:88px!important;
+  height:clamp(132px,18.2dvh,172px)!important;
+  min-height:132px!important;
+  padding:7px!important;
   color:var(--vg-ink)!important;
   background:var(--vg-card)!important;
   border:1.5px solid var(--vg-card-edge)!important;
@@ -473,7 +474,7 @@ html[data-theme="dark"] .virtual-game{
 .virtual-card-slot.empty{display:none!important}
 .virtual-card-slot.selected{
   z-index:5!important;
-  transform:translateY(-4px)!important;
+  transform:translateY(-8px)!important;
   border-color:var(--vg-amber)!important;
   box-shadow:0 0 0 3px color-mix(in srgb,var(--vg-amber) 24%,transparent),0 11px 22px rgba(45,31,16,.2)!important
 }
@@ -497,9 +498,9 @@ html[data-theme="dark"] .virtual-game{
 .virtual-game[data-phase="play"] .virtual-card-slot.selected:after{content:"DA GIOCARE"}
 .virtual-card-slot.is-drag-source,.virtual-card-slot.is-flight-source,.virtual-card-slot.is-draw-target{visibility:hidden!important;opacity:1!important}
 .virtual-card-corner{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;line-height:1!important}
-.virtual-card-corner b{font:900 .9rem/1 Georgia,serif!important}
-.virtual-card-corner i{font-style:normal!important;font-size:.78rem!important}
-.virtual-card-symbol{display:grid!important;place-items:center!important;color:currentColor!important;font-size:1.95rem!important;line-height:1!important;opacity:1!important}
+.virtual-card-corner b{font:900 1.05rem/1 Georgia,serif!important}
+.virtual-card-corner i{font-style:normal!important;font-size:.92rem!important}
+.virtual-card-symbol{display:grid!important;place-items:center!important;color:currentColor!important;font-size:2.65rem!important;line-height:1!important;opacity:1!important}
 .virtual-card-effect{display:grid!important;gap:2px!important;align-self:end!important;min-width:0!important}
 .virtual-card-effect em{
   width:max-content!important;
@@ -508,24 +509,24 @@ html[data-theme="dark"] .virtual-game{
   color:var(--vg-muted)!important;
   background:color-mix(in srgb,var(--vg-line) 45%,transparent)!important;
   border-radius:4px!important;
-  font-size:.4rem!important;
+  font-size:.47rem!important;
   font-style:normal!important;
   font-weight:950!important;
   letter-spacing:.035em!important
 }
 .virtual-card-effect b{
-  font:850 .59rem/1.02 Georgia,serif!important;
+  font:850 .72rem/1.02 Georgia,serif!important;
   white-space:nowrap!important;
   overflow:hidden!important;
   text-overflow:ellipsis!important
 }
 .virtual-card-effect small{
-  min-height:2.12em!important;
+  min-height:4.4em!important;
   color:var(--vg-muted)!important;
-  font-size:.44rem!important;
-  line-height:1.06!important;
+  font-size:.52rem!important;
+  line-height:1.1!important;
   display:-webkit-box!important;
-  -webkit-line-clamp:2!important;
+  -webkit-line-clamp:4!important;
   -webkit-box-orient:vertical!important;
   overflow:hidden!important
 }
@@ -533,8 +534,8 @@ html[data-theme="dark"] .virtual-game{
 .virtual-gesture-hint{
   margin:0!important;
   color:var(--vg-muted)!important;
-  font-size:.56rem!important;
-  line-height:1.1!important;
+  font-size:.64rem!important;
+  line-height:1.15!important;
   text-align:center!important;
   white-space:nowrap!important;
   overflow:hidden!important;
@@ -575,18 +576,18 @@ html[data-theme="dark"] .virtual-game{
 .virtual-card-back-mark small{color:var(--vg-amber)!important;font-size:.38rem!important;font-weight:950!important;letter-spacing:.06em!important}
 
 .virtual-table-card{
-  width:72px!important;
-  max-width:72px!important;
-  height:100px!important;
-  min-height:100px!important;
+  width:90px!important;
+  max-width:90px!important;
+  height:130px!important;
+  min-height:130px!important;
   padding:6px!important
 }
 .virtual-table-card .virtual-card-corner b{font-size:.86rem!important}
 .virtual-table-card .virtual-card-corner i{font-size:.72rem!important}
-.virtual-table-card .virtual-card-symbol{font-size:2.1rem!important}
+.virtual-table-card .virtual-card-symbol{font-size:2.7rem!important}
 .virtual-table-card .virtual-card-effect em{font-size:.32rem!important;padding:2px 3px!important}
-.virtual-table-card .virtual-card-effect b{font-size:.55rem!important}
-.virtual-table-card .virtual-card-effect small{font-size:.42rem!important;min-height:2em!important}
+.virtual-table-card .virtual-card-effect b{font-size:.68rem!important}
+.virtual-table-card .virtual-card-effect small{font-size:.5rem!important;min-height:3.2em!important}
 
 .virtual-drag-overlay{position:fixed!important;inset:0!important;z-index:9998!important;pointer-events:none!important;overflow:visible!important}
 .virtual-drag-ghost{
@@ -603,24 +604,23 @@ html[data-theme="dark"] .virtual-game{
 /* Barra azioni stabile e visivamente subordinata al gioco. */
 .virtual-actions{
   display:grid!important;
-  flex:0 0 64px!important;
-  margin-top:auto!important;
+  margin-top:0!important;
   grid-template-columns:repeat(2,minmax(0,1fr))!important;
   align-items:center!important;
   gap:8px!important;
-  height:64px!important;
-  min-height:64px!important;
+  height:68px!important;
+  min-height:68px!important;
   padding-top:5px!important;
   border-top:1px solid var(--vg-line)!important
 }
 .virtual-actions button{
   width:100%!important;
-  height:54px!important;
-  min-height:54px!important;
+  height:58px!important;
+  min-height:58px!important;
   margin:0!important;
   padding:8px 12px!important;
   border-radius:13px!important;
-  font-size:.9rem!important;
+  font-size:1rem!important;
   font-weight:950!important
 }
 .virtual-actions button:disabled{opacity:.38!important;filter:saturate(.42)!important;box-shadow:none!important}
@@ -708,43 +708,43 @@ html[data-theme="dark"] .virtual-menu-sheet{--vg-panel:#17181e;--vg-panel-2:#222
   .virtual-player-title img{width:34px!important;height:34px!important;flex-basis:34px!important}
   .virtual-icon-button{width:40px!important;min-width:40px!important;height:40px!important;min-height:40px!important}
   .virtual-menu-button{width:49px!important;min-width:49px!important}
-  .virtual-card-slot,.virtual-drag-ghost{width:calc((100vw - 32px)/5)!important}
+  .virtual-card-slot,.virtual-drag-ghost{width:clamp(72px,20.8vw,88px)!important}
   .virtual-table-board{gap:18px!important}
 }
 @media(max-height:780px){
   .virtual-game{gap:4px!important}
-  .virtual-story-stage{min-height:78px!important}
-  .virtual-table-board{height:145px!important;min-height:145px!important}
+  .virtual-story-stage{min-height:100px!important}
+  .virtual-table-board{height:auto!important;min-height:156px!important}
   .virtual-game-header{min-height:44px!important}
-  .virtual-story-stage{min-height:64px!important;padding:6px 7px!important}
+  .virtual-story-stage{min-height:96px!important;padding:8px 9px!important}
   .virtual-story-icon{width:38px!important;height:38px!important}
-  .virtual-card-slot,.virtual-drag-ghost{height:102px!important;min-height:102px!important}
+  .virtual-card-slot,.virtual-drag-ghost{height:132px!important;min-height:132px!important}
   .virtual-card-symbol{font-size:2.05rem!important}
-  .virtual-card-effect small{font-size:.49rem!important}
-  .virtual-actions{height:60px!important;min-height:60px!important}
-  .virtual-actions button{height:50px!important;min-height:50px!important}
+  .virtual-card-effect small{font-size:.5rem!important}
+  .virtual-actions{height:62px!important;min-height:62px!important}
+  .virtual-actions button{height:54px!important;min-height:54px!important}
 }
 @media(max-height:700px){
-  .virtual-table-board{height:128px!important;min-height:128px!important}
+  .virtual-table-board{height:auto!important;min-height:132px!important}
   .virtual-turn-rail li{height:27px!important}
   .virtual-phase-callout span{display:none!important}
   .virtual-phase-callout{grid-template-columns:1fr!important;min-height:30px!important;text-align:center!important}
   .virtual-story-copy small{-webkit-line-clamp:1!important}
-  .virtual-card-slot,.virtual-drag-ghost{height:102px!important;min-height:102px!important;padding:6px!important}
+  .virtual-card-slot,.virtual-drag-ghost{height:118px!important;min-height:118px!important;padding:6px!important}
   .virtual-card-symbol{font-size:1.95rem!important}
-  .virtual-card-effect small{font-size:.47rem!important;-webkit-line-clamp:1!important;min-height:1.05em!important}
-  .virtual-hand-section{grid-template-rows:24px auto 15px!important}
+  .virtual-card-effect small{font-size:.46rem!important;-webkit-line-clamp:2!important;min-height:2.15em!important}
+  .virtual-hand-section{grid-template-rows:28px auto 14px!important}
   .virtual-gesture-hint{display:none!important}
   .virtual-actions{height:58px!important;min-height:58px!important}
   .virtual-actions button{height:48px!important;min-height:48px!important}
 }
 
 @media(min-height:850px){
-  .virtual-story-stage{min-height:128px!important;align-items:start!important;padding-top:10px!important;padding-bottom:10px!important}
-  .virtual-story-copy small{-webkit-line-clamp:4!important;font-size:.69rem!important;line-height:1.22!important}
+  .virtual-story-stage{min-height:150px!important;align-items:start!important;padding-top:10px!important;padding-bottom:10px!important}
+  .virtual-story-copy small{-webkit-line-clamp:4!important;font-size:.8rem!important;line-height:1.25!important}
 }
 @media(min-width:410px){
-  .virtual-hand{gap:5px!important}
+  .virtual-hand{gap:0!important}
   .virtual-table-board{gap:28px!important}
 }
 @media(prefers-reduced-motion:reduce){
