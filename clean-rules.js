@@ -5,7 +5,7 @@
 
   const guideMarkup = ({ eyebrow, title, intro, steps, className = '' }) => `<section class="play-guide ${className}"><header class="play-guide-heading"><p class="eyebrow">${eyebrow}</p><h3>${title}</h3><p>${intro}</p></header><div class="play-guide-steps">${steps.map((step, index) => `<article class="play-guide-step"><span>${index + 1}</span><div><b>${step.title}</b><p>${step.text}</p></div></article>`).join('')}</div></section>`;
 
-  const numericCardsMarkup = () => `<section class="meaning-block"><div class="meaning-heading"><span>CARTE NUMERICHE · DA 2 A 10</span><h4>Leggi seme e parità.</h4><p>Cuori e Quadri sono positivi con un numero pari e negativi con un numero dispari. Fiori e Picche non cambiano effetto.</p></div><div class="plain-suit-grid"><article><span class="red">♥</span><div><b>Relazione</b><p><strong>Pari:</strong> rafforza o avvicina. <strong>Dispari:</strong> allontana o crea tensione.</p><em>♥6: due personaggi tornano a fidarsi. ♥5: nasce un conflitto tra loro.</em></div></article><article><span class="red">♦</span><div><b>Scoperta</b><p><strong>Pari:</strong> emerge qualcosa di utile. <strong>Dispari:</strong> emerge qualcosa che complica.</p><em>♦8: viene trovata una prova utile. ♦3: viene scoperto un problema nascosto.</em></div></article><article><span>♣</span><div><b>Azione</b><p>Un personaggio prova a fare qualcosa di concreto.</p><em>Il protagonista tenta di aprire la porta bloccata.</em></div></article><article><span>♠</span><div><b>Ostacolo</b><p>Compare un problema che rende tutto più difficile.</p><em>La strada viene chiusa prima della fuga.</em></div></article></div></section>`;
+  const numericCardsMarkup = () => `<section class="meaning-block"><div class="meaning-heading"><span>CARTE NUMERICHE · DA 2 A 10</span><h4>Leggi seme e parità.</h4><p>Cuori e Quadri sono positivi con un numero pari e negativi con un numero dispari. Fiori e Picche non cambiano effetto.</p></div><div class="plain-suit-grid"><article><span class="red" style="color:var(--red)!important">♥</span><div><b>Relazione</b><p><strong>Pari:</strong> rafforza o avvicina. <strong>Dispari:</strong> allontana o crea tensione.</p><em>♥6: due personaggi tornano a fidarsi. ♥5: nasce un conflitto tra loro.</em></div></article><article><span class="red" style="color:var(--red)!important">♦</span><div><b>Scoperta</b><p><strong>Pari:</strong> emerge qualcosa di utile. <strong>Dispari:</strong> emerge qualcosa che complica.</p><em>♦8: viene trovata una prova utile. ♦3: viene scoperto un problema nascosto.</em></div></article><article><span style="color:var(--ink)!important">♣</span><div><b>Azione</b><p>Un personaggio prova a fare qualcosa di concreto.</p><em>Il protagonista tenta di aprire la porta bloccata.</em></div></article><article><span style="color:var(--ink)!important">♠</span><div><b>Ostacolo</b><p>Compare un problema che rende tutto più difficile.</p><em>La strada viene chiusa prima della fuga.</em></div></article></div></section>`;
 
   const specialCardsMarkup = () => `<section class="meaning-block special-meaning-block"><div class="meaning-heading"><span>J · Q · K · A</span><h4>Guarda valore e colore. Ignora il seme.</h4><p>Rosso significa positivo, nero significa negativo.</p></div><div class="special-rank-grid"><article><small>NUOVO ELEMENTO</small><b>J</b><span>Oggetto</span></article><article><small>NUOVO ELEMENTO</small><b>Q</b><span>Personaggio</span></article><article><small>NUOVO ELEMENTO</small><b>K</b><span>Luogo</span></article><article><small>SVOLTA</small><b>A</b><span>Colpo di scena</span></article></div></section>`;
 
@@ -55,5 +55,46 @@
   });
 
   S.rulesMarkup = () => `<div class="rules-menu"><p class="rules-menu-intro">Dalla preparazione al finale: tutte le regole per giocare con un mazzo reale o con le carte virtuali.</p><div class="rulebook"><details><summary>1. Preparazione</summary><div class="body">${S.preparationGuideMarkup()}</div></details><details><summary>2. Significato delle carte</summary><div class="body">${S.cardRulesMarkup()}</div></details><details><summary>3. Il turno</summary><div class="body">${S.turnGuideMarkup()}</div></details><details><summary>4. Come si chiude la storia</summary><div class="body">${S.finalRulesMarkup()}</div></details></div></div>`;
-  S.openRulesModal = () => S.modal('Regole di E POI?', S.rulesMarkup(), { wide: true, className: 'rules-modal' });
+
+  const setImportant = (element, property, value) => element?.style.setProperty(property, value, 'important');
+  const enableRulesModalScroll = () => {
+    const apply = () => {
+      const modals = document.querySelectorAll('.rules-modal');
+      const modal = modals[modals.length - 1];
+      if (!modal) return;
+      const card = modal.querySelector('.modal-card');
+      const menu = modal.querySelector('.rules-menu');
+      const rulebook = modal.querySelector('.rulebook');
+      setImportant(modal, 'touch-action', 'pan-y');
+      setImportant(card, 'display', 'flex');
+      setImportant(card, 'flex-direction', 'column');
+      setImportant(card, 'height', 'min(92dvh,840px)');
+      setImportant(card, 'max-height', 'calc(100dvh - 20px)');
+      setImportant(card, 'overflow', 'hidden');
+      setImportant(card, 'touch-action', 'pan-y');
+      setImportant(menu, 'display', 'flex');
+      setImportant(menu, 'flex', '1 1 auto');
+      setImportant(menu, 'flex-direction', 'column');
+      setImportant(menu, 'min-height', '0');
+      setImportant(menu, 'overflow', 'hidden');
+      setImportant(menu, 'touch-action', 'pan-y');
+      setImportant(rulebook, 'display', 'flex');
+      setImportant(rulebook, 'flex', '1 1 auto');
+      setImportant(rulebook, 'min-height', '0');
+      setImportant(rulebook, 'overflow-x', 'hidden');
+      setImportant(rulebook, 'overflow-y', 'auto');
+      setImportant(rulebook, 'overscroll-behavior', 'contain');
+      setImportant(rulebook, 'touch-action', 'pan-y');
+      setImportant(rulebook, '-webkit-overflow-scrolling', 'touch');
+      setImportant(rulebook, 'padding-bottom', 'max(18px,env(safe-area-inset-bottom))');
+      rulebook?.querySelectorAll('details,details>.body,.card-meaning-board,.rule-card-mini-sections').forEach(element => setImportant(element, 'touch-action', 'pan-y'));
+    };
+    requestAnimationFrame(apply);
+    setTimeout(apply, 80);
+  };
+
+  S.openRulesModal = () => {
+    S.modal('Regole di E POI?', S.rulesMarkup(), { wide: true, className: 'rules-modal' });
+    enableRulesModalScroll();
+  };
 })();
