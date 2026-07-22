@@ -60,10 +60,10 @@
 
   const decorateTools = root => {
     const tools = [
-      ['[data-virtual-story]', 'story', 'Storia'],
-      ['[data-virtual-rules]', 'rules', 'Regole'],
-      ['[data-virtual-invite]', 'invite', 'Invita'],
-      ['[data-virtual-objective]', 'objective', 'Obiettivo']
+      ['.virtual-header-actions [data-virtual-story]', 'story', 'Storia'],
+      ['.virtual-header-actions [data-virtual-rules]', 'rules', 'Regole'],
+      ['.virtual-header-actions [data-virtual-invite]', 'invite', 'Invita'],
+      ['.virtual-header-actions [data-virtual-objective]', 'objective', 'Obiettivo']
     ];
     tools.forEach(([selector, key, label]) => {
       root.querySelectorAll(selector).forEach(button => {
