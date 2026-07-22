@@ -23,9 +23,27 @@ jobs:
         shell: bash
         run: |
           sed -n "/cat <<'PATCH64'/,/^[[:space:]]*PATCH64[[:space:]]*$/p" .github/workflows/apply-virtual-v38.yml | sed '1d;$d' | tr -d '[:space:]' | base64 -d | gzip -d > scripts/apply-virtual-v38.py
-      - name: Apply patch
+      - name: Apply patch and record result
         shell: bash
-        run: python scripts/apply-virtual-v38.py
+        run: |
+          set +e
+          python scripts/apply-virtual-v38.py > v38-apply.log 2>&1
+          status=$?
+          echo "$status" > v38-apply.status
+          exit 0
+      - name: Save diagnostic when patch fails
+        if: ${{ hashFiles('v38-apply.status') != '' }}
+        shell: bash
+        run: |
+          if [ "$(cat v38-apply.status)" = "0" ]; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v38-apply.log v38-apply.status
+          git commit -m "Registra errore applicazione v38"
+          git push origin HEAD:agent/virtual-cards-mobile-polish-v2
+      - name: Stop after diagnostic failure
+        shell: bash
+        run: test "$(cat v38-apply.status)" = "0"
       - name: Verify patched files
         shell: bash
         run: |
@@ -38,7 +56,7 @@ jobs:
       - name: Commit final files
         shell: bash
         run: |
-          rm -f scripts/apply-virtual-v38.py .github/workflows/apply-virtual-v38.yml .github/workflows/run-virtual-v38.yml
+          rm -f scripts/apply-virtual-v38.py v38-apply.log v38-apply.status .github/workflows/apply-virtual-v38.yml .github/workflows/run-virtual-v38.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
