@@ -45,7 +45,10 @@ check(!index.includes('<style>'), 'index.html: contiene ancora CSS inline');
 check(index.includes('initial-skeleton'), 'index.html: skeleton iniziale mancante');
 check(styleIndex('loading-skeleton.css') >= 0, 'index.html: loading-skeleton.css non caricato');
 check(styleIndex('release-polish.css') >= 0, 'index.html: release-polish.css non caricato');
+check(styleIndex('virtual-cards.css') >= 0, 'index.html: virtual-cards.css non caricato');
 check(scriptIndex('collection-data.js') < scriptIndex('clean-core.js'), 'index.html: dati collezione caricati dopo il core');
+check(scriptIndex('virtual-cards.js') > scriptIndex('clean-rules.js'), 'index.html: carte virtuali caricate prima delle regole');
+check(scriptIndex('virtual-cards.js') < scriptIndex('clean-config.js'), 'index.html: carte virtuali caricate dopo la configurazione');
 check(scriptIndex('collection-objectives.js') > scriptIndex('archive-v20-objectives-07-08.js'), 'index.html: filtro obiettivi caricato troppo presto');
 check(scriptIndex('ready-story-objectives.js') > scriptIndex('collection-objectives.js'), 'index.html: assegnazione obiettivi caricata prima dei dati');
 check(scriptIndex('collection-controller.js') > scriptIndex('clean-stories-view.js'), 'index.html: controller collezioni caricato prima della vista');
@@ -63,6 +66,9 @@ for (const file of activeScripts) {
 
 const controller = read('collection-controller.js');
 const collectionCss = read('collection-prima-scintilla.css');
+const setup = read('clean-config.js');
+const virtualSource = read('virtual-cards.js');
+const virtualCss = read('virtual-cards.css');
 check(!controller.includes('Qui trovate il contesto generale'), 'Testo interno presente nella scelta collezione');
 check(!controller.includes('senza ripetere queste informazioni'), 'Testo interno presente nella scelta collezione');
 check(!controller.includes('modificando il salvataggio locale'), 'Dettagli tecnici mostrati agli utenti');
@@ -70,6 +76,17 @@ check(controller.includes('Ogni collezione riunisce storie con una propria atmos
 check(!controller.includes('collection-coming-overlay'), 'Il cartello In arrivo copre ancora la scheda');
 check(!collectionCss.includes('collection-coming-overlay'), 'Il vecchio overlay In arrivo è ancora nello stile');
 check(collectionCss.includes('collection-status-coming'), 'Lo stato In arrivo discreto è mancante');
+check(setup.includes("session.delivery === 'multi'"), 'La modalità carte non dipende dai telefoni separati');
+check(setup.includes('data-card-mode'), 'La scelta del mazzo non è presente nella configurazione');
+check(setup.includes("if (session.delivery === 'single') session.cardMode = 'physical'"), 'Un telefono non forza il mazzo reale');
+check(setup.includes('mazzo francese da 52 carte'), 'La descrizione del mazzo reale non è precisa');
+check(virtualSource.includes('Mazzo finito: scarti rimescolati'), 'Manca l’avviso di rimescolamento');
+check(virtualSource.includes("action === 'exchange'"), 'Manca la fase di cambio carta');
+check(virtualSource.includes("action === 'draw-end'"), 'Manca la fase di pesca finale');
+check(virtualCss.includes('@keyframes dealCard') && virtualCss.includes('@keyframes virtualShuffle'), 'Animazioni delle carte virtuali mancanti');
+check(!read('clean-home.js').includes('Il 6 è pari'), 'Il tutorial usa ancora la parità');
+check(!read('content-polish.js').includes('PARI') && !read('content-polish.js').includes('DISPARI'), 'Il polish reintroduce ancora la parità');
+check(!read('clean-rules.js').includes('PARI') && !read('clean-rules.js').includes('DISPARI'), 'Le regole mostrano ancora la parità');
 
 const removedFiles = [
   'collection-prima-scintilla-stories.js', 'ready-stories-data.js', 'collection-prima-scintilla.js',
@@ -116,16 +133,68 @@ for (const match of coreBlock.matchAll(/['"]\.\/([^'"]*)['"]/g)) {
   const file = match[1];
   if (file) check(exists(file), `sw.js: file in cache mancante ${file}`);
 }
-check(sw.includes('shell-v29') && sw.includes('runtime-v29'), 'sw.js: cache PWA v29 non attiva');
+check(sw.includes('shell-v30') && sw.includes('runtime-v30'), 'sw.js: cache PWA v30 non attiva');
 check(sw.includes("'./collection-data.js'"), 'sw.js: dati collezione non precacheati');
 check(sw.includes("'./collection-controller.js'"), 'sw.js: controller collezione non precacheato');
+check(sw.includes("'./virtual-cards.js'") && sw.includes("'./virtual-cards.css'"), 'sw.js: carte virtuali non precacheate');
 check(sw.includes("'./release-polish.css'"), 'sw.js: CSS finale non precacheato');
 check(!sw.includes('archive-v20-stories-'), 'sw.js: precachea ancora gli archivi storie legacy');
 check(sw.includes('cache.addAll(requests)'), 'sw.js: installazione cache non atomica');
 check(sw.includes('staleWhileRevalidate'), 'sw.js: strategia rete instabile mancante');
+check(read('pwa-refresh.js').includes('epoi_sw_reload_v30'), 'pwa-refresh.js: refresh v30 non attivo');
 
 const evaluate = file => (0, eval)(read(file));
 globalThis.window = globalThis;
+delete globalThis.S52;
+evaluate('virtual-cards.js');
+const virtual = globalThis.EpoiVirtualCardsEngine;
+check(Boolean(virtual), 'Motore carte virtuali non inizializzato');
+check(virtual?.cardIds.length === 52 && new Set(virtual?.cardIds).size === 52, 'Il mazzo virtuale non contiene 52 carte uniche');
+check(virtual?.meaningFor('H-7').title === 'Relazione', 'Il significato di Cuori non è corretto');
+check(virtual?.meaningFor('D-6').title === 'Scoperta', 'Il significato di Quadri dipende ancora dalla parità');
+check(virtual?.meaningFor('H-J').title.includes('favorevole'), 'Una figura rossa non è favorevole');
+check(virtual?.meaningFor('S-A').title.includes('problematico'), 'Un Asso nero non è problematico');
+
+const assignments = virtual.buildAssignments('TEST-MAZZO', 8);
+const assignedCards = assignments.flatMap(assignment => assignment.ownedCards);
+check(assignments.length === 8, 'Il mazzo non viene distribuito a 8 giocatori');
+check(assignments.every(assignment => assignment.hand.length === 5), 'Ogni mano iniziale deve avere 5 carte');
+check(assignedCards.length === 52 && new Set(assignedCards).size === 52, 'Le mani private producono carte duplicate o mancanti');
+
+let virtualState = virtual.createState('TEST-TURNO', 4, 0);
+let outcome = virtual.apply(virtualState, 'start', 'TEST-TURNO', 0);
+check(outcome.ok && outcome.state.phase === 'exchange', 'Il turno non parte dalla fase di cambio');
+virtualState = outcome.state;
+outcome = virtual.apply(virtualState, 'play', 'TEST-TURNO', 0, virtualState.hand[0]);
+check(!outcome.ok, 'È possibile giocare prima del cambio iniziale');
+outcome = virtual.apply(virtualState, 'exchange', 'TEST-TURNO', 0, virtualState.hand[0]);
+check(outcome.ok && outcome.state.phase === 'play' && outcome.state.hand.length === 5, 'Il cambio non sostituisce esattamente una carta');
+virtualState = outcome.state;
+outcome = virtual.apply(virtualState, 'exchange', 'TEST-TURNO', 0, virtualState.hand[0]);
+check(!outcome.ok, 'È possibile cambiare due volte nello stesso turno');
+outcome = virtual.apply(virtualState, 'play', 'TEST-TURNO', 0, virtualState.hand[0]);
+check(outcome.ok && outcome.state.phase === 'afterPlay' && outcome.state.hand.length === 4, 'La giocata non rimuove esattamente una carta');
+virtualState = outcome.state;
+outcome = virtual.apply(virtualState, 'draw-end', 'TEST-TURNO', 0);
+check(outcome.ok && outcome.state.phase === 'waiting' && outcome.state.hand.length === 5, 'La pesca non chiude correttamente il turno');
+
+let recycleState = virtual.createState('TEST-RICICLO', 2, 0);
+recycleState.discard = [...recycleState.drawPile];
+recycleState.drawPile = [];
+recycleState.phase = 'afterPlay';
+outcome = virtual.apply(recycleState, 'draw-end', 'TEST-RICICLO', 0);
+check(outcome.ok && outcome.reshuffled && outcome.state.cycle === 1, 'Gli scarti non vengono rimescolati quando il mazzo finisce');
+
+let finalState = virtual.createState('TEST-FINALE', 2, 0);
+finalState.hand = [finalState.hand[0]];
+finalState.discard.push(...finalState.drawPile, ...finalState.hand.slice(1));
+finalState.drawPile = [];
+finalState.phase = 'play';
+outcome = virtual.apply(finalState, 'play', 'TEST-FINALE', 0, finalState.hand[0]);
+check(outcome.ok && outcome.state.hand.length === 0, 'L’ultima carta non svuota la mano');
+outcome = virtual.apply(outcome.state, 'final', 'TEST-FINALE', 0);
+check(outcome.ok && outcome.state.phase === 'final', 'La mano vuota non può collegarsi al finale');
+
 evaluate('collection-data.js');
 const collections = globalThis.STORIA52_READY_COLLECTIONS || [];
 const stories = globalThis.STORIA52_READY_STORIES || [];
@@ -171,12 +240,16 @@ const S = globalThis.window.S52;
 const story = stories[0];
 const readySession = {
   source: 'ready', collectionId: 'prima-scintilla', readyStoryId: story.id, count: 4,
+  delivery: 'multi', cardMode: 'virtual', cardSeed: 'SEED-CARTE-30', seed: 'SEED-CARTE-30',
   names: ['Marta', 'Luca', '', 'Sara'], objectives: S.objectivesForReadyStory(story, 4), openingText: story.opening
 };
 const readyCode = await S.encodeGameInvite(readySession);
-check(readyCode.startsWith('r3.'), 'Invito storia pronta non usa il formato r3');
+check(readyCode.startsWith('r4.'), 'Invito storia pronta non usa il formato r4');
 const readyDecoded = await S.decodeGameInvite(readyCode);
 check(readyDecoded?.collectionId === 'prima-scintilla' && readyDecoded?.readyStoryId === story.id, 'Invito non ricostruisce la collezione');
+check(readyDecoded?.cardMode === 'virtual' && readyDecoded?.cardSeed === 'SEED-CARTE-30', 'Invito non conserva le carte virtuali');
+const legacyDecoded = await S.decodeGameInvite(`r3.${story.id}.4`);
+check(legacyDecoded?.cardMode === 'physical', 'Un invito r3 precedente non viene mantenuto come mazzo reale');
 check(await S.decodeGameInvite('c2.jAAAA') === null, 'Un vecchio invito personalizzato viene ancora accettato');
 check(await S.decodeGameInvite('A'.repeat(6001)) === null, 'Invito enorme non rifiutato');
 
@@ -184,4 +257,4 @@ if (failures.length) {
   console.error('\nRelease check fallito:\n- ' + failures.join('\n- '));
   process.exit(1);
 }
-console.log(`Release check completato: ${scriptOrder.length} script, architettura consolidata, 8+16 collezioni, WebP e cache v29 verificati.`);
+console.log(`Release check completato: ${scriptOrder.length} script, carte virtuali, turni guidati, rimescolamento e cache v30 verificati.`);
