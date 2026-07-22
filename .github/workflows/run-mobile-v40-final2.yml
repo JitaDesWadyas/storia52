@@ -1,0 +1,77 @@
+name: Run mobile layout v40 final2
+
+on:
+  pull_request:
+    types: [synchronize]
+
+permissions:
+  contents: write
+
+jobs:
+  mobile-v40-final2:
+    if: github.head_ref == 'agent/virtual-cards-mobile-layout-v40'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Apply final layout patch
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re, subprocess
+          source = Path('.github/workflows/rebuild-mobile-layout-v40.yml').read_text()
+          match = re.search(r'      - name: Rebuild mobile proportions\n        run: \|\n(.*?)(?=\n      - name: )', source, re.S)
+          script = '\n'.join(line[10:] if line.startswith('          ') else line for line in match.group(1).splitlines()) + '\n'
+          script = re.sub(r"\n\s*\('(shell-v39|runtime-v39|epoi_sw_reload_v39)'.*?\),", '', script)
+          subprocess.run(['bash', '-euxo', 'pipefail'], input=script, text=True, check=True)
+          css_path = Path('virtual-cards.css')
+          css = css_path.read_text()
+          css = css.replace('grid-template-rows:auto auto minmax(0,1fr) auto auto 68px!important;', 'grid-template-rows:auto auto minmax(0,1fr) auto auto auto!important;')
+          css = re.sub(r'(\.virtual-story-copy h3\{.*?-webkit-line-clamp:)4(!important;)', r'\g<1>2\2', css, count=1, flags=re.S)
+          css = re.sub(r'(\.virtual-card-effect small\{.*?-webkit-line-clamp:)2(!important;)', r'\g<1>4\2', css, count=1, flags=re.S)
+          css_path.write_text(css)
+          PY
+
+      - name: Validate release
+        run: node scripts/release-check.mjs
+
+      - name: Build visual harness
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re, subprocess
+          source = Path('.github/workflows/rebuild-mobile-layout-v40.yml').read_text()
+          match = re.search(r'      - name: Build mobile visual harness\n        run: \|\n(.*?)(?=\n      - name: )', source, re.S)
+          script = '\n'.join(line[10:] if line.startswith('          ') else line for line in match.group(1).splitlines()) + '\n'
+          subprocess.run(['bash', '-euxo', 'pipefail'], input=script, text=True, check=True)
+          PY
+
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Verify mobile layout visually
+        run: node verify-mobile-v40.mjs
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: virtual-mobile-v40-screenshots
+          path: v40-screenshots
+          retention-days: 14
+
+      - name: Commit final layout
+        run: |
+          rm -f verify-mobile-v40.html verify-mobile-v40.mjs v40-debug.txt
+          rm -f .github/workflows/rebuild-mobile-layout-v40.yml .github/workflows/run-mobile-v40.yml .github/workflows/run-mobile-v40-fixed.yml .github/workflows/run-mobile-v40-final.yml .github/workflows/run-mobile-v40-final2.yml .github/workflows/bootstrap-mobile-v40.yml .github/workflows/debug-mobile-v40.yml
+          rm -f .github/v40-trigger.txt .github/v40-trigger-2.txt .github/v40-branch-note.txt .github/v40-branch-anchor.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: ricostruisce le proporzioni del tavolo mobile"
+          git push origin HEAD:${{ github.head_ref }}
