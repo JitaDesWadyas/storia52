@@ -1,0 +1,81 @@
+/* Mobile table v34: compact real-card layout, fixed viewport and true drag scale. */
+.card-mode-options .option-card>span{font-size:.82rem}
+.join-mode-badge{display:inline-flex;width:max-content;margin-top:12px;padding:6px 9px;color:#211a12;background:var(--amber);border-radius:999px;font-size:.66rem;font-weight:950}
+
+body.virtual-table-active{height:100dvh!important;overflow:hidden!important}
+body.virtual-table-active .app-shell{position:fixed!important;inset:0!important;display:grid!important;grid-template-rows:auto minmax(0,1fr)!important;height:100dvh!important;min-height:0!important;overflow:hidden!important}
+body.virtual-table-active .site-header{width:calc(100% - 12px)!important;margin:6px!important;padding:7px 10px!important}
+body.virtual-table-active .site-header .brand img{width:34px!important;height:34px!important}
+body.virtual-table-active .site-header .brand h1{font-size:clamp(1.35rem,5.5vw,1.85rem)!important}
+body.virtual-table-active main{display:flex!important;min-height:0!important;height:100%!important;padding:0 6px 6px!important;overflow:hidden!important}
+body.virtual-table-active #play,body.virtual-table-active .page.active{display:flex!important;align-items:stretch!important;flex:1!important;width:100%!important;height:100%!important;min-height:0!important;padding:0!important;overflow:hidden!important}
+
+.virtual-game{grid-template-rows:auto 27px 132px minmax(126px,1fr) 48px!important;align-self:stretch!important;height:100%!important;min-height:0!important;padding:7px!important;gap:5px!important;border-radius:15px!important;overflow:hidden!important}
+.virtual-game-header{min-height:39px!important;gap:7px!important}
+.virtual-player-title{gap:7px!important}
+.virtual-player-title>.eyebrow{max-width:78px!important;font-size:.51rem!important}
+.virtual-game-header h2{font-size:1.08rem!important}
+.virtual-game-header p{max-width:none!important;font-size:.57rem!important;line-height:1.12!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important}
+.virtual-header-actions{gap:3px!important}
+.virtual-header-actions .compact{height:34px!important;padding:5px 6px!important;font-size:.52rem!important;border-radius:9px!important}
+.virtual-turn-rail li{height:27px!important;font-size:.58rem!important}
+.virtual-turn-rail li span{width:17px!important;height:17px!important;font-size:.51rem!important}
+
+.virtual-table{grid-template-columns:58px minmax(72px,1fr) 58px!important;gap:6px!important;align-items:center!important;height:132px!important;min-height:132px!important;padding:7px!important;overflow:visible!important}
+.virtual-deck-card,.virtual-discard-stack{width:54px!important;height:82px!important;aspect-ratio:auto!important}
+.virtual-deck-face{padding:6px 4px!important;border-radius:8px!important}
+.virtual-deck-face small{font-size:.42rem!important}
+.virtual-discard-card{padding:5px!important;border-radius:8px!important}
+.virtual-discard-card.empty img{width:45%!important;height:45%!important}
+.virtual-discard-card.empty small{font-size:.4rem!important}
+
+/* The centre is a target, not a giant white panel. */
+.virtual-play-zone{position:relative!important;display:grid!important;grid-template-columns:1fr!important;place-items:center!important;justify-self:center!important;width:76px!important;height:104px!important;min-width:76px!important;min-height:104px!important;padding:6px!important;background:color-mix(in srgb,var(--vg-panel) 72%,transparent)!important;border:1px dashed color-mix(in srgb,var(--vg-amber) 58%,var(--vg-line))!important;border-radius:11px!important;overflow:visible!important}
+.virtual-play-zone .virtual-drop-visual{width:58px!important;height:58px!important;aspect-ratio:auto!important;border:0!important}
+.virtual-play-zone .virtual-drop-visual:before{inset:5px!important}.virtual-play-zone .virtual-drop-visual:after{inset:13px!important}
+.virtual-play-zone .virtual-drop-visual span{font-size:1.45rem!important}.virtual-play-zone .virtual-drop-visual i{bottom:3px!important;width:22px!important;height:2px!important}
+.virtual-zone-copy{display:none!important}
+.virtual-play-zone:after{content:"SCARTA QUI";position:absolute;left:50%;bottom:7px;transform:translateX(-50%);width:max-content;color:var(--vg-amber);font-size:.42rem;font-weight:950;letter-spacing:.07em}
+.virtual-game[data-phase="play"] .virtual-play-zone:after{content:"GIOCA QUI"}
+.virtual-game[data-phase="afterPlay"] .virtual-play-zone:after{content:"SUL TAVOLO"}
+.virtual-play-zone.played{width:76px!important;height:104px!important;background:transparent!important;border-style:solid!important}
+.virtual-table-card{width:62px!important;height:92px!important;max-height:none!important;padding:5px!important;border-radius:8px!important}
+.virtual-play-zone.drag-armed{transform:scale(1.035)!important;box-shadow:0 0 0 4px color-mix(in srgb,var(--vg-amber) 22%,transparent)!important}
+
+/* Five compact cards. The dragged card keeps exactly this size. */
+.virtual-hand-section{grid-template-rows:auto minmax(0,1fr) auto!important;align-content:end!important;overflow:visible!important}
+.virtual-hand{align-items:end!important;height:auto!important;min-height:0!important;gap:4px!important;overflow:visible!important}
+.virtual-card-slot,.virtual-drag-ghost{width:100%!important;height:clamp(100px,14.7dvh,116px)!important;min-height:0!important;max-height:116px!important;padding:5px 4px!important;border-width:1.5px!important;border-radius:8px!important;box-sizing:border-box!important}
+.virtual-card-slot.is-drag-source,.virtual-card-slot.is-flight-source{visibility:hidden!important;opacity:1!important}
+.virtual-drag-ghost{max-width:none!important;transform-origin:50% 50%!important;filter:drop-shadow(0 12px 18px rgba(0,0,0,.26))!important}
+.virtual-card-corner b{font-size:.8rem!important}.virtual-card-corner i{font-size:.68rem!important}
+.virtual-card-effect em{font-size:.33rem!important;padding:2px 3px!important}
+.virtual-card-effect b{font-size:.47rem!important;white-space:nowrap!important}
+.virtual-card-effect small{font-size:.36rem!important;line-height:1.06!important;-webkit-line-clamp:2!important}
+.virtual-gesture-hint{font-size:.53rem!important;line-height:1!important}
+
+.virtual-actions{height:48px!important;min-height:48px!important;border-top:1px solid color-mix(in srgb,var(--vg-line) 70%,transparent)!important}
+.virtual-actions button{height:39px!important;min-width:106px!important;padding:7px 11px!important;font-size:.72rem!important}
+
+@media(max-width:390px){
+  .virtual-game{grid-template-rows:auto 25px 120px minmax(116px,1fr) 45px!important;padding:5px!important;gap:4px!important}
+  .virtual-header-actions .compact{height:31px!important;padding:4px 5px!important;font-size:.48rem!important}
+  .virtual-game-header h2{font-size:1rem!important}.virtual-game-header p{font-size:.53rem!important}
+  .virtual-table{grid-template-columns:52px minmax(68px,1fr) 52px!important;height:120px!important;min-height:120px!important;padding:5px!important;gap:4px!important}
+  .virtual-deck-card,.virtual-discard-stack{width:48px!important;height:73px!important}
+  .virtual-play-zone{width:68px!important;min-width:68px!important;height:94px!important;min-height:94px!important}
+  .virtual-play-zone .virtual-drop-visual{width:50px!important;height:50px!important}.virtual-table-card{width:55px!important;height:83px!important}
+  .virtual-card-slot,.virtual-drag-ghost{height:clamp(94px,14dvh,106px)!important;max-height:106px!important;padding:4px 3px!important}
+  .virtual-card-effect b{font-size:.44rem!important}.virtual-card-effect small{font-size:.33rem!important}
+  .virtual-actions{height:45px!important;min-height:45px!important}.virtual-actions button{height:36px!important;min-width:100px!important}
+}
+
+@media(max-height:680px){
+  body.virtual-table-active .site-header{margin:4px!important;width:calc(100% - 8px)!important;padding:4px 8px!important}
+  .virtual-game{grid-template-rows:36px 23px 104px minmax(100px,1fr) 40px!important;padding:4px!important;gap:3px!important}
+  .virtual-game-header p{display:none!important}.virtual-header-actions .compact{height:29px!important}
+  .virtual-turn-rail li{height:23px!important}.virtual-table{height:104px!important;min-height:104px!important}
+  .virtual-deck-card,.virtual-discard-stack{width:44px!important;height:67px!important}.virtual-play-zone{width:62px!important;min-width:62px!important;height:84px!important;min-height:84px!important}.virtual-table-card{width:49px!important;height:74px!important}
+  .virtual-card-slot,.virtual-drag-ghost{height:90px!important;max-height:90px!important}.virtual-gesture-hint{display:none!important}
+  .virtual-hand-section{grid-template-rows:auto minmax(0,1fr)!important}.virtual-actions{height:40px!important;min-height:40px!important}.virtual-actions button{height:34px!important}
+}
