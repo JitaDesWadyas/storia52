@@ -2,8 +2,8 @@
 
 (() => {
   if (!('serviceWorker' in navigator)) return;
-  // La v41 aggiorna l'accordion delle regole e la pulizia dei trascinamenti delle carte.
-  const reloadKey = 'epoi_sw_reload_v41';
+  // La v42 corregge il drag delle carte selezionate e aggiorna le regole di figure e assi.
+  const reloadKey = 'epoi_sw_reload_v42';
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     try {
       if (sessionStorage.getItem(reloadKey) === '1') return;

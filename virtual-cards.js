@@ -563,7 +563,9 @@
     const makeGhost = (element, extraClass = '') => {
       const rect = element.getBoundingClientRect();
       const ghost = element.cloneNode(true);
+      ghost.classList.remove('selected', 'is-drag-source', 'is-flight-source', 'is-draw-target', 'card-enter');
       ghost.classList.add('virtual-drag-ghost');
+      ghost.removeAttribute('aria-pressed');
       if (extraClass) ghost.classList.add(extraClass);
       Object.assign(ghost.style, {
         left: `${rect.left}px`,
@@ -668,6 +670,20 @@
       await commitOutcome(outcome, action);
     };
 
+    const dropState = current => {
+      if (!current?.ghost || !current?.rect) return { valid: false, armed: false };
+      const distance = Math.hypot(current.dx, current.dy);
+      const focusRect = refs.focus.getBoundingClientRect();
+      const ghostRect = current.ghost.getBoundingClientRect();
+      const centerX = ghostRect.left + ghostRect.width / 2;
+      const centerY = ghostRect.top + ghostRect.height / 2;
+      const centerInside = centerX >= focusRect.left - 8 && centerX <= focusRect.right + 8
+        && centerY >= focusRect.top - 8 && centerY <= focusRect.bottom + 8;
+      const thrownUp = current.dy < -112 && Math.abs(current.dy) > Math.abs(current.dx) * .82;
+      const armed = distance >= 76 && (centerInside || thrownUp);
+      return { valid: armed, armed };
+    };
+
     const returnDragGhost = async current => {
       if (!current.ghost) return;
       if (!reducedMotion()) {
@@ -697,12 +713,7 @@
       }
 
       const action = state.phase === 'exchange' ? 'exchange' : state.phase === 'play' ? 'play' : '';
-      const focusRect = refs.focus.getBoundingClientRect();
-      const ghostRect = current.ghost.getBoundingClientRect();
-      const overlaps = ghostRect.right > focusRect.left && ghostRect.left < focusRect.right
-        && ghostRect.bottom > focusRect.top && ghostRect.top < focusRect.bottom;
-      const thrownUp = current.dy < -58 && Math.abs(current.dy) > Math.abs(current.dx) * .55;
-      const valid = !cancelled && action && (overlaps || thrownUp);
+      const valid = !cancelled && action && dropState(current).valid;
 
       if (!valid) {
         await returnDragGhost(current);
@@ -761,7 +772,7 @@
         event.preventDefault();
         pointer.dx = event.clientX - pointer.startX;
         pointer.dy = event.clientY - pointer.startY;
-        if (!pointer.dragging && Math.hypot(pointer.dx, pointer.dy) >= 9) {
+        if (!pointer.dragging && Math.hypot(pointer.dx, pointer.dy) >= 15) {
           const made = makeGhost(slot);
           pointer.dragging = true;
           pointer.ghost = made.ghost;
@@ -773,11 +784,7 @@
           frame = 0;
           if (!pointer?.ghost) return;
           pointer.ghost.style.transform = `translate3d(${pointer.dx}px,${pointer.dy}px,0) rotate(${Math.max(-7, Math.min(7, pointer.dx / 18))}deg) scale(1.035)`;
-          const focusRect = refs.focus.getBoundingClientRect();
-          const ghostRect = pointer.ghost.getBoundingClientRect();
-          const overlaps = ghostRect.right > focusRect.left && ghostRect.left < focusRect.right
-            && ghostRect.bottom > focusRect.top && ghostRect.top < focusRect.bottom;
-          const armed = overlaps || (pointer.dy < -58 && Math.abs(pointer.dy) > Math.abs(pointer.dx) * .55);
+          const armed = dropState(pointer).armed;
           refs.focus.classList.toggle('drag-armed', armed);
           primaryAction()?.classList.toggle('drag-preview', armed);
         });

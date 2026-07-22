@@ -23,13 +23,13 @@ const scripts = [...index.matchAll(/<script src="([^"?]+)/g)].map(match => match
 const styles = [...index.matchAll(/<link rel="stylesheet" href="([^"?]+)/g)].map(match => match[1]);
 check(new Set(scripts).size === scripts.length, 'index.html: script duplicati');
 check(new Set(styles).size === styles.length, 'index.html: stili duplicati');
-check(index.includes('virtual-cards.js?v=40'), 'index.html: motore virtuale v40 non caricato');
+check(index.includes('virtual-cards.js?v=42'), 'index.html: motore virtuale v42 non caricato');
 check(index.includes('virtual-cards.css?v=40'), 'index.html: stile virtuale v40 non caricato');
-check(index.includes('clean-rules.js?v=32'), 'index.html: regole aggiornate non caricate');
+check(index.includes('clean-rules.js?v=33'), 'index.html: regole aggiornate non caricate');
 check(index.includes('clean-objectives.js?v=20'), 'index.html: fix obiettivo in partita non caricato');
 check(!index.includes('virtual-cards-mobile-v35.css') && !index.includes('virtual-table-redesign-v35.js'), 'index.html: vecchi override v35 ancora caricati');
 check(index.includes('interaction-polish.js?v=22'), 'index.html: interazioni aggiornate non caricate');
-check(index.includes('pwa-refresh.js?v=41'), 'index.html: refresh PWA v41 non caricato');
+check(index.includes('pwa-refresh.js?v=42'), 'index.html: refresh PWA v42 non caricato');
 
 const virtualSource = read('virtual-cards.js');
 const virtualCss = read('virtual-cards.css');
@@ -44,7 +44,7 @@ check(virtualSource.includes('Carta da cambiare') && !virtualSource.includes('La
 check(virtualSource.includes('Una relazione si incrina') && virtualSource.includes('Un personaggio tenta un’azione'), 'Le descrizioni delle carte non spiegano chiaramente l’effetto narrativo');
 check(virtualSource.includes('data-toggle-cards') && virtualSource.includes('card-back'), 'Manca il comando per girare le carte sul retro');
 check(virtualSource.includes('S.openRulesModal?.()'), 'Il menu virtuale non apre le stesse regole della home');
-check(virtualSource.includes('const valid = !cancelled && action && (overlaps || thrownUp)') && virtualSource.includes('await commitOutcome(outcome, action)'), 'Il drag non esegue direttamente Cambia o Gioca');
+check(virtualSource.includes('const valid = !cancelled && action && dropState(current).valid') && virtualSource.includes('await commitOutcome(outcome, action)'), 'Il drag non esegue direttamente Cambia o Gioca');
 check(virtualSource.includes('setPointerCapture') && virtualSource.includes('requestAnimationFrame'), 'Il drag non usa Pointer Events e requestAnimationFrame');
 check(virtualSource.includes('virtual-drag-overlay'), 'Il drag non usa un overlay fullscreen');
 check(virtualSource.includes('virtual-confetti') && virtualSource.includes('burstConfetti'), 'Manca la celebrazione del finale accettato');
@@ -54,6 +54,8 @@ check(virtualSource.includes('playedCard') && virtualSource.includes('settlePlay
 check((virtualSource.match(/S\.mount\(/g) || []).length === 1, 'Il tavolo viene rimontato durante il turno');
 check(objectivesSource.includes('if (duringGame) return;') && objectivesSource.includes('if (!duringGame && (changed || forceRefresh))'), 'La chiusura dell’obiettivo può ancora rimontare la schermata di gioco');
 check(rulesSource.includes('rule-card-mini-sections') && rulesSource.includes('<details open>') && rulesSource.includes('Figure e assi'), 'Le regole delle carte non sono divise in mini sezioni');
+check(rulesSource.includes('Solo J, Q, K e A') && !rulesSource.includes('<summary>Positivo e negativo</summary>'), 'La regola del colore non è integrata esclusivamente nelle figure e negli assi');
+check(virtualSource.includes("ghost.classList.remove('selected'") && virtualSource.includes('const dropState = current') && virtualSource.includes('distance >= 76'), 'Il drag della carta selezionata o la soglia di rilascio non sono corretti');
 check((interactionSource.match(/animation\.cancel\(\);/g) || []).length >= 2, 'L’accordion può ancora restare bloccato all’altezza animata');
 check(interactionSource.includes('clearPreviousVirtualDrag') && interactionSource.includes("querySelectorAll('.virtual-drag-ghost')"), 'Un clone di trascinamento precedente può ancora restare sullo schermo');
 
@@ -73,10 +75,10 @@ check(virtualCss.includes('@media(max-height:700px)'), 'Manca l’adattamento pe
 check(virtualCss.includes('.rule-card-mini-sections>details'), 'Le mini sezioni delle regole non hanno uno stile dedicato');
 
 const sw = read('sw.js');
-check(sw.includes('shell-v41') && sw.includes('runtime-v41'), 'Cache PWA v41 non attiva');
+check(sw.includes('shell-v42') && sw.includes('runtime-v42'), 'Cache PWA v42 non attiva');
 check(sw.includes("'./virtual-cards.css'") && sw.includes("'./virtual-cards.js'"), 'Carte virtuali non precacheate');
 check(!sw.includes('virtual-cards-mobile-v35.css') && !sw.includes('virtual-table-redesign-v35.js'), 'Vecchi file v35 ancora nella cache');
-check(read('pwa-refresh.js').includes('epoi_sw_reload_v41'), 'Refresh PWA v41 non attivo');
+check(read('pwa-refresh.js').includes('epoi_sw_reload_v42'), 'Refresh PWA v42 non attivo');
 const coreBlock = sw.match(/const CORE_FILES = \[([\s\S]*?)\];/)?.[1] || '';
 for (const match of coreBlock.matchAll(/['"]\.\/([^'"]*)['"]/g)) check(exists(match[1]), `sw.js: file mancante ${match[1]}`);
 
@@ -119,4 +121,4 @@ if (failures.length) {
   console.error('\nRelease check fallito:\n- ' + failures.join('\n- '));
   process.exit(1);
 }
-console.log('Release check completato: modalità virtuale v40, accordion dinamico, pulizia drag e cache PWA v41 verificati.');
+console.log('Release check completato: modalità virtuale v42, drag selezionato, soglia di rilascio, regole J/Q/K/A e cache verificati.');
