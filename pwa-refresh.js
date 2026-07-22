@@ -2,6 +2,7 @@
 
 (() => {
   if (!('serviceWorker' in navigator)) return;
+  // La v39 forza il passaggio al layout con mano singola e retri delle carte.
   const reloadKey = 'epoi_sw_reload_v39';
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     try {
