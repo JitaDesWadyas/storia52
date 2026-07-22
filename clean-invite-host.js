@@ -22,6 +22,12 @@
     S.play.querySelector('[data-game-scroll-top]')?.addEventListener('click', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+    S.play.querySelectorAll('[data-game-invite]').forEach(button => button.addEventListener('click', async () => {
+      button.disabled = true;
+      try { await S.openGameInvite(session); }
+      catch (error) { S.toast(error?.message || 'Invito non disponibile.'); }
+      finally { button.disabled = false; }
+    }));
   };
 
   S.createGameInviteUrl = async session => {
@@ -54,6 +60,13 @@
     const body = `<div class="qr-modal-content"><p class="eyebrow">SCANSIONA PER ENTRARE</p>${qrMarkup(label, url)}<h3>Apri il link e scegli il tuo nome.</h3><p>Gli altri possono inquadrare direttamente questo schermo.</p><div class="modal-actions"><button type="button" class="primary" data-copy-qr-link>Copia link</button></div></div>`;
     const modal = S.modal('QR della partita', body, { className: 'qr-modal' });
     modal.host.querySelector('[data-copy-qr-link]')?.addEventListener('click', () => S.copy(url, 'Link copiato'));
+  };
+
+  S.openGameInvite = async session => {
+    await (window.EpoiQrReady || Promise.resolve(window.EpoiQr)).catch(() => null);
+    const url = await S.createGameInviteUrl(session);
+    S.openInviteQr('E POI?', url);
+    return url;
   };
 
   const loadingMarkup = () => `<section class="surface app-skeleton invite-skeleton" aria-busy="true" aria-label="Preparazione dell’invito"><div class="skeleton-heading"><span class="skeleton-line skeleton-kicker"></span><span class="skeleton-line skeleton-title"></span><span class="skeleton-line skeleton-copy"></span></div><div class="skeleton-invite-card"><span class="skeleton-qr"></span><div><span class="skeleton-line skeleton-subtitle"></span><span class="skeleton-line skeleton-copy"></span><span class="skeleton-button-row"><i></i><i></i></span></div></div></section>`;
@@ -117,7 +130,7 @@
     const virtualHint = session.cardMode === 'virtual'
       ? '<div class="hint"><b>Le mani sono sui telefoni dei giocatori.</b> Ogni telefono guida cambio, giocata e pesca senza mostrare le carte agli altri.</div>'
       : '';
-    S.mount(`<section class="surface"><div class="screen-heading"><p class="eyebrow">PARTITA IN CORSO</p><h2>Continuate la storia.</h2></div>${copyableStoryContext(session)}${virtualHint}${S.turnGuideMarkup()}<details class="accordion"><summary>Significato delle carte</summary><div class="accordion-body">${S.cardRulesMarkup()}</div></details><details class="accordion"><summary>Come si chiude la storia</summary><div class="accordion-body">${S.finalRulesMarkup()}</div></details><div class="actions one"><button type="button" class="secondary" data-return-invites>Torna al QR</button></div>${scrollTopButton()}</section>`, { session: true });
+    S.mount(`<section class="surface"><div class="screen-heading game-heading-with-action"><div><p class="eyebrow">PARTITA IN CORSO</p><h2>Continuate la storia.</h2></div><button type="button" class="secondary compact" data-game-invite>QR invito</button></div>${copyableStoryContext(session)}${virtualHint}${S.turnGuideMarkup()}<details class="accordion"><summary>Significato delle carte</summary><div class="accordion-body">${S.cardRulesMarkup()}</div></details><details class="accordion"><summary>Come si chiude la storia</summary><div class="accordion-body">${S.finalRulesMarkup()}</div></details><div class="actions one"><button type="button" class="secondary" data-return-invites>Torna al QR</button></div>${scrollTopButton()}</section>`, { session: true });
     S.play.querySelector('[data-return-invites]')?.addEventListener('click', () => S.renderInvites(session));
     bindGameUtilities(session);
   };
