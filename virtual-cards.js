@@ -57,59 +57,53 @@
     const card = cardFromId(id);
     if (!card) return { title: 'Carta non valida', short: '', text: '', tone: 'neutral', badge: '' };
 
-    const isEven = /^\d+$/.test(card.rank) && Number(card.rank) % 2 === 0;
-    if (/^\d+$/.test(card.rank)) {
-      if (card.id.startsWith('H-')) {
-        return {
-          title: `Relazione ${isEven ? 'positiva' : 'negativa'}`,
-          short: 'Relazione',
-          text: isEven ? 'Rafforza un legame.' : 'Crea distanza o tensione.',
-          ...polarity(isEven)
-        };
-      }
-      if (card.id.startsWith('D-')) {
-        return {
-          title: `Scoperta ${isEven ? 'positiva' : 'negativa'}`,
-          short: 'Scoperta',
-          text: isEven ? 'Scopri qualcosa che aiuta.' : 'Scopri qualcosa che complica.',
-          ...polarity(isEven)
-        };
-      }
-      if (card.id.startsWith('C-')) {
-        return {
-          title: 'Azione',
-          short: 'Azione',
-          text: 'Un personaggio agisce.',
-          ...polarity(false, true)
-        };
-      }
+    const numeric = /^\d+$/.test(card.rank);
+    const even = numeric && Number(card.rank) % 2 === 0;
+    if (numeric && card.id.startsWith('H-')) {
       return {
-        title: 'Ostacolo',
-        short: 'Ostacolo',
-        text: 'Compare un problema.',
-        ...polarity(false)
+        title: `Relazione ${even ? 'positiva' : 'negativa'}`,
+        short: 'Relazione',
+        text: even ? 'Rafforza un legame' : 'Crea distanza o tensione',
+        ...polarity(even)
       };
+    }
+    if (numeric && card.id.startsWith('D-')) {
+      return {
+        title: `Scoperta ${even ? 'positiva' : 'negativa'}`,
+        short: 'Scoperta',
+        text: even ? 'Scopri qualcosa che aiuta' : 'Scopri qualcosa che complica',
+        ...polarity(even)
+      };
+    }
+    if (numeric && card.id.startsWith('C-')) {
+      return { title: 'Azione', short: 'Azione', text: 'Un personaggio agisce', ...polarity(false, true) };
+    }
+    if (numeric) {
+      return { title: 'Ostacolo', short: 'Ostacolo', text: 'Compare un problema', ...polarity(false) };
     }
 
     const positive = card.red;
     const special = {
-      J: { short: 'Oggetto', text: positive ? 'Un oggetto aiuta.' : 'Un oggetto crea problemi.' },
-      Q: { short: 'Personaggio', text: positive ? 'Una persona aiuta.' : 'Una persona ostacola.' },
-      K: { short: 'Luogo', text: positive ? 'Un luogo offre possibilità.' : 'Un luogo complica tutto.' },
-      A: { short: 'Svolta', text: positive ? 'La situazione migliora.' : 'La situazione peggiora.' }
+      J: { short: 'Oggetto', good: 'Un oggetto aiuta', bad: 'Un oggetto crea problemi' },
+      Q: { short: 'Personaggio', good: 'Una persona aiuta', bad: 'Una persona ostacola' },
+      K: { short: 'Luogo', good: 'Un luogo offre possibilità', bad: 'Un luogo complica tutto' },
+      A: { short: 'Svolta', good: 'La situazione migliora', bad: 'La situazione peggiora' }
     }[card.rank];
 
     return {
       title: `${special.short} ${positive ? 'positivo' : 'negativo'}`,
       short: special.short,
-      text: special.text,
+      text: positive ? special.good : special.bad,
       ...polarity(positive)
     };
   };
 
+  // Un solo mazzo da 52 carte viene mescolato e spartito fra i giocatori.
+  // Ogni carta appartiene a un solo telefono: mani, pescate e rimescolamenti
+  // non possono creare doppioni con gli altri giocatori.
   const buildAssignments = (seed, count) => {
     const playerCount = Math.max(2, Math.min(8, Number(count) || 2));
-    const deck = shuffle(CARD_IDS, `${seed}|mazzo`);
+    const deck = shuffle(CARD_IDS, `${seed}|mazzo-condiviso`);
     const hands = Array.from({ length: playerCount }, () => []);
     const piles = Array.from({ length: playerCount }, () => []);
     let cursor = 0;
@@ -140,7 +134,7 @@
     const safeIndex = Math.max(0, Math.min(assignments.length - 1, Number(playerIndex) || 0));
     const assignment = assignments[safeIndex];
     return {
-      version: 2,
+      version: 3,
       hand: [...assignment.hand],
       drawPile: [...assignment.drawPile],
       discard: [],
@@ -153,7 +147,7 @@
   };
 
   const isValidState = (state, seed, count, playerIndex) => {
-    if (!state || state.version !== 2) return false;
+    if (!state || state.version !== 3) return false;
     if (!['exchange', 'play', 'afterPlay', 'final', 'completed'].includes(state.phase)) return false;
     const assignment = buildAssignments(seed, count)[playerIndex];
     if (!assignment) return false;
@@ -193,9 +187,9 @@
     const state = JSON.parse(JSON.stringify(source));
 
     if (action === 'exchange') {
-      if (state.phase !== 'exchange') return result(source, false, 'Il cambio è già stato fatto in questo turno.');
+      if (state.phase !== 'exchange') return result(source, false, 'Il cambio è già stato fatto.');
       const index = state.hand.indexOf(cardId);
-      if (index < 0) return result(source, false, 'Scegli una carta della tua mano.');
+      if (index < 0) return result(source, false, 'Scegli una carta.');
       state.hand.splice(index, 1);
       state.discard.push(cardId);
       const drawn = drawOne(state, seed, playerIndex);
@@ -205,7 +199,7 @@
     }
 
     if (action === 'skip-exchange') {
-      if (state.phase !== 'exchange') return result(source, false, 'Il cambio è già stato concluso.');
+      if (state.phase !== 'exchange') return result(source, false, 'Il cambio è già concluso.');
       if (state.hand.length > 1) return result(source, false, 'Con almeno due carte devi cambiarne una.');
       state.phase = 'play';
       state.lastAction = 'skip-exchange';
@@ -213,9 +207,9 @@
     }
 
     if (action === 'play') {
-      if (state.phase !== 'play') return result(source, false, 'Prima completa il cambio.');
+      if (state.phase !== 'play') return result(source, false, 'Prima cambia una carta.');
       const index = state.hand.indexOf(cardId);
-      if (index < 0) return result(source, false, 'Scegli una carta della tua mano.');
+      if (index < 0) return result(source, false, 'Scegli una carta.');
       state.hand.splice(index, 1);
       state.playedCard = cardId;
       state.phase = 'afterPlay';
@@ -224,7 +218,7 @@
     }
 
     if (action === 'draw-end') {
-      if (state.phase !== 'afterPlay') return result(source, false, 'Puoi pescare soltanto dopo aver giocato.');
+      if (state.phase !== 'afterPlay') return result(source, false, 'Puoi pescare dopo aver giocato.');
       settlePlayedCard(state);
       const drawn = drawOne(state, seed, playerIndex);
       if (!drawn.card) return result(source, false, 'Non ci sono carte disponibili.');
@@ -235,8 +229,8 @@
     }
 
     if (action === 'skip-draw') {
-      if (state.phase !== 'afterPlay') return result(source, false, 'Prima devi giocare una carta.');
-      if (!state.hand.length) return result(source, false, 'Con la mano vuota devi pescare oppure collegarti al finale.');
+      if (state.phase !== 'afterPlay') return result(source, false, 'Prima gioca una carta.');
+      if (!state.hand.length) return result(source, false, 'Con la mano vuota pesca oppure vai al finale.');
       settlePlayedCard(state);
       state.phase = 'exchange';
       state.turn += 1;
@@ -245,7 +239,7 @@
     }
 
     if (action === 'final') {
-      if (state.phase !== 'afterPlay' || state.hand.length) return result(source, false, 'Puoi tentare il finale soltanto dopo l’ultima carta.');
+      if (state.phase !== 'afterPlay' || state.hand.length) return result(source, false, 'Il finale si tenta dopo l’ultima carta.');
       state.phase = 'final';
       state.lastAction = 'final';
       return result(state, true);
@@ -308,79 +302,124 @@
     catch { /* Il gioco continua anche senza persistenza. */ }
   };
 
-  const cardMarkup = (id, index, selected, incoming = false) => {
+  const cardFaceMarkup = id => {
     const card = engine.cardFromId(id);
     const meaning = engine.meaningFor(id);
-    return `<button type="button" class="virtual-card ${meaning.tone}${card.red ? ' red' : ''}${selected ? ' selected' : ''}${incoming ? ' card-enter' : ''}" data-virtual-card="${S.esc(id)}" aria-pressed="${selected ? 'true' : 'false'}" style="--card-index:${index}"><span class="virtual-card-corner"><b>${S.esc(card.rank)}</b><i>${card.symbol}</i></span><span class="virtual-card-effect"><em>${S.esc(meaning.badge)}</em><b>${S.esc(meaning.short)}</b><small>${S.esc(meaning.text)}</small></span></button>`;
+    if (!card) return '';
+    return `<span class="virtual-card-corner"><b>${S.esc(card.rank)}</b><i>${card.symbol}</i></span><span class="virtual-card-effect"><em>${S.esc(meaning.badge)}</em><b>${S.esc(meaning.short)}</b><small>${S.esc(meaning.text)}</small></span>`;
   };
+
+  const cardSlotMarkup = index => `<button type="button" class="virtual-card-slot" data-card-slot="${index}" aria-pressed="false" aria-label="Carta ${index + 1}"><span class="virtual-card-corner"><b>—</b><i></i></span><span class="virtual-card-effect"><em></em><b></b><small></small></span></button>`;
 
   const phaseIndex = phase => ({ exchange: 0, play: 1, afterPlay: 2, final: 2, completed: 2 }[phase] || 0);
-  const phaseRail = state => {
-    const current = phaseIndex(state.phase);
-    const steps = ['Cambia', 'Gioca', 'Pesca o finale'];
-    return `<ol class="virtual-turn-rail">${steps.map((label, index) => `<li class="${index < current ? 'done' : index === current ? 'current' : ''}"><span>${index + 1}</span><b>${label}</b></li>`).join('')}</ol>`;
-  };
-
   const instructionFor = state => {
     if (state.phase === 'exchange') return state.hand.length > 1
-      ? { title: `Turno ${state.turn} · Cambia`, text: 'Scorri una carta di lato oppure selezionala e conferma.' }
-      : { title: `Turno ${state.turn} · Ultima carta`, text: 'Puoi cambiarla oppure tenerla e giocarla.' };
-    if (state.phase === 'play') return { title: 'Gioca una carta', text: 'Scorrila verso l’alto oppure selezionala e conferma.' };
-    if (state.phase === 'afterPlay') return { title: 'Racconta la scena', text: state.hand.length ? 'Poi pesca oppure termina il turno.' : 'Hai giocato l’ultima carta: pesca oppure collegati al finale.' };
-    if (state.phase === 'final') return { title: 'Collegati al finale', text: 'Rivela il tuo obiettivo e continua questa stessa scena fino alla conclusione.' };
-    return { title: 'Storia conclusa', text: 'Il finale è stato accettato.' };
+      ? { title: `Turno ${state.turn}`, text: 'Cambia una carta' }
+      : { title: `Turno ${state.turn}`, text: 'Cambia o tieni l’ultima carta' };
+    if (state.phase === 'play') return { title: `Turno ${state.turn}`, text: 'Gioca una carta' };
+    if (state.phase === 'afterPlay') return { title: `Turno ${state.turn}`, text: state.hand.length ? 'Racconta, poi pesca o non pescare' : 'Racconta, poi pesca o vai al finale' };
+    if (state.phase === 'final') return { title: 'Finale', text: 'Collega questa scena al tuo obiettivo' };
+    return { title: 'Partita conclusa', text: 'Il finale è stato accettato' };
   };
 
-  const miniCardMarkup = id => {
-    const card = engine.cardFromId(id);
-    const meaning = engine.meaningFor(id);
-    return `<span class="virtual-mini-card ${meaning.tone}${card.red ? ' red' : ''}"><b>${S.esc(card.rank)}${card.symbol}</b><small>${S.esc(meaning.short)}</small></span>`;
-  };
+  const actionShellMarkup = () => `
+    <button type="button" class="primary" data-virtual-action="exchange">Cambia</button>
+    <button type="button" class="secondary" data-virtual-action="skip-exchange">Tieni</button>
+    <button type="button" class="primary" data-virtual-action="play">Gioca</button>
+    <button type="button" class="primary" data-virtual-action="draw-end">Pesca</button>
+    <button type="button" class="secondary" data-virtual-action="skip-draw">Non pescare</button>
+    <button type="button" class="secondary" data-virtual-action="final">Finale</button>
+    <button type="button" class="primary" data-virtual-objective data-action-objective hidden>Obiettivo</button>
+    <button type="button" class="secondary" data-virtual-action="complete">Finale accettato</button>
+    <button type="button" class="text-button" data-virtual-action="continue">Continuiamo</button>
+    <button type="button" class="primary" data-virtual-home>Home</button>`;
 
-  const deckMarkup = state => {
-    const discarded = state.discard[state.discard.length - 1] || '';
-    return `<div class="virtual-deck-area"><div class="virtual-deck-card" data-virtual-deck><span class="virtual-deck-layer layer-one"></span><span class="virtual-deck-layer layer-two"></span><div class="virtual-deck-face"><img src="storia52-cards-logo.svg" alt=""><small>MAZZO</small><b>${state.drawPile.length}</b></div></div><div class="virtual-discard-stack" data-virtual-discard>${discarded ? miniCardMarkup(discarded) : '<span class="virtual-discard-empty"><b>◇</b><small>SCARTI</small></span>'}<i>${state.discard.length}</i></div></div>`;
-  };
-
-  const playZoneMarkup = (state, selectedId = '') => {
-    const id = state.playedCard || selectedId;
-    if (!id) return `<div class="virtual-play-zone empty" data-play-zone><span>↑</span><b>${state.phase === 'exchange' ? 'Scegli la carta da cambiare' : 'Trascina qui la carta da giocare'}</b></div>`;
-    const card = engine.cardFromId(id);
-    const meaning = engine.meaningFor(id);
-    const played = Boolean(state.playedCard);
-    return `<article class="virtual-play-zone${played ? ' played' : ' preview'} ${meaning.tone}${card.red ? ' red' : ''}" data-play-zone><span class="virtual-table-card"><b>${S.esc(card.rank)}${card.symbol}</b><em>${S.esc(meaning.badge)}</em></span><div><small>${played ? 'CARTA GIOCATA' : 'CARTA SELEZIONATA'}</small><h3>${S.esc(meaning.title)}</h3><p>${S.esc(meaning.text)}</p>${played ? '<strong>Racconta ora la scena.</strong>' : `<strong>${state.phase === 'exchange' ? 'Scorri di lato per cambiarla.' : 'Scorri verso l’alto per giocarla.'}</strong>`}</div></article>`;
-  };
-
-  const actionMarkup = (state, selectedId) => {
-    if (state.phase === 'exchange') return `<button type="button" class="primary virtual-main-action" data-virtual-action="exchange"${selectedId ? '' : ' disabled'}>Cambia carta</button>${state.hand.length <= 1 ? '<button type="button" class="secondary" data-virtual-action="skip-exchange">Tieni la carta</button>' : ''}`;
-    if (state.phase === 'play') return `<button type="button" class="primary virtual-main-action" data-virtual-action="play"${selectedId ? '' : ' disabled'}>Gioca carta</button>`;
-    if (state.phase === 'afterPlay' && state.hand.length) return '<button type="button" class="primary" data-virtual-action="draw-end">Pesca e termina</button><button type="button" class="secondary" data-virtual-action="skip-draw">Termina senza pescare</button>';
-    if (state.phase === 'afterPlay') return '<button type="button" class="primary" data-virtual-action="draw-end">Pesca una carta</button><button type="button" class="secondary" data-virtual-action="final">Collegati al finale</button>';
-    if (state.phase === 'final') return '<button type="button" class="primary" data-virtual-objective>Rivela obiettivo</button><button type="button" class="secondary" data-virtual-action="complete">Finale accettato</button><button type="button" class="text-button" data-virtual-action="continue">Continuiamo</button>';
-    return '<button type="button" class="primary" data-virtual-home>Torna alla home</button>';
-  };
+  const shellMarkup = (session, playerIndex) => `<section class="surface virtual-game" data-virtual-root data-phase="exchange">
+    <header class="virtual-game-header">
+      <div class="virtual-player-title"><p class="eyebrow">${S.esc(S.playerName(session, playerIndex))}</p><div><h2 data-turn-title>Turno 1</h2><p data-turn-text>Cambia una carta</p></div></div>
+      <nav class="virtual-header-actions" aria-label="Strumenti partita">
+        <button type="button" class="secondary compact" data-virtual-story>Storia</button>
+        <button type="button" class="secondary compact" data-virtual-rules>Regole</button>
+        <button type="button" class="secondary compact" data-virtual-invite>QR</button>
+        <button type="button" class="secondary compact" data-virtual-objective>Obiettivo</button>
+      </nav>
+    </header>
+    <ol class="virtual-turn-rail" aria-label="Fasi del turno">
+      <li data-rail-step="0"><span>1</span><b>Cambia</b></li>
+      <li data-rail-step="1"><span>2</span><b>Gioca</b></li>
+      <li data-rail-step="2"><span>3</span><b>Chiudi</b></li>
+    </ol>
+    <section class="virtual-table" aria-label="Tavolo di gioco">
+      <div class="virtual-piles">
+        <button type="button" class="virtual-deck-card" data-virtual-deck aria-label="Mazzo">
+          <span class="virtual-deck-layer layer-three"></span><span class="virtual-deck-layer layer-two"></span><span class="virtual-deck-layer layer-one"></span>
+          <span class="virtual-deck-face"><img src="storia52-cards-logo.svg" alt=""><small data-deck-action>MAZZO</small><b data-deck-count>0</b></span>
+        </button>
+        <div class="virtual-discard-stack" data-virtual-discard aria-label="Scarti">
+          <span class="virtual-discard-card" data-discard-card><b>—</b><i></i><small>SCARTI</small></span><em data-discard-count>0</em>
+        </div>
+      </div>
+      <article class="virtual-play-zone empty" data-play-zone>
+        <span class="virtual-table-card" data-table-card><b>—</b><i></i><em></em></span>
+        <div><small data-zone-label>CARTA GIOCATA</small><h3 data-zone-title>Trascina qui una carta</h3><p data-zone-text>La carta resterà sul tavolo mentre racconti.</p></div>
+      </article>
+    </section>
+    <section class="virtual-hand-section">
+      <div class="virtual-hand-heading"><span>LA TUA MANO</span><b data-hand-count>5 carte</b></div>
+      <div class="virtual-hand" data-virtual-hand>${Array.from({ length: 5 }, (_, index) => cardSlotMarkup(index)).join('')}</div>
+      <p class="virtual-gesture-hint" data-gesture-hint>Trascina di lato per cambiare.</p>
+    </section>
+    <div class="virtual-actions" data-virtual-actions>${actionShellMarkup()}</div>
+  </section>`;
 
   const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const animateTo = async (element, target, action) => {
-    if (!element?.animate || !target || reducedMotion()) return;
+  const animateFlight = async (element, target, kind) => {
+    if (!element || !target || reducedMotion()) return;
     const from = element.getBoundingClientRect();
     const to = target.getBoundingClientRect();
+    const ghost = element.cloneNode(true);
+    ghost.classList.add('virtual-card-flight');
+    Object.assign(ghost.style, {
+      position: 'fixed', left: `${from.left}px`, top: `${from.top}px`, width: `${from.width}px`, height: `${from.height}px`, margin: '0', zIndex: '9999', pointerEvents: 'none'
+    });
+    document.body.appendChild(ghost);
+    element.classList.add('is-flight-source');
     const dx = to.left + to.width / 2 - (from.left + from.width / 2);
     const dy = to.top + to.height / 2 - (from.top + from.height / 2);
-    const rotate = action === 'exchange' ? 12 : -4;
-    await element.animate([
-      { transform: getComputedStyle(element).transform === 'none' ? 'translate(0,0)' : getComputedStyle(element).transform, opacity: 1 },
-      { transform: `translate(${dx * .35}px,${dy * .35}px) scale(.94) rotate(${rotate / 3}deg)`, opacity: 1, offset: .36 },
-      { transform: `translate(${dx}px,${dy}px) scale(.58) rotate(${rotate}deg)`, opacity: .08 }
-    ], { duration: 460, easing: 'cubic-bezier(.2,.82,.22,1)' }).finished.catch(() => {});
+    const rotate = kind === 'exchange' ? 9 : -3;
+    try {
+      await ghost.animate([
+        { transform: 'translate3d(0,0,0) scale(1) rotate(0)', opacity: 1 },
+        { transform: `translate3d(${dx}px,${dy}px,0) scale(.62) rotate(${rotate}deg)`, opacity: .12 }
+      ], { duration: 230, easing: 'cubic-bezier(.2,.78,.25,1)' }).finished;
+    } catch { /* L’azione continua. */ }
+    ghost.remove();
+    element.classList.remove('is-flight-source');
   };
 
-  const animatePlayedToDiscard = async () => {
-    const played = S.play.querySelector('[data-play-zone].played');
-    const discard = S.play.querySelector('[data-virtual-discard]');
-    if (!played || !discard) return;
-    await animateTo(played, discard, 'exchange');
+  const openRulesPopup = initial => {
+    const sections = {
+      cards: ['Carte', () => S.cardRulesMarkup()],
+      turn: ['Turno', () => S.turnGuideMarkup()],
+      final: ['Finale', () => S.finalRulesMarkup()]
+    };
+    const body = `<div class="virtual-popup"><nav class="virtual-popup-tabs">${Object.entries(sections).map(([id, [label]]) => `<button type="button" class="${id === initial ? 'active' : ''}" data-rule-tab="${id}">${label}</button>`).join('')}</nav><div class="virtual-popup-scroll" data-rule-panel>${sections[initial][1]()}</div></div>`;
+    const modal = S.modal('Regole', body, { wide: true, className: 'virtual-rules-modal' });
+    const panel = modal.host.querySelector('[data-rule-panel]');
+    modal.host.querySelectorAll('[data-rule-tab]').forEach(button => button.addEventListener('click', () => {
+      const section = sections[button.dataset.ruleTab];
+      if (!section || !panel) return;
+      modal.host.querySelectorAll('[data-rule-tab]').forEach(item => item.classList.toggle('active', item === button));
+      panel.innerHTML = section[1]();
+      panel.scrollTop = 0;
+      S.bindRulebook?.(panel);
+    }));
+    S.bindRulebook?.(panel);
+  };
+
+  const openStoryPopup = session => {
+    S.modal('Storia', `<div class="virtual-popup-scroll virtual-story-popup">${S.storyContextMarkup(session)}</div>`, { wide: true, className: 'virtual-story-modal' });
   };
 
   S.renderVirtualPlayer = (session, playerIndex) => {
@@ -391,153 +430,305 @@
 
     let state = loadState(session, playerIndex);
     let selectedId = '';
-    let incomingId = state.lastAction === 'deal' ? state.hand[state.hand.length - 1] : '';
     let busy = false;
+    let incomingId = state.lastAction === 'deal' ? state.hand[state.hand.length - 1] : '';
+    let drag = null;
+    let dragFrame = 0;
+
+    document.body.classList.add('virtual-table-active');
+    S.mount(shellMarkup(session, playerIndex), { session: true, preserveHash: true, scroll: false, animate: false });
+    const root = S.play.querySelector('[data-virtual-root]');
+    if (!root) return;
+
+    const refs = {
+      title: root.querySelector('[data-turn-title]'),
+      text: root.querySelector('[data-turn-text]'),
+      handCount: root.querySelector('[data-hand-count]'),
+      hint: root.querySelector('[data-gesture-hint]'),
+      deck: root.querySelector('[data-virtual-deck]'),
+      deckCount: root.querySelector('[data-deck-count]'),
+      deckAction: root.querySelector('[data-deck-action]'),
+      discard: root.querySelector('[data-virtual-discard]'),
+      discardCard: root.querySelector('[data-discard-card]'),
+      discardCount: root.querySelector('[data-discard-count]'),
+      zone: root.querySelector('[data-play-zone]'),
+      tableCard: root.querySelector('[data-table-card]'),
+      zoneLabel: root.querySelector('[data-zone-label]'),
+      zoneTitle: root.querySelector('[data-zone-title]'),
+      zoneText: root.querySelector('[data-zone-text]'),
+      slots: [...root.querySelectorAll('[data-card-slot]')],
+      actions: [...root.querySelectorAll('[data-virtual-action]')],
+      objectiveButtons: [...root.querySelectorAll('[data-virtual-objective]')]
+    };
 
     const save = () => saveState(session, playerIndex, state);
+    const cardElement = id => refs.slots.find(slot => slot.dataset.virtualCard === id) || null;
 
-    const bindActionButtons = () => {
-      S.play.querySelectorAll('[data-virtual-action]').forEach(button => button.addEventListener('click', () => run(button.dataset.virtualAction)));
-      S.play.querySelectorAll('[data-virtual-objective]').forEach(button => button.addEventListener('click', () => S.openObjective(session, playerIndex, true)));
-      S.play.querySelectorAll('[data-virtual-invite]').forEach(button => button.addEventListener('click', () => openInvite(button)));
-      S.play.querySelector('[data-virtual-home]')?.addEventListener('click', S.renderHome);
-    };
-
-    const syncSelection = () => {
-      S.play.querySelectorAll('[data-virtual-card]').forEach(button => {
-        const selected = button.dataset.virtualCard === selectedId;
-        button.classList.toggle('selected', selected);
-        button.setAttribute('aria-pressed', String(selected));
+    const updateRail = () => {
+      const current = phaseIndex(state.phase);
+      root.querySelectorAll('[data-rail-step]').forEach(item => {
+        const index = Number(item.dataset.railStep);
+        item.classList.toggle('done', index < current);
+        item.classList.toggle('current', index === current);
       });
-      const zone = S.play.querySelector('[data-play-zone]');
-      if (zone && !state.playedCard) zone.outerHTML = playZoneMarkup(state, selectedId);
-      const actions = S.play.querySelector('[data-virtual-actions]');
-      if (actions) {
-        actions.innerHTML = actionMarkup(state, selectedId);
-        bindActionButtons();
-      }
     };
 
-    const commit = (next, { reshuffled = false, drawn = '' } = {}) => {
-      state = next;
-      incomingId = drawn;
-      selectedId = '';
-      save();
-      render();
-      if (reshuffled) {
-        requestAnimationFrame(() => S.play.querySelector('[data-virtual-deck]')?.classList.add('is-shuffling'));
-        S.toast('Mazzo finito: scarti rimescolati');
-      }
-    };
-
-    const run = async (action, cardId = selectedId) => {
-      if (busy) return;
-      busy = true;
-      const cardElement = cardId ? S.play.querySelector(`[data-virtual-card="${CSS.escape(cardId)}"]`) : null;
-      if (action === 'exchange' && cardElement) await animateTo(cardElement, S.play.querySelector('[data-virtual-discard]'), action);
-      if (action === 'play' && cardElement) await animateTo(cardElement, S.play.querySelector('[data-play-zone]'), action);
-      if (['draw-end', 'skip-draw', 'continue'].includes(action)) await animatePlayedToDiscard();
-      const outcome = engine.apply(state, action, session.cardSeed, playerIndex, cardId);
-      busy = false;
-      if (!outcome.ok) { S.toast(outcome.message); return; }
-      commit(outcome.state, outcome);
-    };
-
-    const selectCard = id => {
-      if (!['exchange', 'play'].includes(state.phase) || busy) return;
-      selectedId = selectedId === id ? '' : id;
-      syncSelection();
-    };
-
-    const bindGesture = button => {
-      const id = button.dataset.virtualCard;
-      let start = null;
-      let moved = false;
-
-      button.addEventListener('pointerdown', event => {
-        if (!['exchange', 'play'].includes(state.phase) || busy) return;
-        start = { x: event.clientX, y: event.clientY, pointerId: event.pointerId };
-        moved = false;
-        button.classList.add('is-dragging');
-        button.setPointerCapture?.(event.pointerId);
-      });
-
-      button.addEventListener('pointermove', event => {
-        if (!start || event.pointerId !== start.pointerId) return;
-        const dx = event.clientX - start.x;
-        const dy = event.clientY - start.y;
-        if (Math.abs(dx) + Math.abs(dy) > 6) moved = true;
-        button.style.setProperty('--drag-x', `${dx}px`);
-        button.style.setProperty('--drag-y', `${dy}px`);
-        button.style.setProperty('--drag-rotate', `${Math.max(-8, Math.min(8, dx / 14))}deg`);
-      });
-
-      const finish = event => {
-        if (!start || event.pointerId !== start.pointerId) return;
-        const dx = event.clientX - start.x;
-        const dy = event.clientY - start.y;
-        const exchangeGesture = state.phase === 'exchange' && Math.abs(dx) > 52 && Math.abs(dx) > Math.abs(dy);
-        const playGesture = state.phase === 'play' && dy < -58 && Math.abs(dy) > Math.abs(dx) * .8;
-        start = null;
-        button.classList.remove('is-dragging');
-        button.style.removeProperty('--drag-x');
-        button.style.removeProperty('--drag-y');
-        button.style.removeProperty('--drag-rotate');
-        if (exchangeGesture || playGesture) {
-          button.dataset.suppressClick = 'true';
-          selectedId = id;
-          syncSelection();
-          run(exchangeGesture ? 'exchange' : 'play', id);
-        }
-      };
-
-      button.addEventListener('pointerup', finish);
-      button.addEventListener('pointercancel', event => {
-        if (!start || event.pointerId !== start.pointerId) return;
-        start = null;
-        button.classList.remove('is-dragging');
-        button.style.removeProperty('--drag-x');
-        button.style.removeProperty('--drag-y');
-        button.style.removeProperty('--drag-rotate');
-      });
-      button.addEventListener('click', event => {
-        if (button.dataset.suppressClick === 'true' || moved) {
-          delete button.dataset.suppressClick;
-          moved = false;
-          event.preventDefault();
+    const updateHand = () => {
+      refs.handCount.textContent = `${state.hand.length} ${state.hand.length === 1 ? 'carta' : 'carte'}`;
+      refs.slots.forEach((slot, index) => {
+        const id = state.hand[index] || '';
+        slot.dataset.virtualCard = id;
+        slot.disabled = !id || busy || !['exchange', 'play'].includes(state.phase);
+        slot.className = 'virtual-card-slot';
+        slot.setAttribute('aria-pressed', String(Boolean(id && id === selectedId)));
+        if (!id) {
+          slot.classList.add('empty');
+          slot.removeAttribute('aria-label');
+          slot.innerHTML = '<span class="virtual-empty-slot" aria-hidden="true"></span>';
           return;
         }
-        selectCard(id);
+        const card = engine.cardFromId(id);
+        const meaning = engine.meaningFor(id);
+        slot.classList.add(meaning.tone);
+        if (card.red) slot.classList.add('red');
+        if (id === selectedId) slot.classList.add('selected');
+        if (id === incomingId) slot.classList.add('card-enter');
+        slot.setAttribute('aria-label', `${card.rank} di ${card.name}: ${meaning.title}. ${meaning.text}`);
+        slot.innerHTML = cardFaceMarkup(id);
       });
     };
 
-    const openInvite = async button => {
-      if (button) button.disabled = true;
-      try {
-        await S.openGameInvite(session);
-      } catch (error) {
-        S.toast(error?.message || 'Invito non disponibile.');
-      } finally {
-        if (button) button.disabled = false;
-      }
+    const updateDeck = () => {
+      refs.deckCount.textContent = String(state.drawPile.length);
+      refs.deckAction.textContent = state.phase === 'afterPlay' ? 'PESCA' : 'MAZZO';
+      refs.deck.classList.toggle('can-draw', state.phase === 'afterPlay');
+      refs.deck.disabled = busy || state.phase === 'completed';
+      refs.deck.setAttribute('aria-label', state.phase === 'afterPlay'
+        ? `Pesca una carta. ${state.drawPile.length} carte disponibili.`
+        : `Mazzo: ${state.drawPile.length} carte disponibili.`);
     };
 
-    const render = () => {
-      const instruction = instructionFor(state);
-      const hand = state.hand.map((id, index) => cardMarkup(id, index, selectedId === id, incomingId === id)).join('');
-
-      S.mount(`<section class="surface virtual-game"><header class="virtual-game-header"><div><p class="eyebrow">CARTE VIRTUALI · ${S.esc(S.playerName(session, playerIndex))}</p><h2>${S.esc(instruction.title)}</h2><p>${S.esc(instruction.text)}</p></div><div class="virtual-header-actions"><button type="button" class="secondary compact" data-virtual-invite>QR invito</button><button type="button" class="secondary compact" data-virtual-objective>Obiettivo</button></div></header>${phaseRail(state)}<div class="virtual-table">${deckMarkup(state)}${playZoneMarkup(state, selectedId)}</div><section class="virtual-hand-section"><div class="virtual-hand-heading"><span>LA TUA MANO</span><b>${state.hand.length} ${state.hand.length === 1 ? 'carta' : 'carte'}</b></div><div class="virtual-hand${state.lastAction === 'deal' ? ' is-dealing' : ''}">${hand || '<div class="virtual-empty-hand">La mano è vuota.</div>'}</div><p class="virtual-gesture-hint">${state.phase === 'exchange' ? 'Scorri una carta di lato per cambiarla.' : state.phase === 'play' ? 'Scorri una carta verso l’alto per giocarla.' : 'La carta giocata resta sul tavolo finché chiudi il turno.'}</p></section><div class="virtual-actions" data-virtual-actions>${actionMarkup(state, selectedId)}</div><details class="virtual-story-details"><summary>Storia e regole delle carte</summary><div>${S.storyContextMarkup(session)}${S.cardRulesMarkup()}</div></details></section>`, { session: true, preserveHash: true, scroll: false, animate: false });
-
-      S.play.querySelectorAll('[data-virtual-card]').forEach(bindGesture);
-      bindActionButtons();
-
-      if (state.lastAction) {
-        state.lastAction = '';
-        save();
+    const updateDiscard = () => {
+      const id = state.discard[state.discard.length - 1] || '';
+      refs.discardCount.textContent = String(state.discard.length);
+      refs.discardCard.className = 'virtual-discard-card';
+      if (!id) {
+        refs.discardCard.innerHTML = '<b>—</b><i></i><small>SCARTI</small>';
+        return;
       }
+      const card = engine.cardFromId(id);
+      const meaning = engine.meaningFor(id);
+      refs.discardCard.classList.add(meaning.tone);
+      if (card.red) refs.discardCard.classList.add('red');
+      refs.discardCard.innerHTML = `<b>${S.esc(card.rank)}</b><i>${card.symbol}</i><small>${S.esc(meaning.short)}</small>`;
+    };
+
+    const updateZone = () => {
+      const id = state.playedCard || selectedId;
+      refs.zone.className = 'virtual-play-zone';
+      refs.tableCard.className = 'virtual-table-card';
+      if (!id) {
+        refs.zone.classList.add('empty');
+        refs.tableCard.innerHTML = '<b>—</b><i></i><em></em>';
+        refs.zoneLabel.textContent = 'TAVOLO';
+        refs.zoneTitle.textContent = state.phase === 'exchange' ? 'Scegli la carta da cambiare' : 'Trascina qui una carta';
+        refs.zoneText.textContent = state.phase === 'exchange' ? 'Scorri una carta di lato.' : 'Scorri una carta verso l’alto.';
+        return;
+      }
+      const card = engine.cardFromId(id);
+      const meaning = engine.meaningFor(id);
+      refs.zone.classList.add(meaning.tone, state.playedCard ? 'played' : 'preview');
+      refs.tableCard.classList.add(meaning.tone);
+      if (card.red) {
+        refs.zone.classList.add('red');
+        refs.tableCard.classList.add('red');
+      }
+      refs.tableCard.innerHTML = `<b>${S.esc(card.rank)}</b><i>${card.symbol}</i><em>${S.esc(meaning.badge)}</em>`;
+      refs.zoneLabel.textContent = state.playedCard ? 'CARTA GIOCATA' : 'CARTA SELEZIONATA';
+      refs.zoneTitle.textContent = meaning.title;
+      refs.zoneText.textContent = state.playedCard ? `${meaning.text}. Racconta la scena.` : meaning.text;
+    };
+
+    const showAction = (action, visible, enabled = true) => {
+      const button = root.querySelector(`[data-virtual-action="${action}"]`);
+      if (!button) return;
+      button.hidden = !visible;
+      button.disabled = !enabled || busy;
+    };
+
+    const updateActions = () => {
+      refs.actions.forEach(button => { button.hidden = true; button.disabled = true; });
+      refs.objectiveButtons.forEach(button => {
+        button.disabled = busy;
+        button.hidden = button.hasAttribute('data-action-objective') ? state.phase !== 'final' : false;
+      });
+      const selected = Boolean(selectedId);
+      showAction('exchange', state.phase === 'exchange', selected);
+      showAction('skip-exchange', state.phase === 'exchange' && state.hand.length <= 1, true);
+      showAction('play', state.phase === 'play', selected);
+      showAction('draw-end', state.phase === 'afterPlay', true);
+      showAction('skip-draw', state.phase === 'afterPlay' && state.hand.length > 0, true);
+      showAction('final', state.phase === 'afterPlay' && state.hand.length === 0, true);
+      showAction('complete', state.phase === 'final', true);
+      showAction('continue', state.phase === 'final', true);
+      const home = root.querySelector('[data-virtual-home]');
+      if (home) home.hidden = state.phase !== 'completed';
+    };
+
+    const update = () => {
+      const instruction = instructionFor(state);
+      root.dataset.phase = state.phase;
+      refs.title.textContent = instruction.title;
+      refs.text.textContent = instruction.text;
+      refs.hint.textContent = state.phase === 'exchange'
+        ? 'Trascina di lato per cambiare.'
+        : state.phase === 'play'
+          ? 'Trascina verso l’alto per giocare.'
+          : state.phase === 'afterPlay'
+            ? 'Tocca il mazzo per pescare.'
+            : 'Usa i pulsanti per continuare.';
+      updateRail();
+      updateHand();
+      updateDeck();
+      updateDiscard();
+      updateZone();
+      updateActions();
       incomingId = '';
     };
 
-    render();
+    const select = id => {
+      if (busy || !['exchange', 'play'].includes(state.phase) || !state.hand.includes(id)) return;
+      selectedId = selectedId === id ? '' : id;
+      updateHand();
+      updateZone();
+      updateActions();
+    };
+
+    const run = async (action, id = selectedId) => {
+      if (busy) return;
+      const outcome = engine.apply(state, action, session.cardSeed, playerIndex, id);
+      if (!outcome.ok) { S.toast(outcome.message); return; }
+
+      busy = true;
+      updateActions();
+      const source = id ? cardElement(id) : null;
+      if (action === 'exchange') await animateFlight(source, refs.discard, 'exchange');
+      if (action === 'play') await animateFlight(source, refs.zone, 'play');
+      if (['draw-end', 'skip-draw', 'continue'].includes(action) && state.playedCard) {
+        await animateFlight(refs.tableCard, refs.discard, 'exchange');
+      }
+
+      state = outcome.state;
+      selectedId = '';
+      incomingId = outcome.drawn || '';
+      busy = false;
+      save();
+      update();
+
+      if (outcome.reshuffled) {
+        refs.deck.classList.remove('is-shuffling');
+        void refs.deck.offsetWidth;
+        refs.deck.classList.add('is-shuffling');
+        S.toast('Scarti rimescolati');
+      }
+    };
+
+    const resetDragVisual = slot => {
+      slot.classList.remove('is-dragging');
+      slot.style.removeProperty('--drag-x');
+      slot.style.removeProperty('--drag-y');
+      slot.style.removeProperty('--drag-rotate');
+    };
+
+    const applyDragFrame = () => {
+      dragFrame = 0;
+      if (!drag) return;
+      const { slot, dx, dy } = drag;
+      slot.style.setProperty('--drag-x', `${Math.max(-90, Math.min(90, dx))}px`);
+      slot.style.setProperty('--drag-y', `${Math.max(-105, Math.min(40, dy))}px`);
+      slot.style.setProperty('--drag-rotate', `${Math.max(-7, Math.min(7, dx / 16))}deg`);
+    };
+
+    refs.slots.forEach(slot => {
+      slot.addEventListener('pointerdown', event => {
+        const id = slot.dataset.virtualCard;
+        if (!id || busy || !['exchange', 'play'].includes(state.phase)) return;
+        drag = { slot, id, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, dx: 0, dy: 0, moved: false };
+        slot.setPointerCapture?.(event.pointerId);
+      });
+
+      slot.addEventListener('pointermove', event => {
+        if (!drag || drag.slot !== slot || drag.pointerId !== event.pointerId) return;
+        drag.dx = event.clientX - drag.startX;
+        drag.dy = event.clientY - drag.startY;
+        if (Math.abs(drag.dx) + Math.abs(drag.dy) > 10) {
+          drag.moved = true;
+          slot.classList.add('is-dragging');
+        }
+        if (!dragFrame) dragFrame = requestAnimationFrame(applyDragFrame);
+      });
+
+      const finishDrag = event => {
+        if (!drag || drag.slot !== slot || drag.pointerId !== event.pointerId) return;
+        const current = drag;
+        drag = null;
+        if (dragFrame) cancelAnimationFrame(dragFrame);
+        dragFrame = 0;
+        const exchangeGesture = state.phase === 'exchange' && Math.abs(current.dx) >= 64 && Math.abs(current.dx) > Math.abs(current.dy) * 1.05;
+        const playGesture = state.phase === 'play' && current.dy <= -64 && Math.abs(current.dy) > Math.abs(current.dx) * .8;
+        if (exchangeGesture || playGesture) {
+          slot.dataset.ignoreClickUntil = String(performance.now() + 450);
+          selectedId = current.id;
+          run(exchangeGesture ? 'exchange' : 'play', current.id).finally(() => resetDragVisual(slot));
+        } else {
+          resetDragVisual(slot);
+        }
+      };
+
+      slot.addEventListener('pointerup', finishDrag);
+      slot.addEventListener('pointercancel', event => {
+        if (!drag || drag.slot !== slot || drag.pointerId !== event.pointerId) return;
+        drag = null;
+        if (dragFrame) cancelAnimationFrame(dragFrame);
+        dragFrame = 0;
+        resetDragVisual(slot);
+      });
+      slot.addEventListener('click', () => {
+        const ignoreUntil = Number(slot.dataset.ignoreClickUntil || 0);
+        if (performance.now() < ignoreUntil) return;
+        delete slot.dataset.ignoreClickUntil;
+        select(slot.dataset.virtualCard);
+      });
+    });
+
+    refs.actions.forEach(button => button.addEventListener('click', () => run(button.dataset.virtualAction)));
+    refs.objectiveButtons.forEach(button => button.addEventListener('click', () => S.openObjective(session, playerIndex, true)));
+    root.querySelector('[data-virtual-story]')?.addEventListener('click', () => openStoryPopup(session));
+    root.querySelector('[data-virtual-rules]')?.addEventListener('click', () => openRulesPopup('cards'));
+    root.querySelector('[data-virtual-invite]')?.addEventListener('click', async event => {
+      const button = event.currentTarget;
+      button.disabled = true;
+      try { await S.openGameInvite(session); }
+      catch (error) { S.toast(error?.message || 'Invito non disponibile.'); }
+      finally { button.disabled = false; }
+    });
+    root.querySelector('[data-virtual-home]')?.addEventListener('click', S.renderHome);
+    refs.deck.addEventListener('click', () => {
+      if (state.phase === 'afterPlay') run('draw-end');
+      else S.toast('Puoi pescare dopo aver giocato.');
+    });
+
+    const cleanupObserver = new MutationObserver(() => {
+      if (S.play.querySelector('[data-virtual-root]')) return;
+      document.body.classList.remove('virtual-table-active');
+      cleanupObserver.disconnect();
+    });
+    cleanupObserver.observe(S.play, { childList: true, subtree: false });
+
+    if (state.lastAction) {
+      state.lastAction = '';
+      save();
+    }
+    update();
   };
 })();
