@@ -24,6 +24,7 @@
 
   const normalizeCount = value => Math.max(2, Math.min(8, Number(value) || 4));
   const emptyOpeningNotes = () => ({ protagonist: '', setting: '', action: '', problem: '' });
+  const cleanSeed = value => S.cleanText(value, 64).replace(/[^A-Za-z0-9_-]/g, '').slice(0, 64);
 
   const normalizeObjectives = (session, story) => {
     if (!story || typeof S.objectivesForReadyStory !== 'function') return;
@@ -38,10 +39,12 @@
   S.normalizeSession = session => {
     if (!session || typeof session !== 'object') return null;
 
-    session.version = Math.max(5, Number(session.version) || 0);
+    session.version = Math.max(6, Number(session.version) || 0);
     session.mode = 'play';
     session.source = 'ready';
     session.delivery = session.delivery === 'multi' ? 'multi' : 'single';
+    session.cardMode = session.delivery === 'multi' && session.cardMode === 'virtual' ? 'virtual' : 'physical';
+    session.cardSeed = cleanSeed(session.cardSeed || session.seed || 'PARTITA') || 'PARTITA';
     session.count = normalizeCount(session.count);
     session.names = Array.from({ length: session.count }, (_, index) => S.cleanText(session.names?.[index] || '', S.limits.name));
     session.confirmed = Array.from({ length: session.count }, (_, index) => Boolean(session.confirmed?.[index]));

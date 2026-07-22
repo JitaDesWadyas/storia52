@@ -31,6 +31,11 @@
       S.renderSharedInvitePicker(session);
       return;
     }
+    if (session.cardMode === 'virtual') {
+      S.renderVirtualPlayer(session, index);
+      return;
+    }
+
     session.confirmed ||= Array(session.count).fill(false);
     S.mount(personalInviteMarkup(session, index), { session: true, preserveHash: true });
     S.play.querySelector('[data-show-card]')?.addEventListener('click', () => S.openObjective(session, index, true));
@@ -51,7 +56,10 @@
 
   const confirmPlayer = (session, index) => {
     const name = S.playerName(session, index);
-    const modal = S.modal('Conferma giocatore', `<div class="join-confirm"><p class="eyebrow">GIOCATORE ${index + 1}</p><h3>Sei ${S.esc(name)}?</h3><p>Conferma soltanto quando hai il telefono in mano e gli altri non stanno guardando.</p><div class="modal-actions"><button type="button" class="primary" data-confirm-player>Sì, apri il mio invito</button><button type="button" class="secondary" data-cancel-player>Annulla</button></div></div>`, { className: 'join-confirm-modal' });
+    const modeText = session.cardMode === 'virtual'
+      ? 'Aprirai il tuo obiettivo e la tua mano privata.'
+      : 'Aprirai il tuo obiettivo personale.';
+    const modal = S.modal('Conferma giocatore', `<div class="join-confirm"><p class="eyebrow">GIOCATORE ${index + 1}</p><h3>Sei ${S.esc(name)}?</h3><p>${modeText} Conferma soltanto quando gli altri non stanno guardando.</p><div class="modal-actions"><button type="button" class="primary" data-confirm-player>Sì, continua</button><button type="button" class="secondary" data-cancel-player>Annulla</button></div></div>`, { className: 'join-confirm-modal' });
     modal.host.querySelector('[data-confirm-player]')?.addEventListener('click', () => {
       modal.close();
       setTimeout(() => S.renderSharedPlayer(session, index), 150);
@@ -60,8 +68,9 @@
   };
 
   S.renderSharedInvitePicker = session => {
-    const players = session.names.map((_, index) => `<button type="button" class="player-button" data-join-player="${index}"><span>${index + 1}</span><div><b>${S.esc(S.playerName(session, index))}</b><small>Apri il tuo invito personale</small></div><i>→</i></button>`).join('');
-    S.mount(`<section class="surface join-surface"><div class="screen-heading"><p class="eyebrow">INVITO ALLA PARTITA</p><h2>Scegli il tuo giocatore.</h2><p>Tutti aprono lo stesso link. Seleziona soltanto il tuo nome: l’obiettivo resta nascosto finché non lo riveli.</p></div>${S.storyContextMarkup(session)}<div class="join-player-list">${players}</div><div class="privacy-inline"><span aria-hidden="true">i</span><p>I nomi servono solo per distinguere i giocatori. Non è necessario inserire nome e cognome reali.</p></div></section>`, { session: true, preserveHash: true });
+    const modeBadge = session.cardMode === 'virtual' ? '<span class="join-mode-badge">CARTE VIRTUALI</span>' : '';
+    const players = session.names.map((_, index) => `<button type="button" class="player-button" data-join-player="${index}"><span>${index + 1}</span><div><b>${S.esc(S.playerName(session, index))}</b><small>${session.cardMode === 'virtual' ? 'Apri obiettivo e mano privata' : 'Apri il tuo invito personale'}</small></div><i>→</i></button>`).join('');
+    S.mount(`<section class="surface join-surface"><div class="screen-heading"><p class="eyebrow">INVITO ALLA PARTITA</p><h2>Scegli il tuo giocatore.</h2><p>Tutti aprono lo stesso link. Seleziona soltanto il tuo nome: obiettivo${session.cardMode === 'virtual' ? ' e carte' : ''} restano privati.</p>${modeBadge}</div>${S.storyContextMarkup(session)}<div class="join-player-list">${players}</div><div class="privacy-inline"><span aria-hidden="true">i</span><p>I nomi servono solo per distinguere i giocatori. Non è necessario inserire nome e cognome reali.</p></div></section>`, { session: true, preserveHash: true });
     S.play.querySelectorAll('[data-join-player]').forEach(button => button.addEventListener('click', () => {
       confirmPlayer(session, Number(button.dataset.joinPlayer));
     }));

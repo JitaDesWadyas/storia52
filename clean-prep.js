@@ -1,4 +1,5 @@
 'use strict';
+
 (() => {
   const S = window.S52;
 
@@ -22,10 +23,15 @@
   };
 
   S.renderPreparation = (session, scroll = true) => {
+    if (session.delivery === 'multi') {
+      S.renderInvites(session);
+      return;
+    }
+    session.cardMode = 'physical';
     session.stage = 'prep';
     S.save(session);
-    S.mount(`<section class="surface"><div class="screen-heading"><p class="eyebrow">PREPARAZIONE</p><h2>Preparate il tavolo.</h2></div>${S.storyContextMarkup(session)}<div class="section-title"><span>PRIMA DI INIZIARE</span><h3>Tre cose.</h3></div><div class="prep-grid"><article class="prep-step"><span>1</span><div><b>Togliete i jolly e mescolate.</b></div></article><article class="prep-step"><span>2</span><div><b>Date 5 carte a ogni giocatore.</b></div></article><article class="prep-step"><span>3</span><div><b>Mettete mazzo e scarti al centro.</b></div></article></div><div class="actions one"><button type="button" class="primary" data-ready-to-play>Siamo pronti</button></div></section>`, { session: true, scroll });
-    S.play.querySelector('[data-ready-to-play]').addEventListener('click', () => S.renderGame(session));
+    S.mount(`<section class="surface"><div class="screen-heading"><p class="eyebrow">PREPARAZIONE</p><h2>Preparate il tavolo.</h2><p>Serve un normale mazzo francese da 52 carte: uno dei mazzi usati, per esempio, a Scala 40.</p></div>${S.storyContextMarkup(session)}<div class="section-title"><span>PRIMA DI INIZIARE</span><h3>Tre cose.</h3></div><div class="prep-grid"><article class="prep-step"><span>1</span><div><b>Togliete i jolly e mescolate le 52 carte.</b></div></article><article class="prep-step"><span>2</span><div><b>Date 5 carte a ogni giocatore.</b></div></article><article class="prep-step"><span>3</span><div><b>Mettete mazzo e scarti al centro.</b></div></article></div><div class="actions one"><button type="button" class="primary" data-ready-to-play>Siamo pronti</button></div></section>`, { session: true, scroll });
+    S.play.querySelector('[data-ready-to-play]')?.addEventListener('click', () => S.renderGame(session));
   };
 
   S.renderGame = session => {
