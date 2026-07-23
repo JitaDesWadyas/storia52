@@ -1,0 +1,27 @@
+/* Blocca i gesti del browser che interrompono la partita senza impedire lo scroll interno. */
+html,
+body {
+  overscroll-behavior-x: none !important;
+  overscroll-behavior-y: none !important;
+}
+
+html {
+  touch-action: pan-y !important;
+}
+
+body,
+body:not(.modal-open),
+body:not(.modal-open) .app-shell,
+body:not(.modal-open) main,
+body:not(.modal-open) .page.active {
+  overscroll-behavior: none !important;
+  touch-action: pan-y !important;
+}
+
+.modal,
+.modal-card,
+.rulebook,
+.accordion-body,
+.product-modal-info {
+  overscroll-behavior: contain !important;
+}
