@@ -1,8 +1,8 @@
 'use strict';
 
 const CACHE_PREFIX = 'epoi-';
-const SHELL_CACHE = `${CACHE_PREFIX}shell-v42`;
-const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v42`;
+const SHELL_CACHE = `${CACHE_PREFIX}shell-v43`;
+const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v43`;
 const CORE_FILES = [
   './', './index.html', './privacy.html', './copyright.html',
   './clean-app.css', './refine-flow.css', './home-product.css', './app-polish.css', './home-fixes.css',
@@ -16,7 +16,7 @@ const CORE_FILES = [
   './archive-v20-objectives-05-06.js', './archive-v20-objectives-07-08.js',
   './collection-objectives.js', './ready-story-objectives.js', './clean-stories-markup.js',
   './clean-stories-view.js', './collection-controller.js', './clean-objectives.js', './clean-prep.js',
-  './qr-local.js', './invite-codec.js', './clean-invite-host.js', './clean-invite-data.js',
+  './qr-local.js', './invite-codec.js', './clean-invite-host.js', './clean-invite-data.js', './game-balance.js',
   './clean-exit.js', './interaction-polish.js', './scroll-safety.js', './clean-init.js', './pwa-refresh.js',
   './icon.svg', './storia52-cards-logo.svg', './creator-jita.svg', './creator-jita.webp',
   './manifest.webmanifest'
