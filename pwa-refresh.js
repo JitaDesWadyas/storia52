@@ -2,8 +2,8 @@
 
 (() => {
   if (!('serviceWorker' in navigator)) return;
-  // La v42 corregge il drag delle carte selezionate e aggiorna le regole di figure e assi.
-  const reloadKey = 'epoi_sw_reload_v42';
+  // La v43 bilancia le mani per numero di giocatori e aggiorna storie, obiettivi e finali.
+  const reloadKey = 'epoi_sw_reload_v43';
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     try {
       if (sessionStorage.getItem(reloadKey) === '1') return;
