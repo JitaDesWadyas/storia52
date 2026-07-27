@@ -50,7 +50,10 @@
     });
 
     const draw = () => {
-      card.innerHTML = `<button type="button" class="modal-close" aria-label="Chiudi">×</button><p class="eyebrow">${S.esc(S.playerName(session, index))}</p><h2>Obiettivo segreto</h2><div class="secret-card">${revealed ? secretContent(session.objectives[index]) : secretClosed(`Passa il telefono a ${S.playerName(session, index)}`, 'Gli altri non guardano.')}</div><div class="modal-actions"><button type="button" class="primary" data-toggle-objective>${revealed ? 'Nascondi' : 'Rivela'}</button>${duringGame ? '<button type="button" class="secondary" data-close-objective>Chiudi</button>' : `<button type="button" class="secondary" data-confirm-objective${seen ? '' : ' disabled'}>Ho letto e memorizzato</button>`}</div>`;
+      const closedTitle = session.delivery === 'multi'
+        ? 'Assicurati che nessuno veda il tuo obiettivo'
+        : `Passa il telefono a ${S.playerName(session, index)}`;
+      card.innerHTML = `<button type="button" class="modal-close" aria-label="Chiudi">×</button><p class="eyebrow">${S.esc(S.playerName(session, index))}</p><h2>Obiettivo segreto</h2><div class="secret-card">${revealed ? secretContent(session.objectives[index]) : secretClosed(closedTitle, 'Gli altri non guardano.')}</div><div class="modal-actions"><button type="button" class="primary" data-toggle-objective>${revealed ? 'Nascondi' : 'Rivela'}</button>${duringGame ? '<button type="button" class="secondary" data-close-objective>Chiudi</button>' : `<button type="button" class="secondary" data-confirm-objective${seen ? '' : ' disabled'}>Ho letto e memorizzato</button>`}</div>`;
       card.querySelector('.modal-close').addEventListener('click', () => finish());
       card.querySelector('[data-close-objective]')?.addEventListener('click', () => finish());
       card.querySelector('[data-toggle-objective]').addEventListener('click', () => {
