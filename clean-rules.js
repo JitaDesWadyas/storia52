@@ -34,7 +34,7 @@
     steps: [
       { title: 'Cambia una carta', text: 'Con 2 o più carte in mano scartane 1 e pescane subito 1. Con una sola carta puoi cambiarla oppure tenerla.' },
       { title: 'Gioca una carta', text: 'Scegli una sola carta e racconta la scena seguendo seme, parità o colore.' },
-      { title: 'Aggiungi una scena', text: 'Fai succedere un solo passaggio chiaro e coerente con ciò che è già apparso.' },
+      { title: 'Aggiungi una scena', text: 'Fai succedere un solo passaggio chiaro e coerente con ciò che è già apparso. Sei bloccato? Scegli chi agisce, cosa fa e una conseguenza: “Il sindaco tira il telo e la statua si gira”.' },
       { title: 'Pesca oppure termina', text: 'Dopo la scena puoi pescare 1 carta oppure terminare il turno senza pescare. Con la mano vuota puoi pescare oppure collegarti al finale.' }
     ]
   });
@@ -48,7 +48,7 @@
       { title: 'Gioca l’ultima carta', text: 'Giocala normalmente e rispetta il suo significato.' },
       { title: 'Collegati al finale', text: 'Continua quella stessa scena fino alla conclusione indicata dal tuo obiettivo segreto.' },
       { title: 'Rivela il tuo obiettivo', text: 'Mostralo agli altri. Il finale deve usare elementi già comparsi e restare coerente.' },
-      { title: 'Chiudete oppure continuate', text: 'Se il finale regge, hai vinto. Altrimenti pesca una carta e la partita continua.' }
+      { title: 'Chiudete oppure continuate', text: 'Il gruppo decide a voce se accettare il finale: deve rispettare l’ultima carta, l’obiettivo e la storia raccontata. Se accettato, la partita finisce per tutti: ditelo agli altri, i telefoni non si sincronizzano. Se rifiutato, pesca una carta e continuate.' }
     ]
   });
 

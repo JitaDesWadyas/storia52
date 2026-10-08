@@ -7,9 +7,9 @@
       const text = `${story.title} ${story.opening} ${story.protagonist} ${story.situation} ${story.objective} ${story.problem}`.toLowerCase();
       return categoryOk && text.includes(S.storyUi.query.toLowerCase());
     });
-    const pages = Math.max(1, Math.ceil(filtered.length / 3));
+    const pages = Math.max(1, Math.ceil(filtered.length / 8));
     S.storyUi.page = Math.max(0, Math.min(S.storyUi.page, pages - 1));
-    return { filtered, pages, visible: filtered.slice(S.storyUi.page * 3, S.storyUi.page * 3 + 3) };
+    return { filtered, pages, visible: [...filtered].sort((a, b) => (b.id === 'com03') - (a.id === 'com03')).slice(S.storyUi.page * 8, S.storyUi.page * 8 + 8) };
   };
   S.chooseReadyStory = (session, story) => {
     if (!S.storyAllowedInSession?.(session, story)) {

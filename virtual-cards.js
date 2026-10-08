@@ -533,8 +533,8 @@
           : state.phase === 'afterPlay'
             ? ['RACCONTA LA SCENA', 'Poi scegli se pescare oppure continuare con una carta in meno.']
             : state.phase === 'final'
-              ? ['COLLEGA IL FINALE', 'Rivela il tuo obiettivo e chiudi la storia.']
-              : ['FINALE ACCETTATO', 'La storia è conclusa.'];
+              ? ['COLLEGA IL FINALE', 'Rivela l’obiettivo: il gruppo decide a voce se il finale rispetta carta e storia.']
+              : ['FINALE ACCETTATO', 'Dite a tutti che la partita è finita: i telefoni non si sincronizzano.'];
       refs.phaseTitle.textContent = phaseCopy[0];
       refs.phaseHelp.textContent = phaseCopy[1];
       refs.phaseCallout.dataset.phase = state.phase;
@@ -546,7 +546,7 @@
             ? 'La carta resta sul tavolo mentre racconti.'
             : state.phase === 'final'
               ? 'Rivela l’obiettivo e racconta il finale.'
-              : 'La storia è conclusa.';
+              : 'Dite a tutti che la partita è finita: i telefoni non si sincronizzano.';
       updateFocus();
       updateHand();
       updateActions();

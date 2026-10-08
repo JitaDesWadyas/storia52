@@ -107,6 +107,14 @@
   const comingCard = collection => `<article class="collection-choice-card collection-choice-coming"><header><span>${S.esc(collection.label)}</span><b class="collection-status collection-status-coming">In arrivo</b></header><h3>${S.esc(collection.title)}</h3><p class="collection-choice-description">${S.esc(collection.description)}</p><p class="collection-independent-note">${S.esc(collection.independence)}</p><footer><span>${collection.storyCount} storie</span><button type="button" class="secondary" data-coming-collection="${S.esc(collection.id)}">Dettagli</button></footer></article>`;
 
   S.renderCollections = (session, scroll = true) => {
+    const available = S.collections.filter(collection => collection.status === 'available');
+    if (available.length === 1) {
+      session.collectionId = available[0].id;
+      session.stage = 'stories';
+      S.save(session);
+      S.renderStories(session, scroll);
+      return;
+    }
     session.source = 'ready';
     session.stage = COLLECTION_STAGE;
     session.collectionId = '';
@@ -142,6 +150,6 @@
     const categoryButtons = Object.entries(S.categories).map(([key, category]) => `<button type="button" class="${S.storyUi.category === key ? 'active' : ''}" data-category="${key}">${S.esc(category.symbol)} ${S.esc(category.label)}<small>Genere</small></button>`).join('');
     const storyCards = visible.map(story => `<article class="ready-story"><div class="meta"><span>${S.esc(S.categories[story.category]?.symbol || '')} ${S.esc(S.categories[story.category]?.label || '')}</span><span>STORIA ${String(S.stories.indexOf(story) + 1).padStart(2, '0')}</span></div><h3>${S.esc(story.title)}</h3><p>${S.highlightStoryOpening(story)}</p><button type="button" data-ready-story="${S.esc(story.id)}">Scegli questa storia</button></article>`).join('');
 
-    return `<section class="surface story-archive-surface"><div class="screen-heading story-archive-heading"><div class="story-archive-collection-line"><p class="eyebrow">${S.esc(collection?.title || 'STORIE PRONTE')}</p><button type="button" class="collection-info-trigger" data-collection-info="${S.esc(collection?.id || '')}">Informazioni sulla raccolta</button></div><h2>Scegliete una storia.</h2><p>Scegliete un genere, leggete gli incipit e decidete da quale situazione iniziare.</p></div><div class="story-toolbar"><input type="search" data-story-search value="${S.esc(S.storyUi.query)}" placeholder="Cerca titolo, luogo o personaggio"><button type="button" class="secondary" data-random-story>Casuale</button></div><div class="category-grid"><button type="button" class="${S.storyUi.category === 'all' ? 'active' : ''}" data-category="all">Tutte<small>${S.stories.length} storie</small></button>${categoryButtons}</div><div class="story-list">${storyCards || '<div class="hint">Nessuna storia trovata.</div>'}</div><div class="pagination"><button type="button" data-page-prev${S.storyUi.page === 0 ? ' disabled' : ''}>← Precedenti</button><span>${S.storyUi.page + 1} / ${pages}</span><button type="button" data-page-next${S.storyUi.page >= pages - 1 ? ' disabled' : ''}>Successive →</button></div></section>`;
+    return `<section class="surface story-archive-surface"><div class="screen-heading story-archive-heading"><div class="story-archive-collection-line"><p class="eyebrow">${S.esc(collection?.title || 'STORIE PRONTE')}</p><button type="button" class="collection-info-trigger" data-collection-info="${S.esc(collection?.id || '')}">Informazioni sulla raccolta</button></div><h2>Scegliete una storia.</h2><p>Prima partita? Provate “La statua al contrario”. Tutte le 8 storie sono disponibili. Nuove Scintille, la seconda collezione, arriverà in futuro.</p></div><div class="story-toolbar"><input type="search" data-story-search value="${S.esc(S.storyUi.query)}" placeholder="Cerca titolo, luogo o personaggio"><button type="button" class="secondary" data-random-story>Casuale</button></div><div class="category-grid"><button type="button" class="${S.storyUi.category === 'all' ? 'active' : ''}" data-category="all">Tutte<small>${S.stories.length} storie</small></button>${categoryButtons}</div><div class="story-list">${storyCards || '<div class="hint">Nessuna storia trovata.</div>'}</div><div class="pagination"${pages === 1 ? ' hidden' : ''}><button type="button" data-page-prev${S.storyUi.page === 0 ? ' disabled' : ''}>← Precedenti</button><span>${S.storyUi.page + 1} / ${pages}</span><button type="button" data-page-next${S.storyUi.page >= pages - 1 ? ' disabled' : ''}>Successive →</button></div></section>`;
   };
 })();
