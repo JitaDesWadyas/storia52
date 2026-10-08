@@ -69,6 +69,7 @@
     const offset = raw.indexOf(text);
     return raw.slice(0, offset) + converted + raw.slice(offset + text.length);
   };
+  const richStoryStates = new WeakMap();
   const textStates = new WeakMap();
   const attributeStates = new WeakMap();
   const SKIP = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT']);
@@ -81,7 +82,24 @@
     textStates.set(node, { raw, shown: next });
     if (value !== next) node.nodeValue = next;
   };
+  const updateRichStory = element => {
+    if (!element.matches('article.ready-story p')) return;
+    const previous = richStoryStates.get(element);
+    if (language === 'it') {
+      if (previous) {
+        element.innerHTML = previous.html;
+        richStoryStates.delete(element);
+      }
+      return;
+    }
+    if (previous) return;
+    const english = dict.get(element.textContent.trim());
+    if (!english) return;
+    richStoryStates.set(element, { html: element.innerHTML });
+    element.textContent = english;
+  };
   const updateElement = element => {
+    updateRichStory(element);
     if (SKIP.has(element.tagName) || element.isContentEditable) return;
     const states = attributeStates.get(element) || {};
     for (const name of ATTRS) {
