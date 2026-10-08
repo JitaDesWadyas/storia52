@@ -83,7 +83,8 @@
     if (value !== next) node.nodeValue = next;
   };
   const updateRichStory = element => {
-    if (!element.matches('article.ready-story p')) return;
+    const storySummaryId = element.getAttribute('data-epoi-story-summary');
+    if (!element.matches('article.ready-story p') && !storySummaryId) return;
     const previous = richStoryStates.get(element);
     if (language === 'it') {
       if (previous) {
@@ -93,7 +94,9 @@
       return;
     }
     if (previous) return;
-    const english = dict.get(element.textContent.trim());
+    const english = storySummaryId
+      ? window.EPOI_EN_STORIES?.[storySummaryId]?.opening?.slice(0, 330) + '…'
+      : dict.get(element.textContent.trim());
     if (!english) return;
     richStoryStates.set(element, { html: element.innerHTML });
     element.textContent = english;
