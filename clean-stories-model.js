@@ -4,7 +4,8 @@
   S.getStoryPage = () => {
     const filtered = S.stories.filter(story => {
       const categoryOk = S.storyUi.category === 'all' || story.category === S.storyUi.category;
-      const text = `${story.title} ${story.opening} ${story.protagonist} ${story.situation} ${story.objective} ${story.problem}`.toLowerCase();
+      const english = window.EPOI_EN_STORIES?.[story.id];
+      const text = `${story.title} ${story.opening} ${story.protagonist} ${story.situation} ${story.objective} ${story.problem} ${english ? Object.values(english).join(' ') : ''}`.toLowerCase();
       return categoryOk && text.includes(S.storyUi.query.toLowerCase());
     });
     const pages = Math.max(1, Math.ceil(filtered.length / 8));
