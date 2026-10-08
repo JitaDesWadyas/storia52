@@ -326,7 +326,7 @@
           <div class="virtual-story-copy">
             <p>${S.esc(category.label || 'Storia')}</p>
             <h3>${S.esc(story.title || 'La storia di questa partita')}</h3>
-            <small>${S.esc(shortText(opening, 340))}</small>
+            <small data-epoi-story-summary="${S.esc(story.id || '')}">${S.esc(shortText(opening, 340))}</small>
           </div>
           <div class="virtual-party" aria-label="Giocatori">${partyMarkup(session, playerIndex)}</div>
         </button>
