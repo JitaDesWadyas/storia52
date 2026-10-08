@@ -10,11 +10,14 @@
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="clean-app.css">
   <link rel="stylesheet" href="release-ready.css">
+  <link rel="stylesheet" href="locale.css?v=1">
+  <style>html[data-lang="en"] .legal-it{display:none}html:not([data-lang="en"]) .legal-en{display:none}html[data-lang="en"] .legal-sheet-it,html:not([data-lang="en"]) .legal-sheet-en{display:none}.legal-header .epoi-lang-label{margin-inline-start:10px}</style>
+  <script>(()=>{let lang="it";try{lang=localStorage.getItem("epoi_language")==="en"?"en":"it"}catch{}document.documentElement.dataset.lang=lang;document.documentElement.lang=lang})();</script>
 </head>
 <body>
   <main class="legal-page">
-    <header class="legal-header"><a class="legal-brand" href="./"><img src="storia52-cards-logo.svg" alt=""><span>E POI?</span></a><a class="legal-back" href="./">← Torna al gioco</a></header>
-    <article class="legal-sheet">
+    <header class="legal-header"><a class="legal-brand" href="./"><img src="storia52-cards-logo.svg" alt=""><span>E POI?</span></a><a class="legal-back" href="./"><span class="legal-it">← Torna al gioco</span><span class="legal-en">← Back to game</span></a><label class="epoi-lang-label"><span>Language</span><select id="epoiLanguage" aria-label="Language"><option value="it">IT</option><option value="en">EN</option></select></label></header>
+    <article class="legal-sheet legal-sheet-it">
       <p class="eyebrow">PROPRIETÀ E LICENZE</p>
       <h1>Copyright e crediti</h1>
       <p class="legal-lead">E POI? è un progetto indipendente creato da Jita DesWadyas. Questa pagina chiarisce cosa appartiene al progetto e quali componenti esterni vengono utilizzati.</p>
@@ -35,6 +38,20 @@
 
       <p class="legal-meta">Ultimo aggiornamento: 16 luglio 2026 · E POI? · Jita DesWadyas</p>
     </article>
+    <article class="legal-sheet legal-sheet-en">
+      <p class="eyebrow">OWNERSHIP & LICENSING</p>
+      <h1>Copyright & credits</h1>
+      <p class="legal-lead">E POI? is an independent project created by Jita DesWadyas. This page explains which content belongs to the project and which external components it uses.</p>
+      <section><h2>Original content</h2><p>Except where noted otherwise, <strong>Jita DesWadyas</strong> reserves rights to the E POI? name and visual identity, logo, interface, rules, stories, goals, examples, illustrations and other original materials published in the app.</p><p>© 2026 Jita DesWadyas. All rights reserved.</p></section>
+      <section><h2>Using the game</h2><p>You may use the web app free of charge for private games, testing, non-commercial demonstrations and sharing normal game invitation links. Re-publishing, selling, distributing as your own product or reusing the original content in a commercial product requires written permission.</p></section>
+      <section><h2>Source code</h2><p>The public repository lets you read the code and follow development. Public availability alone does not automatically grant permission to copy, redistribute or create commercial versions of the entire project. Any licence files added to the repository govern the components they cover.</p><p><a href="https://github.com/JitaDesWadyas/storia52" target="_blank" rel="noopener noreferrer">Official GitHub repository ↗</a></p></section>
+      <section><h2>Playing cards</h2><p>The suits, ranks and structure of a standard deck of cards are generic elements used as game mechanics. E POI? does not claim exclusive ownership of hearts, diamonds, clubs, spades or standard playing cards.</p></section>
+      <section><h2>QR component</h2><p>Local QR generation uses code derived from <strong>QRCode for JavaScript</strong> by Kazuhiko Arase, released under the MIT licence. “QR Code” is a registered trademark of DENSO WAVE INCORPORATED. The component is bundled locally so invitations are not sent to outside QR generators.</p></section>
+      <section><h2>Third-party brands and services</h2><p>GitHub, GitHub Pages and other named services belong to their respective owners. Mentioning them does not imply sponsorship or endorsement.</p></section>
+      <section><h2>Contact</h2><p>For permissions, attribution questions or reports about content, contact the creator through their GitHub profile <a href="https://github.com/JitaDesWadyas" target="_blank" rel="noopener noreferrer">JitaDesWadyas ↗</a>.</p></section>
+      <p class="legal-meta">Last updated: 16 July 2026 · E POI? · Jita DesWadyas</p>
+    </article>
   </main>
+<script>(()=>{const select=document.querySelector("#epoiLanguage");select.value=document.documentElement.dataset.lang||"it";select.addEventListener("change",()=>{const value=select.value==="en"?"en":"it";document.documentElement.dataset.lang=value;document.documentElement.lang=value;try{localStorage.setItem("epoi_language",value)}catch{}})})();</script>
 </body>
 </html>
