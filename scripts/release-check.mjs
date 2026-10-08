@@ -214,6 +214,55 @@ const qrSvg = globalThis.EpoiQr.toSvg(`https://example.test/#g=${'A'.repeat(900)
 assert.match(qrSvg, /^<svg class="epoi-qr-svg"/);
 assert.ok(qrSvg.includes('<path'));
 
+
+// Offline bilingual release guarantees: data stay in Italian for invite compatibility,
+// while every available story and every goal has complete English display fields.
+const localeFiles = scripts.filter(file => /^locale-en-(?:stories|objectives-|ui-)/.test(file));
+const sourceDataBeforeLocale = JSON.stringify({
+  stories: globalThis.STORIA52_READY_STORIES,
+  objectives: globalThis.STORIA52_READY_OBJECTIVES
+});
+for (const file of localeFiles) evaluate(file);
+check(index.includes('id="epoiLanguage"') && scripts.includes('locale-runtime.js'),
+  'Selettore IT/EN o motore di localizzazione non caricato');
+check(index.indexOf('locale-runtime.js?v=1') < index.indexOf('clean-init.js?v=23'),
+  'La traduzione viene inizializzata dopo la prima schermata');
+check(globalThis.EPOI_EN_STORIES && Object.keys(globalThis.EPOI_EN_STORIES).length === 8,
+  'Manca la traduzione di uno degli otto incipit');
+const localeStoryFields = ['title','protagonist','situation','objective','problem','opening'];
+for (const story of stories) {
+  const english = globalThis.EPOI_EN_STORIES?.[story.id];
+  check(english && localeStoryFields.every(field => english[field]?.length >= 12),
+    story.id + ': traduzione della storia incompleta');
+}
+let translatedGoals = 0;
+for (const id of readyIds) {
+  const italian = globalThis.STORIA52_READY_OBJECTIVES[id];
+  const english = globalThis.EPOI_EN_OBJECTIVES?.[id];
+  check(Array.isArray(english) && english.length === italian.length,
+    id + ': numero di obiettivi EN non corrispondente');
+  translatedGoals += english?.length || 0;
+  for (let i = 0; i < (english?.length || 0); i++) {
+    check(english[i].length === 3 && english[i].every((value, field) =>
+      typeof value === 'string' && value.length >= [8, 30, 40][field]),
+      id + ': obiettivo EN ' + i + ' incompleto');
+  }
+}
+check(translatedGoals === 64, 'Non risultano tradotti tutti i 64 obiettivi');
+check(Object.keys(globalThis.EPOI_EN_UI || {}).length > 300,
+  'Dizionario interfaccia IT/EN troppo piccolo');
+check(JSON.stringify({
+  stories: globalThis.STORIA52_READY_STORIES,
+  objectives: globalThis.STORIA52_READY_OBJECTIVES
+}) === sourceDataBeforeLocale, 'La localizzazione altera dati di gioco o inviti');
+check(read('locale-runtime.js').includes('const observer = new MutationObserver') &&
+  read('locale-runtime.js').includes('epoi_language'), 'Cambio lingua o persistenza assenti');
+for (const file of [...localeFiles, 'locale-runtime.js', 'locale.css']) {
+  check(coreBlock.includes("'./" + file + "'"), 'Asset lingua non precacheato: ' + file);
+}
+check(read('privacy.html').includes('legal-sheet-en') &&
+  read('copyright.html').includes('legal-sheet-en'), 'Pagine legali EN mancanti');
+
 if (failures.length) {
   console.error('\nRelease check fallito:\n- ' + failures.join('\n- '));
   process.exit(1);
