@@ -1,8 +1,8 @@
 'use strict';
 
 const CACHE_PREFIX = 'epoi-';
-const SHELL_CACHE = `${CACHE_PREFIX}shell-v48`;
-const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v48`;
+const SHELL_CACHE = `${CACHE_PREFIX}shell-v49`;
+const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v49`;
 const CORE_FILES = [
   './', './index.html', './privacy.html', './copyright.html',
   './clean-app.css', './refine-flow.css', './home-product.css', './app-polish.css', './home-fixes.css',
@@ -20,7 +20,7 @@ const CORE_FILES = [
   './clean-exit.js', './interaction-polish.js', './scroll-safety.js', './clean-init.js', './pwa-refresh.js',
   './icon.svg', './storia52-cards-logo.svg', './creator-jita.svg', './creator-jita.webp',
   './manifest.webmanifest',
-  './locale.css', './locale-en-stories.js', './locale-en-objectives-real01.js', './locale-en-objectives-mys02.js', './locale-en-objectives-sci01.js', './locale-en-objectives-fan02.js', './locale-en-objectives-hor02a.js', './locale-en-objectives-hor02b.js', './locale-en-objectives-lov01.js', './locale-en-objectives-adv01a.js', './locale-en-objectives-adv01b.js', './locale-en-objectives-com03.js', './locale-en-ui-home.js', './locale-en-ui-tutorial.js', './locale-en-ui-rules.js', './locale-en-ui-setup.js', './locale-en-ui-qr.js', './locale-en-ui-join.js', './locale-en-ui-game.js', './locale-runtime.js'
+  './locale.css', './locale-en-stories.js', './locale-en-objectives-real01.js', './locale-en-objectives-mys02.js', './locale-en-objectives-sci01.js', './locale-en-objectives-fan02.js', './locale-en-objectives-hor02a.js', './locale-en-objectives-hor02b.js', './locale-en-objectives-lov01.js', './locale-en-objectives-adv01a.js', './locale-en-objectives-adv01b.js', './locale-en-objectives-com03.js', './locale-en-ui-home.js', './locale-en-ui-tutorial.js', './locale-en-ui-rules.js', './locale-en-ui-setup.js', './locale-en-ui-qr.js', './locale-en-ui-join.js', './locale-en-ui-game.js', './locale-en-ui-misc.js', './locale-runtime.js'
 ];
 
 const scopedUrl = path => new URL(path, self.registration.scope).toString();
