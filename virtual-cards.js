@@ -376,10 +376,16 @@
   const openMenu = (session, playerIndex, handlers) => {
     const sheet = document.createElement('div');
     sheet.className = 'virtual-menu-sheet';
-    sheet.innerHTML = `<section class="virtual-menu-panel"><div class="virtual-menu-head"><h2>Menu</h2><button type="button" class="virtual-icon-button" data-close-menu aria-label="Chiudi">×</button></div><div class="virtual-menu-grid"><button type="button" data-menu-story><span>✦</span><b>Storia</b></button><button type="button" data-menu-rules><span>?</span><b>Regole</b></button><button type="button" data-menu-invite><span>⌁</span><b>Invita</b></button><button type="button" data-menu-objective><span>◎</span><b>Obiettivo</b></button></div></section>`;
+    sheet.innerHTML = `<section class="virtual-menu-panel"><div class="virtual-menu-head"><h2>Menu</h2><button type="button" class="virtual-icon-button" data-menu-language aria-label="Switch language">${window.EpoiI18n?.language === 'en' ? 'IT' : 'EN'}</button><button type="button" class="virtual-icon-button" data-close-menu aria-label="Chiudi">×</button></div><div class="virtual-menu-grid"><button type="button" data-menu-story><span>✦</span><b>Storia</b></button><button type="button" data-menu-rules><span>?</span><b>Regole</b></button><button type="button" data-menu-invite><span>⌁</span><b>Invita</b></button><button type="button" data-menu-objective><span>◎</span><b>Obiettivo</b></button></div></section>`;
     const close = () => sheet.remove();
     sheet.addEventListener('click', event => { if (event.target === sheet) close(); });
     sheet.querySelector('[data-close-menu]').addEventListener('click', close);
+    sheet.querySelector('[data-menu-language]')?.addEventListener('click', event => {
+      const i18n = window.EpoiI18n;
+      if (!i18n) return;
+      i18n.setLanguage(i18n.language === 'en' ? 'it' : 'en');
+      event.currentTarget.textContent = i18n.language === 'en' ? 'IT' : 'EN';
+    });
     sheet.querySelector('[data-menu-story]').addEventListener('click', () => { close(); openStoryPopup(session); });
     sheet.querySelector('[data-menu-rules]').addEventListener('click', () => { close(); S.openRulesModal?.(); });
     sheet.querySelector('[data-menu-invite]').addEventListener('click', () => { close(); handlers.invite(); });
