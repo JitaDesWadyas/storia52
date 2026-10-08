@@ -10,11 +10,14 @@
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="clean-app.css">
   <link rel="stylesheet" href="release-ready.css">
+  <link rel="stylesheet" href="locale.css?v=1">
+  <style>html[data-lang="en"] .legal-it{display:none}html:not([data-lang="en"]) .legal-en{display:none}html[data-lang="en"] .legal-sheet-it,html:not([data-lang="en"]) .legal-sheet-en{display:none}.legal-header .epoi-lang-label{margin-inline-start:10px}</style>
+  <script>(()=>{let lang="it";try{lang=localStorage.getItem("epoi_language")==="en"?"en":"it"}catch{}document.documentElement.dataset.lang=lang;document.documentElement.lang=lang})();</script>
 </head>
 <body>
   <main class="legal-page">
-    <header class="legal-header"><a class="legal-brand" href="./"><img src="storia52-cards-logo.svg" alt=""><span>E POI?</span></a><a class="legal-back" href="./">← Torna al gioco</a></header>
-    <article class="legal-sheet">
+    <header class="legal-header"><a class="legal-brand" href="./"><img src="storia52-cards-logo.svg" alt=""><span>E POI?</span></a><a class="legal-back" href="./"><span class="legal-it">← Torna al gioco</span><span class="legal-en">← Back to game</span></a><label class="epoi-lang-label"><span>Language</span><select id="epoiLanguage" aria-label="Language"><option value="it">IT</option><option value="en">EN</option></select></label></header>
+    <article class="legal-sheet legal-sheet-it">
       <p class="eyebrow">INFORMATIVA</p>
       <h1>Privacy</h1>
       <p class="legal-lead">E POI? è una web app statica: non richiede account, non ha un database proprietario e non usa strumenti pubblicitari o di analisi del comportamento.</p>
@@ -33,6 +36,19 @@
 
       <p class="legal-meta">Ultimo aggiornamento: 16 luglio 2026 · E POI? · Jita DesWadyas</p>
     </article>
+    <article class="legal-sheet legal-sheet-en">
+      <p class="eyebrow">PRIVACY NOTICE</p>
+      <h1>Privacy</h1>
+      <p class="legal-lead">E POI? is a static web app: it does not require an account, operate its own database, or use advertising or behavioural analytics tools.</p>
+      <section><h2>Data stored on your device</h2><p>The app may use <strong>localStorage</strong> to remember your theme, language and ongoing game. A service worker and the browser cache may store technical assets such as HTML, CSS, JavaScript and images to speed up loading and support unstable or offline connections.</p><p>This data remains in your browser. You can erase it by clearing this site's data in your browser settings.</p></section>
+      <section><h2>Player names and game content</h2><p>Names only distinguish players. Real names are not required. Story openings, names and goals may be encoded into the invitation link after the <strong>#</strong> character so each device can reconstruct the game without a dedicated server.</p><p>Anyone with the link can open the game and select a player. Share it only with people taking part, and never include personal or confidential information.</p></section>
+      <section><h2>QR codes and external services</h2><p>Invitation QR codes are generated locally in the browser. Game content is not sent to an external QR-generation service.</p><p>Links to GitHub and other profiles only open if you select them; after that, the external provider's privacy terms apply.</p></section>
+      <section><h2>Hosting on GitHub Pages</h2><p>The website is hosted on GitHub Pages. GitHub may process technical request data such as IP address, device information, date and time, pages visited and usage information under its own privacy notice. E POI? does not receive a proprietary dashboard showing the contents of games.</p><p><a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer">Read GitHub's General Privacy Statement ↗</a></p></section>
+      <section><h2>Cookies</h2><p>E POI? does not set advertising, profiling or analytics cookies. The local features described above use browser storage and technical cache. The hosting provider may use its own essential technologies according to its terms.</p></section>
+      <section><h2>Contact and updates</h2><p>For questions about this notice or the project, contact the creator through their GitHub profile <a href="https://github.com/JitaDesWadyas" target="_blank" rel="noopener noreferrer">JitaDesWadyas ↗</a>. This notice may change as the web app or the services it uses evolve.</p></section>
+      <p class="legal-meta">Last updated: 16 July 2026 · E POI? · Jita DesWadyas</p>
+    </article>
   </main>
+<script>(()=>{const select=document.querySelector("#epoiLanguage");select.value=document.documentElement.dataset.lang||"it";select.addEventListener("change",()=>{const value=select.value==="en"?"en":"it";document.documentElement.dataset.lang=value;document.documentElement.lang=value;try{localStorage.setItem("epoi_language",value)}catch{}})})();</script>
 </body>
 </html>
