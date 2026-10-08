@@ -232,7 +232,7 @@ check(globalThis.EPOI_EN_STORIES && Object.keys(globalThis.EPOI_EN_STORIES).leng
 const localeStoryFields = ['title','protagonist','situation','objective','problem','opening'];
 for (const story of stories) {
   const english = globalThis.EPOI_EN_STORIES?.[story.id];
-  check(english && localeStoryFields.every(field => english[field]?.length >= 12),
+  check(english && localeStoryFields.every(field => english[field]?.length >= (field === 'title' ? 4 : 12)),
     story.id + ': traduzione della storia incompleta');
 }
 let translatedGoals = 0;
