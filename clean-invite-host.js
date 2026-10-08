@@ -104,9 +104,11 @@
       try {
         await navigator.share({
           title: 'E POI?',
-          text: virtual
+          text: window.EpoiI18n?.translate(virtual
             ? 'Apri la nostra partita di E POI?, scegli il tuo giocatore e ricevi la tua mano virtuale.'
-            : 'Apri l’invito alla nostra partita di E POI? e scegli il tuo giocatore.',
+            : 'Apri l’invito alla nostra partita di E POI? e scegli il tuo giocatore.') || (virtual
+            ? 'Apri la nostra partita di E POI?, scegli il tuo giocatore e ricevi la tua mano virtuale.'
+            : 'Apri l’invito alla nostra partita di E POI? e scegli il tuo giocatore.'),
           url
         });
       } catch { /* Condivisione annullata. */ }
