@@ -56,6 +56,13 @@
     if ((m = /^QR della partita (.+)$/.exec(value))) return 'Game QR code for ' + m[1];
     if ((m = /^([0-9]+) nuove storie alla scelta\.$/.exec(value))) return m[1] + ' new stories to choose from.';
     if ((m = /^([0-9]+) carte$/.exec(value))) return m[1] + ' cards';
+    if ((m = /^(Oggetto|Personaggio|Luogo|Svolta) (positivo|negativo)$/.exec(value))) {
+      return (dict.get(m[1]) || m[1]) + ' ' + (m[2] === 'positivo' ? 'positive' : 'negative');
+    }
+    if ((m = /^([AJQK]|\\d+) di (Cuori|Quadri|Fiori|Picche)\\. (.+)\\. (.+)$/.exec(value))) {
+      return m[1] + ' of ' + (dict.get(m[2]) || m[2]) + '. '
+        + (dict.get(m[3]) || dynamic(m[3])) + '. ' + (dict.get(m[4]) || dynamic(m[4]));
+    }
     if (/^\d+\/\d+$/.test(value)) return value;
     return value;
   };
@@ -95,7 +102,9 @@
     }
     if (previous) return;
     const english = storySummaryId
-      ? window.EPOI_EN_STORIES?.[storySummaryId]?.opening?.slice(0, 330) + '…'
+      ? (window.EPOI_EN_STORIES?.[storySummaryId]?.opening
+          ? window.EPOI_EN_STORIES[storySummaryId].opening.slice(0, 330) + '…'
+          : null)
       : dict.get(element.textContent.trim());
     if (!english) return;
     richStoryStates.set(element, { html: element.innerHTML });
