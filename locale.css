@@ -1,0 +1,7 @@
+/* Compact persistent language switch for the bar companion. */
+.epoi-lang-label{display:inline-flex;align-items:center;flex:0 0 auto}
+.epoi-lang-label>span{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+#epoiLanguage{appearance:none;-webkit-appearance:none;display:block;min-width:56px;min-height:38px;border:1px solid var(--line-soft,#8c806b);border-radius:11px;background:var(--panel,#fff9ee);color:var(--ink,#211a12);font:800 .79rem/1 system-ui,sans-serif;text-align:center;text-align-last:center;padding:8px 6px;cursor:pointer}
+#epoiLanguage:focus-visible{outline:3px solid var(--amber,#e5ab35);outline-offset:2px}
+html[data-theme="dark"] #epoiLanguage{background:var(--panel,#232126);color:var(--ink,#fff9ee)}
+@media(max-width:400px){#epoiLanguage{min-width:46px;padding:6px 3px}.header-actions{gap:6px}}
