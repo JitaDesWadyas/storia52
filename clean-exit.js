@@ -33,7 +33,7 @@
       objectives: () => S.renderObjectives(session),
       prep: () => S.renderPreparation(session),
       invites: () => S.renderInvites(session),
-      game: () => session.delivery === 'multi' ? S.renderHostGame(session) : S.renderGame(session)
+      game: () => session.delivery === 'multi' ? (Number.isInteger(session.localPlayerIndex) ? S.renderSharedPlayer(session, session.localPlayerIndex) : S.renderHostGame(session)) : S.renderGame(session)
     };
 
     (routes[session.stage] || routes.setup)();

@@ -43,7 +43,7 @@
     );
   };
 
-  const buildSession = ({ story, count, names, cardMode = 'physical', cardSeed = 'PARTITA' }) => {
+  const buildSession = ({ story, count, names, cardMode = 'physical', cardSeed = 'PARTITA', objectiveSeed = cardSeed }) => {
     const session = {
       version: 6,
       mode: 'autonomous',
@@ -53,7 +53,7 @@
       stage: 'game',
       count,
       names: namesFor(Array.isArray(names) ? names : [], count),
-      objectives: S.objectivesForReadyStory?.(story, count, 'INVITO-COMUNE') || [],
+      objectives: S.objectivesForReadyStory?.(story, count, objectiveSeed) || [],
       confirmed: Array(count).fill(false),
       openingText: story.opening,
       spokenOpening: false,
@@ -93,7 +93,7 @@
         try { names = JSON.parse(fromBase64Url(parts.slice(3).join('.'))); }
         catch { return null; }
       }
-      return buildSession({ story, count, names, cardMode: 'physical', cardSeed: 'PARTITA' });
+      return buildSession({ story, count, names, cardMode: 'physical', cardSeed: 'PARTITA', objectiveSeed: 'INVITO-COMUNE' });
     }
 
     if (!safeCode.startsWith(GAME_PREFIX)) return null;

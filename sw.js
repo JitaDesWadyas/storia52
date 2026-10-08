@@ -1,8 +1,8 @@
 'use strict';
 
 const CACHE_PREFIX = 'epoi-';
-const SHELL_CACHE = `${CACHE_PREFIX}shell-v46`;
-const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v46`;
+const SHELL_CACHE = `${CACHE_PREFIX}shell-v47`;
+const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v47`;
 const CORE_FILES = [
   './', './index.html', './privacy.html', './copyright.html',
   './clean-app.css', './refine-flow.css', './home-product.css', './app-polish.css', './home-fixes.css',
@@ -89,7 +89,7 @@ const navigationResponse = async event => {
 };
 const staleWhileRevalidate = async event => {
   const request = event.request;
-  const cached = await caches.match(request);
+  const cached = await caches.match(request) || await (await caches.open(SHELL_CACHE)).match(request, { ignoreSearch: true });
   const refresh = fetch(request, { cache: 'no-cache' }).then(async response => {
     await putSafely(RUNTIME_CACHE, request, response);
     return response;

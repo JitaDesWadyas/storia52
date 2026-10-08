@@ -44,7 +44,7 @@
   const previousChooseReadyStory = S.chooseReadyStory;
   S.chooseReadyStory = (session, story) => {
     if (!story) return;
-    session.objectives = S.objectivesForReadyStory(story, session.count, session.seed);
+    session.objectives = S.objectivesForReadyStory(story, session.count, session.cardSeed || session.seed);
     session.confirmed = Array(session.count).fill(false);
     previousChooseReadyStory(session, story);
   };

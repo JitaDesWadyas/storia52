@@ -40,6 +40,9 @@
       S.renderSharedInvitePicker(session);
       return;
     }
+    session.stage = 'game';
+    session.localPlayerIndex = index;
+    S.save(session);
     if (session.cardMode === 'virtual') {
       S.renderVirtualPlayer(session, index);
       return;
@@ -97,7 +100,10 @@
       }
       return false;
     }
-    S.renderSharedInvitePicker(invite.session);
+    const saved = S.load();
+    const sameGame = saved && saved.cardSeed === invite.session.cardSeed && saved.readyStoryId === invite.session.readyStoryId && saved.count === invite.session.count && saved.cardMode === invite.session.cardMode;
+    if (sameGame && Number.isInteger(saved.localPlayerIndex)) S.renderSharedPlayer(saved, saved.localPlayerIndex);
+    else S.renderSharedInvitePicker(invite.session);
     return true;
   };
 })();

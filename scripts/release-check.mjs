@@ -34,7 +34,7 @@ check(index.indexOf('clean-invite-data.js?v=31') < index.indexOf('game-balance.j
 check(index.indexOf('game-balance.js?v=43') < index.indexOf('clean-init.js?v=23'), 'index.html: il bilanciamento parte dopo l’inizializzazione');
 check(!index.includes('virtual-cards-mobile-v35.css') && !index.includes('virtual-table-redesign-v35.js'), 'index.html: vecchi override v35 ancora caricati');
 check(index.includes('interaction-polish.js?v=22'), 'index.html: interazioni aggiornate non caricate');
-check(index.includes('pwa-refresh.js?v=43'), 'index.html: refresh PWA v43 non caricato');
+check(scripts.includes('pwa-refresh.js'), 'index.html: refresh PWA non caricato');
 
 const virtualSource = read('virtual-cards.js');
 const balanceSource = read('game-balance.js');
@@ -102,10 +102,13 @@ check(virtualCss.includes('@media(max-height:700px)'), 'Manca l’adattamento pe
 check(virtualCss.includes('.rule-card-mini-sections>details'), 'Le mini sezioni delle regole non hanno uno stile dedicato');
 
 const sw = read('sw.js');
-check(sw.includes('shell-v43') && sw.includes('runtime-v43'), 'Cache PWA v43 non attiva');
+const shellVersion = sw.match(/shell-v(\d+)/)?.[1];
+const runtimeVersion = sw.match(/runtime-v(\d+)/)?.[1];
+check(Boolean(shellVersion) && shellVersion === runtimeVersion, 'Versioni cache shell/runtime incoerenti');
 check(sw.includes("'./virtual-cards.css'") && sw.includes("'./virtual-cards.js'") && sw.includes("'./game-balance.js'"), 'Bilanciamento o carte virtuali non precacheati');
 check(!sw.includes('virtual-cards-mobile-v35.css') && !sw.includes('virtual-table-redesign-v35.js'), 'Vecchi file v35 ancora nella cache');
-check(read('pwa-refresh.js').includes('epoi_sw_reload_v43'), 'Refresh PWA v43 non attivo');
+const refresh = read('pwa-refresh.js');
+check(refresh.includes('registration?.update()') && !/location\.reload\(/.test(refresh), 'Gli aggiornamenti devono essere controllati senza interrompere la partita');
 const coreBlock = sw.match(/const CORE_FILES = \[([\s\S]*?)\];/)?.[1] || '';
 for (const match of coreBlock.matchAll(/['"]\.\/([^'"]*)['"]/g)) check(exists(match[1]), `sw.js: file mancante ${match[1]}`);
 
@@ -188,6 +191,23 @@ check(objectiveText('adv01').includes('Rispettare la sua scelta di restare') && 
 check(!/undici minuti|1998|lavanderia|via orla 18/i.test(objectiveText('adv01')), 'Sotto Vetra dipende ancora da un’altra storia o da dettagli imposti');
 check(objectiveText('com03').includes('Nessuno vuole più raddrizzarla'), 'La statua conserva l’obiettivo contraddittorio sui progetti');
 
+
+globalThis.S52 = { stories, limits: { inviteCode: 6000 }, primaryCollectionId: 'prima-scintilla',
+  cleanText: value => String(value || '').trim(), cleanName: (value, i) => value || `Giocatore ${i + 1}`,
+  storyAllowedInSession: () => true, chooseReadyStory: () => {} };
+evaluate('ready-story-objectives.js');
+evaluate('invite-codec.js');
+for (const story of stories) for (const count of [2, 3, 4, 6, 8]) for (const seed of ['ABC123', 'TEST_2', 'Z-987']) {
+  const host = { source: 'ready', collectionId: 'prima-scintilla', readyStoryId: story.id, count,
+    seed, cardSeed: seed, delivery: 'multi', cardMode: 'virtual', names: ['Cristian', 'Zoë'] };
+  S52.chooseReadyStory(host, story);
+  const guest = await S52.decodeGameInvite(await S52.encodeGameInvite(host));
+  assert.deepEqual(guest.objectives, host.objectives, `${story.id}/${count}/${seed}: obiettivi discordanti`);
+  assert.equal(guest.cardSeed, seed);
+}
+const legacy = await S52.decodeGameInvite('r3.real01.4');
+assert.deepEqual(legacy.objectives, S52.objectivesForReadyStory(stories.find(s => s.id === 'real01'), 4, 'INVITO-COMUNE'));
+
 (0, eval)(read('qr-local.js'));
 await globalThis.EpoiQrReady;
 const qrSvg = globalThis.EpoiQr.toSvg(`https://example.test/#g=${'A'.repeat(900)}`);
@@ -198,4 +218,4 @@ if (failures.length) {
   console.error('\nRelease check fallito:\n- ' + failures.join('\n- '));
   process.exit(1);
 }
-console.log('Release check completato: mani 5/4/3, finale sull’ultima carta, 39 correzioni narrative, carte virtuali e cache PWA v43 verificati.');
+console.log('Release check completato: mani 5/4/3, finale sull’ultima carta, 39 correzioni narrative, carte virtuali e cache PWA verificati.');
