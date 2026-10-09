@@ -279,7 +279,7 @@ check(read('privacy.html').includes('legal-sheet-en') &&
   const goal = textNode(globalThis.STORIA52_READY_OBJECTIVES.real01[0].text);
   const label = textNode('Giocatore 3');
   const root = element('HTML', [element('BODY', [heading, goal, label])]);
-  const picker = { value: 'it', addEventListener(_, handler) { this.change = handler; } };
+  const picker = { textContent: 'IT', attributes: {}, setAttribute(key, value) { this.attributes[key] = value; }, addEventListener(_, handler) { this.click = handler; } };
   const description = { content: '' };
   const page = {
     nodeType: 9, documentElement: root,
@@ -311,11 +311,13 @@ check(read('privacy.html').includes('legal-sheet-en') &&
   check(heading.nodeValue === 'Play with friends' &&
     goal.nodeValue === globalThis.EPOI_EN_OBJECTIVES.real01[0][1] &&
     label.nodeValue === 'Player 3', 'IT/EN: la lingua iniziale EN non traduce le schermate');
-  app.EpoiI18n.setLanguage('it');
+  picker.click();
+  check(picker.textContent === 'IT', 'IT/EN: un tocco non mostra IT');
   check(heading.nodeValue === 'Gioca con amici' &&
     goal.nodeValue === globalThis.STORIA52_READY_OBJECTIVES.real01[0].text &&
     label.nodeValue === 'Giocatore 3', 'IT/EN: ritorno all’italiano non ripristina i contenuti');
-  app.EpoiI18n.setLanguage('en');
+  picker.click();
+  check(picker.textContent === 'EN', 'IT/EN: secondo tocco non mostra EN');
   check(heading.nodeValue === 'Play with friends' &&
     app.S52.copy(stories[0].opening) === globalThis.EPOI_EN_STORIES.real01.opening &&
     JSON.stringify(globalThis.STORIA52_READY_OBJECTIVES) === sourceSnapshot,
