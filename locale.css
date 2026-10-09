@@ -1,5 +1,4 @@
 /* Compact persistent language switch for the bar companion. */
-#epoiLanguage{display:inline-flex;align-items:center;flex:0 0 auto}
 #epoiLanguage{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;min-width:56px;min-height:38px;border:1px solid var(--line-soft,#8c806b);border-radius:11px;background:var(--panel,#fff9ee);color:var(--ink,#211a12);font:800 .79rem/1 system-ui,sans-serif;text-align:center;padding:8px 6px;cursor:pointer}
 #epoiLanguage:focus-visible{outline:3px solid var(--amber,#e5ab35);outline-offset:2px}
 html[data-theme="dark"] #epoiLanguage{background:var(--panel,#232126);color:var(--ink,#fff9ee)}
