@@ -325,6 +325,18 @@ check(read('privacy.html').includes('legal-sheet-en') &&
     'IT/EN: copertura runtime incompleta');
 }
 
+
+// Language must change immediately on tap: no native select/dropdown or dialog.
+check(/<button[^>]*id="epoiLanguage"/.test(index), 'IT/EN: selettore lingua non è un pulsante');
+check(!/<select[^>]*id="epoiLanguage"/.test(index), 'IT/EN: è rimasto il vecchio menu a tendina');
+check(read('locale-runtime.js').includes("selector?.addEventListener('click', () => setLanguage(language === 'it' ? 'en' : 'it'))"),
+  'IT/EN: un tocco non cambia direttamente lingua');
+for (const page of ['privacy.html', 'copyright.html']) {
+  const legal = read(page);
+  check(/<button[^>]*id="epoiLanguage"/.test(legal) && !/<select[^>]*id="epoiLanguage"/.test(legal),
+    page + ': cambio lingua deve essere un pulsante diretto');
+}
+
 if (failures.length) {
   console.error('\nRelease check fallito:\n- ' + failures.join('\n- '));
   process.exit(1);
