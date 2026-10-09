@@ -263,6 +263,68 @@ for (const file of [...localeFiles, 'locale-runtime.js', 'locale.css']) {
 check(read('privacy.html').includes('legal-sheet-en') &&
   read('copyright.html').includes('legal-sheet-en'), 'Pagine legali EN mancanti');
 
+
+// Exercise real language switching in a minimal DOM without adding a browser dependency.
+{
+  const textNode = initial => ({ nodeType: 3, nodeValue: initial });
+  const element = (tag, children = []) => ({
+    nodeType: 1, tagName: tag, childNodes: children, dataset: {}, attributes: {},
+    isContentEditable: false,
+    matches() { return false; },
+    hasAttribute(key) { return key in this.attributes; },
+    getAttribute(key) { return this.attributes[key] ?? null; },
+    setAttribute(key, value) { this.attributes[key] = String(value); }
+  });
+  const heading = textNode('Gioca con amici');
+  const goal = textNode(globalThis.STORIA52_READY_OBJECTIVES.real01[0].text);
+  const label = textNode('Giocatore 3');
+  const root = element('HTML', [element('BODY', [heading, goal, label])]);
+  const picker = { value: 'it', addEventListener(_, handler) { this.change = handler; } };
+  const description = { content: '' };
+  const page = {
+    nodeType: 9, documentElement: root,
+    querySelector(selector) {
+      return selector === '#epoiLanguage' ? picker
+        : selector === 'meta[name="description"]' ? description : null;
+    }
+  };
+  const storage = new Map([['epoi_language', 'en']]);
+  const memory = {
+    getItem: key => storage.get(key) || null,
+    setItem: (key, value) => storage.set(key, value)
+  };
+  class FakeMutationObserver { observe() {} }
+  const sourceSnapshot = JSON.stringify(globalThis.STORIA52_READY_OBJECTIVES);
+  const app = {
+    S52: { stories, copy: value => value },
+    EPOI_EN_UI: globalThis.EPOI_EN_UI,
+    EPOI_EN_STORIES: globalThis.EPOI_EN_STORIES,
+    EPOI_EN_META: globalThis.EPOI_EN_META,
+    EPOI_EN_OBJECTIVES: globalThis.EPOI_EN_OBJECTIVES,
+    STORIA52_READY_OBJECTIVES: globalThis.STORIA52_READY_OBJECTIVES,
+    STORIA52_READY_CATEGORIES: globalThis.STORIA52_READY_CATEGORIES,
+    STORIA52_READY_COLLECTIONS: globalThis.STORIA52_READY_COLLECTIONS
+  };
+  new Function('window', 'document', 'localStorage', 'MutationObserver', read('locale-runtime.js'))(
+    app, page, memory, FakeMutationObserver
+  );
+  check(heading.nodeValue === 'Play with friends' &&
+    goal.nodeValue === globalThis.EPOI_EN_OBJECTIVES.real01[0][1] &&
+    label.nodeValue === 'Player 3', 'IT/EN: la lingua iniziale EN non traduce le schermate');
+  app.EpoiI18n.setLanguage('it');
+  check(heading.nodeValue === 'Gioca con amici' &&
+    goal.nodeValue === globalThis.STORIA52_READY_OBJECTIVES.real01[0].text &&
+    label.nodeValue === 'Giocatore 3', 'IT/EN: ritorno all’italiano non ripristina i contenuti');
+  app.EpoiI18n.setLanguage('en');
+  check(heading.nodeValue === 'Play with friends' &&
+    app.S52.copy(stories[0].opening) === globalThis.EPOI_EN_STORIES.real01.opening &&
+    JSON.stringify(globalThis.STORIA52_READY_OBJECTIVES) === sourceSnapshot,
+    'IT/EN: cambio lingua modifica i dati di gioco o non traduce gli incipit');
+  check(app.EpoiI18n.coverage().stories === 8 &&
+    app.EpoiI18n.coverage().objectives === 64,
+    'IT/EN: copertura runtime incompleta');
+}
+
 if (failures.length) {
   console.error('\nRelease check fallito:\n- ' + failures.join('\n- '));
   process.exit(1);
