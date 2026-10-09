@@ -11,12 +11,12 @@
   <link rel="stylesheet" href="clean-app.css">
   <link rel="stylesheet" href="release-ready.css">
   <link rel="stylesheet" href="locale.css?v=1">
-  <style>html[data-lang="en"] .legal-it{display:none}html:not([data-lang="en"]) .legal-en{display:none}html[data-lang="en"] .legal-sheet-it,html:not([data-lang="en"]) .legal-sheet-en{display:none}.legal-header .epoi-lang-label{margin-inline-start:10px}</style>
+  <style>html[data-lang="en"] .legal-it{display:none}html:not([data-lang="en"]) .legal-en{display:none}html[data-lang="en"] .legal-sheet-it,html:not([data-lang="en"]) .legal-sheet-en{display:none}.legal-header #epoiLanguage{margin-inline-start:10px}</style>
   <script>(()=>{let lang="it";try{lang=localStorage.getItem("epoi_language")==="en"?"en":"it"}catch{}document.documentElement.dataset.lang=lang;document.documentElement.lang=lang})();</script>
 </head>
 <body>
   <main class="legal-page">
-    <header class="legal-header"><a class="legal-brand" href="./"><img src="storia52-cards-logo.svg" alt=""><span>E POI?</span></a><a class="legal-back" href="./"><span class="legal-it">← Torna al gioco</span><span class="legal-en">← Back to game</span></a><label class="epoi-lang-label"><span>Language</span><select id="epoiLanguage" aria-label="Language"><option value="it">IT</option><option value="en">EN</option></select></label></header>
+    <header class="legal-header"><a class="legal-brand" href="./"><img src="storia52-cards-logo.svg" alt=""><span>E POI?</span></a><a class="legal-back" href="./"><span class="legal-it">← Torna al gioco</span><span class="legal-en">← Back to game</span></a><button type="button" id="epoiLanguage" class="epoi-lang-toggle" aria-label="Switch language to English">IT</button></header>
     <article class="legal-sheet legal-sheet-it">
       <p class="eyebrow">PROPRIETÀ E LICENZE</p>
       <h1>Copyright e crediti</h1>
@@ -52,6 +52,6 @@
       <p class="legal-meta">Last updated: 16 July 2026 · E POI? · Jita DesWadyas</p>
     </article>
   </main>
-<script>(()=>{const select=document.querySelector("#epoiLanguage");select.value=document.documentElement.dataset.lang||"it";select.addEventListener("change",()=>{const value=select.value==="en"?"en":"it";document.documentElement.dataset.lang=value;document.documentElement.lang=value;try{localStorage.setItem("epoi_language",value)}catch{}})})();</script>
+<script>(()=>{const button=document.querySelector("#epoiLanguage");const show=()=>{const lang=document.documentElement.dataset.lang==="en"?"en":"it";button.textContent=lang.toUpperCase();button.setAttribute("aria-label",lang==="it"?"Switch language to English":"Passa alla lingua italiana");button.title=button.getAttribute("aria-label")};show();button.addEventListener("click",()=>{const lang=document.documentElement.dataset.lang==="en"?"it":"en";document.documentElement.dataset.lang=lang;document.documentElement.lang=lang;try{localStorage.setItem("epoi_language",lang)}catch{}show()})})();</script>
 </body>
 </html>
