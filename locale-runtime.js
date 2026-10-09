@@ -137,7 +137,11 @@
     document.documentElement.lang = language;
     document.documentElement.dataset.lang = language;
     const selector = document.querySelector('#epoiLanguage');
-    if (selector && selector.value !== language) selector.value = language;
+    if (selector) {
+      selector.textContent = language.toUpperCase();
+      selector.setAttribute('aria-label', language === 'it' ? 'Switch language to English' : 'Passa alla lingua italiana');
+      selector.title = language === 'it' ? 'Switch language to English' : 'Passa alla lingua italiana';
+    }
     updateTree(document);
     const description = document.querySelector('meta[name="description"]');
     if (description) description.content = language === 'en'
@@ -150,7 +154,7 @@
     apply();
   };
   const selector = document.querySelector('#epoiLanguage');
-  selector?.addEventListener('change', event => setLanguage(event.target.value));
+  selector?.addEventListener('click', () => setLanguage(language === 'it' ? 'en' : 'it'));
   const observer = new MutationObserver(records => {
     for (const record of records) {
       if (record.type === 'characterData') updateText(record.target);
