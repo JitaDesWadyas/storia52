@@ -17,7 +17,10 @@ assert(index.indexOf('locale-runtime.js') < index.indexOf('learning-experience.j
 assert(index.indexOf('learning-experience.js') < index.indexOf('clean-init.js'), 'Learning must load before app init');
 assert(sw.includes("'./learning-experience.js'") && sw.includes("'./learning-experience.css'"), 'Learning is not cached offline');
 assert(css.includes('@media print') && css.includes('@media (prefers-reduced-motion:reduce)'), 'Print or reduced-motion CSS missing');
-assert(css.includes('justify-content:space-evenly') && css.includes('orientation:landscape'), 'Responsive slide layouts missing');
+assert(css.includes('orientation:landscape') && css.includes('.ep-stage-fit') && css.includes('overflow:hidden!important'), 'Non-scrolling fitted mobile layout is missing');
+assert(source.includes('function fitDeck()') && source.includes('--ep-fit-scale'), 'Viewport fit algorithm missing');
+assert(!/statua|mortaio|sindaco|sicario|inaugurazione|camion|artista/i.test(source), 'Tutorial still borrows a playable story');
+assert(source.includes('ESEMPIO INVENTATO · AQUILONI'), 'Tutorial-only illustrative scenario missing');
 assert(css.includes('.ep-deck-counter {display:none;}'), 'Mobile control footer still duplicates progress');
 assert(!/backdrop-filter\s*:|filter\s*:\s*blur\(/.test(css.replace(/\/\*[\s\S]*?\*\//g,'')), 'Expensive blur/filter restored');
 assert(source.includes('Essere semplicemente nello stesso luogo'), 'The E COME direct link requirement is missing');
@@ -26,6 +29,19 @@ function checkLanguage(lang) {
   const state = { printed: 0, setups: 0 };
   const classes = () => ({add() {}, remove() {}, toggle() {}});
   const content = {innerHTML: '',scrollTop: 0, querySelector: () => ({scrollTop: 0})};
+  const viewport = {height: 440, width: 360};
+  const fitted = {scale: 1, count: 0};
+  const inner = {
+    scrollHeight: 580, offsetHeight: 580, scrollWidth: 360, offsetWidth: 360,
+    style: {setProperty(name, value) {
+      if (name === '--ep-fit-scale') { fitted.scale = Number(value); fitted.count++; }
+    }}
+  };
+  const stage = {
+    get clientHeight() {return viewport.height;},
+    get clientWidth() {return viewport.width;},
+    querySelector(selector) {return selector === '.ep-stage-fit' ? inner : null;}
+  };
   const buttons = ['deck','manual','quick'].map(mode => ({
     dataset: {action: mode}, classList: classes(), setAttribute() {}
   }));
@@ -34,6 +50,7 @@ function checkLanguage(lang) {
     addEventListener(name, fn) { this.handlers[name] = fn; },
     querySelector(selector) {
       if (selector === '[data-content]') return content;
+      if (selector === '.ep-stage') return stage;
       if (selector === '[data-action="close"]') return {focus() {}};
       return null;
     },
@@ -62,10 +79,17 @@ function checkLanguage(lang) {
   assert(!window.S52.homeMarkup().includes('data-open-panel="quick"'), 'Quick reference must not be an extra home item');
   window.EpoiLearning.openPresentation();
   assert(content.innerHTML.includes(lang==='it'?'Una storia.':'One story.'), 'First slide not rendered');
+  assert(fitted.scale < 1 && fitted.scale * inner.offsetHeight <= viewport.height - 6, 'Tall slide is clipped');
+  viewport.height = 245;  // simulate browser toolbars and small-screen landscape height
+  window.EpoiLearning.openRulebook();
+  window.EpoiLearning.openPresentation();
+  assert(fitted.scale * inner.offsetHeight <= viewport.height - 6, 'Short viewport is clipped');
+  viewport.height = 440;
 
   for (let i = 0; i < 16; i++) {
     const slide = content.innerHTML;
-    assert(slide.includes('ep-stage-copy') && slide.includes('ep-stage-art'), 'Slide ' + (i + 1) + ' missing its main content');
+    assert(slide.includes('ep-stage-copy') && slide.includes('ep-stage-art') && slide.includes('ep-stage-fit'), 'Slide ' + (i + 1) + ' missing fitted content');
+    assert(fitted.scale * inner.offsetHeight <= viewport.height - 6, 'Slide ' + (i + 1) + ' extends below available stage');
     assert(slide.includes('aria-valuenow="' + (i + 1) + '"'), 'Progress mismatch on slide ' + (i + 1));
     if (i >= 4 && i <= 11) {
       assert(slide.includes('ep-playing-card'), 'Card illustration absent on slide ' + (i + 1));
@@ -98,4 +122,4 @@ const game = read('clean-prep.js');
 assert(game.includes('S.quickReferenceMarkup()'), 'Physical game does not show the quick reference');
 assert(game.includes("data-game-full-rules"), 'Physical game has no way to open full rules');
 assert(!game.includes('S.turnGuideMarkup()') && !game.includes('S.cardRulesMarkup()'), 'Old oversized game rule sections are still rendered');
-console.log('Learning checks passed: all 16 slides (IT/EN), responsive UX contracts, game reference, manual, print and offline assets.');
+console.log('Learning checks passed: 16 fitted non-scrolling slides in IT/EN, short viewport, independent example, game reference, manual, print and PWA assets.');
