@@ -33,7 +33,11 @@
   ];
 
   const card = (rank, suit, mini = false) => '<div class="ep-playing-card '+('♥♦'.includes(suit)?'red':'black')+(mini?' tiny':'')+'" aria-label="'+esc(rank+suit)+'"><span class="ep-pc-corner">'+esc(rank)+'<i>'+esc(suit)+'</i></span><span class="ep-pc-center">'+esc(suit)+'</span><span class="ep-pc-corner bottom">'+esc(rank)+'<i>'+esc(suit)+'</i></span></div>';
-  const example = (label, value) => '<div class="ep-example"><span>'+esc(label)+'</span><p>'+fmt(value)+'</p></div>';
+  const example = (label, value) => {
+    const content = fmt(value).replace(/^([♥♦♠♣])([2-9]|10|[JQKA])(?=\s|\s*—)/, (match, suit, rank) =>
+      '<strong class="' + ('♥♦'.includes(suit) ? 'ep-example-red' : 'ep-example-black') + '">' + suit + rank + '</strong>');
+    return '<div class="ep-example"><span>' + esc(label) + '</span><p>' + content + '</p></div>';
+  };
 
   function visualFor(slide) {
     switch (slide.kind) {
@@ -195,6 +199,7 @@
     previouslyFocused = null;
   }
   function view(mode) {
+    const openingNewDialog = !host;
     if (!host) {
       previouslyFocused = document.activeElement;
       host = document.createElement('div');
@@ -252,7 +257,7 @@
       document.body.classList.add('ep-learn-open');
     }
     activeMode=mode;
-    if(mode==='deck') index=0;
+    if (mode === 'deck' && openingNewDialog) index = 0;
     render();
     host.querySelector('[data-action="close"]')?.focus({preventScroll:true});
   }
