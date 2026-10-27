@@ -395,3 +395,121 @@ body.ep-learn-open { overflow:hidden!important; }
   .ep-deck-bottom button:last-child {justify-self:stretch;}
   .ep-deck-bottom button:active {transform:scale(.99);}
 }
+
+
+/*
+ * Slide fit v4.
+ * Mobile deck contains two fixed-height areas (progress and actions) and a
+ * strictly bounded stage. JavaScript measures the content against this stage
+ * and sets --ep-fit-scale; presentation slides never require vertical scroll.
+ */
+.ep-stage-fit {display:contents;}
+@media (max-width:760px) {
+  .ep-learn-overlay,
+  .ep-learn-dialog,
+  .ep-learn-content {overflow:hidden!important;}
+  .ep-learn-dialog {height:100dvh!important;max-height:100dvh!important;}
+  .ep-learn-content {min-height:0!important;flex:1 1 0!important;}
+  .ep-learn-overlay .ep-deck {
+    display:flex!important;
+    flex-direction:column!important;
+    box-sizing:border-box!important;
+    height:100%!important;
+    min-height:0!important;
+    overflow:hidden!important;
+    padding:10px 14px max(23px, env(safe-area-inset-bottom))!important;
+  }
+  .ep-deck .ep-progress-top,
+  .ep-deck .ep-progress-line,
+  .ep-deck .ep-deck-bottom {flex-shrink:0!important;}
+  .ep-deck .ep-progress-top {min-height:18px;}
+  .ep-deck .ep-progress-line {margin:6px 0 7px!important;}
+  .ep-learn-dialog .ep-deck .ep-stage {
+    position:relative!important;
+    display:block!important;
+    flex:1 1 0!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    overflow:hidden!important;
+    touch-action:pan-x;
+    overscroll-behavior:none;
+  }
+  .ep-learn-dialog .ep-stage-fit {
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:calc(100% - 4px);
+    max-width:none;
+    height:max-content;
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    justify-content:center;
+    gap:clamp(11px,1.6dvh,20px);
+    transform-origin:center center;
+    transform:translate(-50%,-50%) scale(var(--ep-fit-scale,1));
+    pointer-events:auto;
+  }
+  .ep-stage-fit .ep-stage-copy,
+  .ep-stage-fit .ep-stage-art,
+  .ep-stage-fit .ep-stage-details {
+    position:relative;
+    align-self:stretch;
+    margin:0!important;
+    padding:0;
+    flex:0 0 auto!important;
+    min-width:0;
+    animation:none!important;
+  }
+  .ep-stage-fit .ep-stage-art {width:100%!important;max-height:none!important;display:grid;place-items:center;}
+  .ep-stage-fit .ep-stage-details:empty {display:none!important;}
+  .ep-stage-fit .ep-stage-copy h2 {font-size:clamp(2.45rem,10vw,3.4rem)!important;line-height:1.02!important;}
+  .ep-stage-fit .ep-stage-copy>p {font-size:clamp(.88rem,3.4vw,.99rem)!important;line-height:1.4!important;}
+  .ep-stage-fit .ep-playing-card {width:clamp(150px,41vw,190px);height:auto!important;aspect-ratio:2.5/3.5;}
+  .ep-stage-fit .ep-card-display {gap:14px;}
+  .ep-stage-fit .ep-card-foot {max-width:150px;}
+  .ep-stage-fit .ep-stage-examples {gap:8px;}
+  .ep-deck .ep-deck-bottom {
+    margin:6px 0 0!important;
+    padding:10px 0 0!important;
+    width:100%;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    gap:10px!important;
+    position:relative;
+    z-index:1;
+    background:var(--panel);
+  }
+  .ep-deck .ep-deck-bottom button {min-height:46px!important;padding:10px 12px!important;}
+  .ep-deck .ep-deck-counter {display:none!important;}
+  .ep-stage-fit .ep-colors-art {gap:clamp(12px,4vw,24px);justify-content:center;}
+  .ep-stage-fit .ep-colors-art>div {min-width:0;}
+  .ep-stage-fit .ep-colors-art .ep-playing-card {width:clamp(116px,31vw,145px);height:auto!important;}
+  .ep-stage-fit .ep-stage-connect .ep-dialog-bubble {padding:11px;}
+}
+@media (max-width:760px) and (max-height:700px) {
+  .ep-learn-dialog .ep-stage-fit {gap:9px;}
+  .ep-stage-fit .ep-stage-copy h2 {font-size:clamp(2rem,8vw,2.65rem)!important;}
+  .ep-stage-fit .ep-stage-copy>p {font-size:.86rem!important;}
+  .ep-stage-fit .ep-playing-card {width:clamp(122px,34vw,156px);}
+  .ep-deck .ep-deck-bottom button {min-height:43px!important;}
+}
+@media (max-width:760px) and (orientation:landscape) {
+  .ep-learn-dialog .ep-stage-fit {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    grid-template-areas:"copy art" "details art";
+    grid-template-rows:auto auto;
+    align-items:center;
+    column-gap:14px;
+  }
+  .ep-stage-fit .ep-stage-copy {grid-area:copy;}
+  .ep-stage-fit .ep-stage-art {grid-area:art;}
+  .ep-stage-fit .ep-stage-details {grid-area:details;}
+  .ep-stage-fit .ep-stage-copy h2 {font-size:clamp(1.6rem,4.3vw,2.35rem)!important;}
+  .ep-stage-fit .ep-stage-copy>p {font-size:.78rem!important;}
+  .ep-stage-fit .ep-playing-card {width:clamp(95px,18vw,145px);}
+}
