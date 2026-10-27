@@ -11,8 +11,8 @@ const index = read('index.html');
 const sw = read('sw.js');
 
 new Function(source);
-assert(index.includes('learning-experience.js?v=5'), 'Missing JS mount');
-assert(index.includes('learning-experience.css?v=5'), 'Missing CSS mount');
+assert(index.includes('learning-experience.js?v=6'), 'Missing JS mount');
+assert(index.includes('learning-experience.css?v=6'), 'Missing CSS mount');
 assert(index.indexOf('locale-runtime.js') < index.indexOf('learning-experience.js'), 'Locale must load first');
 assert(index.indexOf('learning-experience.js') < index.indexOf('clean-init.js'), 'Learning must load before app init');
 assert(sw.includes("'./learning-experience.js'") && sw.includes("'./learning-experience.css'"), 'Learning is not cached offline');
