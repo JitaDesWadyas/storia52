@@ -281,7 +281,33 @@
     content.innerHTML = activeMode === 'deck' ? deckMarkup() : activeMode === 'manual' ? manualMarkup() : quickMarkup();
     content.scrollTop = 0;
     const docScroll = content.querySelector('.ep-manual-scroll');
-    if (docScroll) docScroll.scrollTop = 0;
+    if (docScroll) {
+      docScroll.scrollTop = 0;
+      // Highlight the chapter currently being read without rebuilding the page.
+      let pending = false;
+      const markChapter = () => {
+        pending = false;
+        const sections = [...docScroll.querySelectorAll('.ep-doc-section')];
+        const scrollTop = docScroll.getBoundingClientRect().top + 55;
+        let current = sections[0]?.id?.replace('ep-rule-', '') || 'overview';
+        for (const section of sections) {
+          if (section.getBoundingClientRect().top <= scrollTop) current = section.id.replace('ep-rule-', '');
+        }
+        host?.querySelectorAll('.ep-manual-index [data-section]').forEach(link => {
+          link.classList.toggle('is-current', link.dataset.section === current);
+          if (link.dataset.section === current) link.setAttribute('aria-current','location');
+          else link.removeAttribute('aria-current');
+        });
+      };
+      docScroll.addEventListener('scroll', () => {
+        if (pending) return;
+        pending = true;
+        if (typeof requestAnimationFrame === 'function') requestAnimationFrame(markChapter);
+        else markChapter();
+      }, {passive:true});
+      if (typeof requestAnimationFrame === 'function') requestAnimationFrame(markChapter);
+      else markChapter();
+    }
     fitDeck();
     if (typeof requestAnimationFrame === 'function') requestAnimationFrame(fitDeck);
     animateSlide(direction, fromIndex);
