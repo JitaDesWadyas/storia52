@@ -281,8 +281,8 @@
     content.innerHTML = activeMode === 'deck' ? deckMarkup() : activeMode === 'manual' ? manualMarkup() : quickMarkup();
     content.scrollTop = 0;
     const docScroll = content.querySelector('.ep-manual-scroll');
-    if (docScroll) {
-      docScroll.scrollTop = 0;
+    if (docScroll) docScroll.scrollTop = 0;
+    if (docScroll?.addEventListener && docScroll?.getBoundingClientRect) {
       // Highlight the chapter currently being read without rebuilding the page.
       let pending = false;
       const markChapter = () => {
