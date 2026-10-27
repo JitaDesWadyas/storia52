@@ -254,7 +254,7 @@
   }
 
   function shellMarkup() {
-    return '<div class="ep-learn-dialog" role="dialog" aria-modal="true" aria-label="'+T('Impara E POI? e consulta le regole','Learn E POI? and browse the rules')+'"><header class="ep-learn-header"><div class="ep-learn-brand">E POI<span>?</span><small>'+T('COME SI GIOCA','HOW TO PLAY')+'</small></div><nav class="ep-learn-tabs" aria-label="'+T('Modalità di apprendimento','Learning views')+'"><button type="button" data-action="deck">'+T('Presentazione','Presentation')+'</button><button type="button" data-action="manual">'+T('Regolamento','Rulebook')+'</button><button type="button" data-action="quick">'+T('Promemoria','Quick guide')+'</button></nav><div class="ep-learn-tools"><button class="ep-learn-print" type="button" data-action="print" title="'+T('Stampa o salva come PDF','Print or save as PDF')+'">'+T('PDF / STAMPA','PDF / PRINT')+'</button><button class="ep-learn-close" type="button" data-action="close" aria-label="'+T('Chiudi','Close')+'">×</button></div></header><main class="ep-learn-content" data-content></main></div>';
+    return '<div class="ep-learn-dialog" role="dialog" aria-modal="true" aria-label="'+T('Impara E POI? e consulta le regole','Learn E POI? and browse the rules')+'"><header class="ep-learn-header"><div class="ep-learn-brand">E POI<span>?</span><small>'+T('COME SI GIOCA','HOW TO PLAY')+'</small></div><nav class="ep-learn-tabs" aria-label="'+T('Modalità di apprendimento','Learning views')+'"><button type="button" data-action="deck">'+T('Presentazione','Presentation')+'</button><button type="button" data-action="manual">'+T('Regolamento','Rulebook')+'</button><button type="button" data-action="quick">'+T('Promemoria','Quick guide')+'</button></nav><div class="ep-learn-tools"><button type="button" class="ep-learn-lang" data-action="language" aria-label="'+T('Passa all’inglese','Switch to Italian')+'">'+(english()?'EN':'IT')+'</button><button class="ep-learn-print" type="button" data-action="print" title="'+T('Stampa o salva come PDF','Print or save as PDF')+'">'+T('PDF / STAMPA','PDF / PRINT')+'</button><button class="ep-learn-close" type="button" data-action="close" aria-label="'+T('Chiudi','Close')+'">×</button></div></header><main class="ep-learn-content" data-content></main></div>';
   }
   // All content is fitted to the actual space between progress and controls.
   // In mobile mode the stage is non-scrollable, and its content is scaled only when necessary.
@@ -351,6 +351,10 @@
         if (target.dataset.slide !== undefined) { goToSlide(Number(target.dataset.slide)); return; }
         const action = target.dataset.action;
         if (action === 'close') return close();
+        if (action === 'language') {
+          window.EpoiI18n?.setLanguage(english() ? 'it' : 'en');
+          return;
+        }
         if (action === 'prev' && index>0) { goToSlide(index-1); return; }
         if (action === 'next' && index<slides.length-1) { goToSlide(index+1); return; }
         if (action === 'play') { close(); document.body.classList.remove('home-static-entry'); S.renderSetup('play'); return; }
@@ -387,6 +391,7 @@
       }, {passive:true});
       document.body.appendChild(host);
       document.body.classList.add('ep-learn-open');
+      S.armBrowserBack?.();
     }
     activeMode=mode;
     if (mode === 'deck' && openingNewDialog) index = 0;
@@ -436,11 +441,57 @@
     return html;
   };
 
+  // Rebuild translated markup without closing the overlay or restarting a slide.
+  window.addEventListener('epoi:languagechange', () => {
+    if (host) {
+      const scrollY = host.querySelector('.ep-manual-scroll')?.scrollTop || 0;
+      const focusedAction = document.activeElement?.dataset?.action;
+      host.innerHTML = shellMarkup();
+      render();
+      const manualScroll = host.querySelector('.ep-manual-scroll');
+      if (manualScroll) manualScroll.scrollTop = scrollY;
+      if (focusedAction) host.querySelector('[data-action="' + focusedAction + '"]')?.focus?.({preventScroll:true});
+      window.EpoiI18n?.apply?.();
+      return;
+    }
+
+    // Update the two new home links immediately; the regular translator alone
+    // cannot reverse English text created directly by the bilingual templates.
+    if (document.body.classList.contains('home-static-entry')) {
+      const scrollY = window.scrollY;
+      S.renderHome();
+      window.EpoiI18n?.apply?.();
+      if (typeof requestAnimationFrame === 'function') {
+        requestAnimationFrame(() => requestAnimationFrame(() =>
+          requestAnimationFrame(() => window.scrollTo({top:scrollY,behavior:'auto'}))));
+      }
+    }
+
+    // During a game, refresh just the shared reference, never the game state.
+    const oldReference = S.play?.querySelector('.ep-game-ref');
+    if (oldReference) {
+      oldReference.outerHTML = S.quickReferenceMarkup();
+      S.play.querySelector('[data-game-full-rules]')?.addEventListener('click', () => S.openHomePanel('rules'));
+      window.EpoiI18n?.apply?.();
+    }
+  });
+
+  const handleBack = () => {
+    if (!host) return false;
+    if (activeMode === 'deck' && index > 0) {
+      goToSlide(index - 1);
+    } else {
+      close();
+    }
+    return true;
+  };
+
   window.EpoiLearning = Object.freeze({
     openPresentation: () => view('deck'),
     openRulebook: () => view('manual'),
     openQuick: () => view('quick'),
     close,
+    handleBack,
     slideCount: slides.length
   });
 })();
