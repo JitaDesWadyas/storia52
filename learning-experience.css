@@ -386,3 +386,12 @@ body.ep-learn-open { overflow:hidden!important; }
   .ep-stage-summary .ep-summary-art>div {padding:13px;font-size:.86rem;}
   .ep-stage-summary .ep-summary-art strong {font-size:1.5rem;}
 }
+
+/* Primary and secondary controls fill the available mobile width. Progress stays above. */
+@media (max-width:760px) {
+  .ep-deck-bottom {grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);}
+  .ep-deck-counter {display:none;}
+  .ep-deck-bottom button {width:100%;max-width:none;justify-self:stretch;}
+  .ep-deck-bottom button:last-child {justify-self:stretch;}
+  .ep-deck-bottom button:active {transform:scale(.99);}
+}
