@@ -91,9 +91,11 @@
       <div class="ep-progress-top"><span>${fmt(slide.chapter)}</span><span>${String(index+1).padStart(2,'0')} / ${slides.length}</span></div>
       <div class="ep-progress-line" role="progressbar" aria-label="${T('Avanzamento','Progress')}" aria-valuemin="1" aria-valuemax="${slides.length}" aria-valuenow="${index+1}"><span style="width:${(index+1)/slides.length*100}%"></span></div>
       <div class="ep-stage ep-stage-${slide.kind}" aria-live="polite">
-        <div class="ep-stage-copy"><span class="eyebrow">E POI? · ${String(index+1).padStart(2,'0')}</span><h2>${L(slide.title)}</h2><p>${fmt(slide.body)}</p></div>
-        <div class="ep-stage-art" aria-hidden="true">${visualFor(slide)}</div>
-        <div class="ep-stage-details">${stageDetail(slide)}</div>
+        <div class="ep-stage-fit">
+          <div class="ep-stage-copy"><span class="eyebrow">E POI? · ${String(index+1).padStart(2,'0')}</span><h2>${L(slide.title)}</h2><p>${fmt(slide.body)}</p></div>
+          <div class="ep-stage-art" aria-hidden="true">${visualFor(slide)}</div>
+          <div class="ep-stage-details">${stageDetail(slide)}</div>
+        </div>
       </div>
       <nav class="ep-deck-bottom" aria-label="${T('Navigazione tutorial','Tutorial navigation')}">
         <button type="button" class="secondary ep-button" data-action="prev"${previous}>← ${T('Indietro','Back')}</button>
@@ -175,6 +177,22 @@
   function shellMarkup() {
     return '<div class="ep-learn-dialog" role="dialog" aria-modal="true" aria-label="'+T('Impara E POI? e consulta le regole','Learn E POI? and browse the rules')+'"><header class="ep-learn-header"><div class="ep-learn-brand">E POI<span>?</span><small>'+T('COME SI GIOCA','HOW TO PLAY')+'</small></div><nav class="ep-learn-tabs" aria-label="'+T('Modalità di apprendimento','Learning views')+'"><button type="button" data-action="deck">'+T('Presentazione','Presentation')+'</button><button type="button" data-action="manual">'+T('Regolamento','Rulebook')+'</button><button type="button" data-action="quick">'+T('Promemoria','Quick guide')+'</button></nav><div class="ep-learn-tools"><button class="ep-learn-print" type="button" data-action="print" title="'+T('Stampa o salva come PDF','Print or save as PDF')+'">'+T('PDF / STAMPA','PDF / PRINT')+'</button><button class="ep-learn-close" type="button" data-action="close" aria-label="'+T('Chiudi','Close')+'">×</button></div></header><main class="ep-learn-content" data-content></main></div>';
   }
+  // All content is fitted to the actual space between progress and controls.
+  // In mobile mode the stage is non-scrollable, and its content is scaled only when necessary.
+  function fitDeck() {
+    if (!host || activeMode !== 'deck') return;
+    const stage = host.querySelector('.ep-stage');
+    const inner = stage?.querySelector('.ep-stage-fit');
+    if (!stage || !inner || !window.matchMedia?.('(max-width:760px)').matches) return;
+    inner.style.setProperty('--ep-fit-scale', '1');
+    const naturalHeight = Math.max(inner.scrollHeight, inner.offsetHeight);
+    const naturalWidth = Math.max(inner.scrollWidth, inner.offsetWidth);
+    const height = Math.max(1, stage.clientHeight - 8);
+    const width = Math.max(1, stage.clientWidth - 8);
+    const fit = Math.min(1, height / Math.max(1, naturalHeight), width / Math.max(1, naturalWidth));
+    inner.style.setProperty('--ep-fit-scale', String(Math.min(1, Math.max(.3, Math.floor(fit * 1000) / 1000))));
+  }
+
   function render() {
     if (!host) return;
     const content = host.querySelector('[data-content]');
@@ -188,7 +206,15 @@
     content.scrollTop = 0;
     const docScroll = content.querySelector('.ep-manual-scroll');
     if (docScroll) docScroll.scrollTop = 0;
+    fitDeck();
+    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(fitDeck);
   }
+  window.addEventListener?.('resize', () => {
+    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(fitDeck);
+    else fitDeck();
+  });
+  window.visualViewport?.addEventListener?.('resize', fitDeck);
+  document.fonts?.ready?.then?.(fitDeck);
   function close() {
     if (!host) return;
     const removed = host;
