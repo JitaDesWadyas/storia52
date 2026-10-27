@@ -442,7 +442,7 @@
   };
 
   // Rebuild translated markup without closing the overlay or restarting a slide.
-  window.addEventListener('epoi:languagechange', () => {
+  window.addEventListener?.('epoi:languagechange', () => {
     if (host) {
       const scrollY = host.querySelector('.ep-manual-scroll')?.scrollTop || 0;
       const focusedAction = document.activeElement?.dataset?.action;
