@@ -363,3 +363,26 @@ body.ep-learn-open { overflow:hidden!important; }
   .ep-deck-bottom {margin-top:3px;padding-top:5px;}
   .ep-deck-bottom button {min-height:36px;}
 }
+
+/* Scale the non-card slides too: the whole deck responds to available space. */
+@media (max-width:760px) and (min-height:730px) {
+  .ep-stage-cover .ep-cover-art {width:min(66vw,250px);height:clamp(205px,29dvh,255px);}
+  .ep-stage-cover .ep-cover-card .ep-playing-card {width:108px;height:151px;}
+  .ep-stage-opening .ep-story-sheet {padding:16px 19px;max-width:min(100%,360px);}
+  .ep-stage-opening .ep-story-sheet h3 {font-size:clamp(1.4rem,5vw,1.8rem);margin:12px 0;}
+  .ep-stage-opening .ep-story-sheet p {font-size:.85rem;line-height:1.47;}
+  .ep-stage-secret .ep-secret-stack {max-width:420px;}
+  .ep-stage-secret .ep-secret-card {padding:12px 15px;}
+  .ep-stage-secret .ep-secret-card b {font-size:1.02rem;}
+  .ep-stage-turn .ep-turn-steps {gap:9px;}
+  .ep-stage-turn .ep-turn-steps>div {min-height:58px;padding:10px 12px;}
+  .ep-stage-turn .ep-turn-steps strong {font-size:.75rem;}
+  .ep-stage-turn .ep-turn-steps small {font-size:.78rem;}
+  .ep-stage-colors .ep-colors-art .ep-playing-card {width:clamp(113px,30vw,142px);height:auto;}
+  .ep-stage-colors .ep-colors-art .ep-pc-center {font-size:5.5rem;}
+  .ep-stage-connect .ep-dialog-bubble {padding:12px 15px;font-size:.9rem;line-height:1.48;}
+  .ep-stage-ending .ep-ending-art .ep-playing-card {width:120px;height:auto;}
+  .ep-stage-ending .ep-final-note {max-width:188px;padding:15px;}
+  .ep-stage-summary .ep-summary-art>div {padding:13px;font-size:.86rem;}
+  .ep-stage-summary .ep-summary-art strong {font-size:1.5rem;}
+}
