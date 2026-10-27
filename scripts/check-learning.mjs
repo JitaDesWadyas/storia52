@@ -55,7 +55,8 @@ function checkLanguage(lang) {
 
   new Function('window','document',source)(window,document);
   assert.equal(window.EpoiLearning.slideCount,16);
-  assert(window.S52.homeMarkup().includes('data-open-panel="quick"'), 'Quick reference missing from home');
+  assert(window.S52.quickReferenceMarkup().includes('ep-game-ref'), 'Shared game quick reference missing');
+  assert(!window.S52.homeMarkup().includes('data-open-panel="quick"'), 'Quick reference must not be an extra home item');
   window.EpoiLearning.openPresentation();
   assert(content.innerHTML.includes(lang==='it'?'Una storia.':'One story.'), 'First slide not rendered');
 
@@ -75,4 +76,8 @@ function checkLanguage(lang) {
 }
 checkLanguage('it');
 checkLanguage('en');
-console.log('Learning checks passed: 16 slides, both languages, navigation, document, PDF, offline assets.');
+const game = read('clean-prep.js');
+assert(game.includes('S.quickReferenceMarkup()'), 'Physical game does not show the quick reference');
+assert(game.includes("data-game-full-rules"), 'Physical game has no way to open full rules');
+assert(!game.includes('S.turnGuideMarkup()') && !game.includes('S.cardRulesMarkup()'), 'Old oversized game rule sections are still rendered');
+console.log('Learning checks passed: 16 slides, both languages, quick reference in game, navigation, document, print and offline assets.');
