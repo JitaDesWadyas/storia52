@@ -190,7 +190,7 @@
     const height = Math.max(1, stage.clientHeight - 8);
     const width = Math.max(1, stage.clientWidth - 8);
     const fit = Math.min(1, height / Math.max(1, naturalHeight), width / Math.max(1, naturalWidth));
-    inner.style.setProperty('--ep-fit-scale', String(Math.min(1, Math.max(.3, Math.floor(fit * 1000) / 1000))));
+    inner.style.setProperty('--ep-fit-scale', String(Math.min(1, Math.max(.01, Math.floor(fit * 1000) / 1000))));
   }
 
   function render() {
