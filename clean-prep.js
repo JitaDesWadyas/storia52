@@ -37,8 +37,9 @@
   S.renderGame = session => {
     session.stage = 'game';
     S.save(session);
-    S.mount(`<section class="surface"><div class="screen-heading"><p class="eyebrow">PARTITA IN CORSO</p><h2>Continuate la storia.</h2></div><div class="game-layout"><main class="game-main">${copyableStoryContext(session)}${S.turnGuideMarkup()}<details class="accordion"><summary>Significato delle carte</summary><div class="accordion-body">${S.cardRulesMarkup()}</div></details><details class="accordion"><summary>Come si chiude la storia</summary><div class="accordion-body">${S.finalRulesMarkup()}</div></details></main><aside class="game-side"><section class="game-card"><h3>Obiettivi segreti</h3><div class="compact-player-list">${session.objectives.map((_, index) => `<button type="button" data-game-objective="${index}"><span>${S.esc(S.playerName(session, index))}</span><span>Apri</span></button>`).join('')}</div></section></aside></div>${scrollTopButton()}</section>`, { session: true });
+    S.mount(`<section class="surface"><div class="screen-heading"><p class="eyebrow">PARTITA IN CORSO</p><h2>Continuate la storia.</h2></div><div class="game-layout"><main class="game-main">${copyableStoryContext(session)}${S.quickReferenceMarkup()}</main><aside class="game-side"><section class="game-card"><h3>Obiettivi segreti</h3><div class="compact-player-list">${session.objectives.map((_, index) => `<button type="button" data-game-objective="${index}"><span>${S.esc(S.playerName(session, index))}</span><span>Apri</span></button>`).join('')}</div></section></aside></div>${scrollTopButton()}</section>`, { session: true });
     S.play.querySelectorAll('[data-game-objective]').forEach(button => button.addEventListener('click', () => S.openObjective(session, Number(button.dataset.gameObjective), true)));
+    S.play.querySelector('[data-game-full-rules]')?.addEventListener('click', () => S.openHomePanel('rules'));
     bindGameUtilities(session);
   };
 })();
