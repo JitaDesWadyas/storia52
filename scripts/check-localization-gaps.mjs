@@ -55,7 +55,7 @@ function checkPreparation() {
   assert.equal(prepStep.textContent,'Deal 4 cards each.');
   S.renderSetup();
   assert(virtualCopy.textContent.includes('4 cards') && !virtualCopy.textContent.includes('carte'), 'Virtual setup is not English');
-  assert(physicalCopy.textContent.includes('Deal 4 cards each'), 'Physical setup is not English');
+  assert(physicalCopy.textContent.includes('deal 4 cards each'), 'Physical setup is not English');
   assert(S.preparationGuideMarkup().includes('4 players: 4 cards each'), 'Preparation guide is not English');
   language='it';
   events['epoi:languagechange']();
