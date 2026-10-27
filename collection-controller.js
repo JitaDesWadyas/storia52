@@ -145,11 +145,31 @@
     }));
   };
 
+  // The category id always stays Italian for saves/filters; only the label
+  // shown to the player follows the active language.
+  const categoryLabel = id => {
+    const italian = S.categories[id]?.label || '';
+    return window.EpoiI18n?.language === 'en'
+      ? (window.EPOI_EN_META?.categories?.[id]?.label || italian)
+      : italian;
+  };
+
   S.storyArchiveMarkup = ({ visible, pages }) => {
     const collection = S.collectionById(S.primaryCollectionId);
-    const categoryButtons = Object.entries(S.categories).map(([key, category]) => `<button type="button" class="${S.storyUi.category === key ? 'active' : ''}" data-category="${key}">${S.esc(category.symbol)} ${S.esc(category.label)}<small>Genere</small></button>`).join('');
-    const storyCards = visible.map(story => `<article class="ready-story"><div class="meta"><span>${S.esc(S.categories[story.category]?.symbol || '')} ${S.esc(S.categories[story.category]?.label || '')}</span><span>STORIA ${String(S.stories.indexOf(story) + 1).padStart(2, '0')}</span></div><h3>${S.esc(story.title)}</h3><p>${S.highlightStoryOpening(story)}</p><button type="button" data-ready-story="${S.esc(story.id)}">Scegli questa storia</button></article>`).join('');
+    const categoryButtons = Object.entries(S.categories).map(([key, category]) => `<button type="button" class="${S.storyUi.category === key ? 'active' : ''}" data-category="${key}">${S.esc(category.symbol)} ${S.esc(categoryLabel(key))}<small>Genere</small></button>`).join('');
+    const storyCards = visible.map(story => `<article class="ready-story"><div class="meta"><span>${S.esc(S.categories[story.category]?.symbol || '')} ${S.esc(categoryLabel(story.category))}</span><span>STORIA ${String(S.stories.indexOf(story) + 1).padStart(2, '0')}</span></div><h3>${S.esc(story.title)}</h3><p>${S.highlightStoryOpening(story)}</p><button type="button" data-ready-story="${S.esc(story.id)}">Scegli questa storia</button></article>`).join('');
 
     return `<section class="surface story-archive-surface"><div class="screen-heading story-archive-heading"><div class="story-archive-collection-line"><p class="eyebrow">${S.esc(collection?.title || 'STORIE PRONTE')}</p><button type="button" class="collection-info-trigger" data-collection-info="${S.esc(collection?.id || '')}">Informazioni sulla raccolta</button></div><h2>Scegliete una storia.</h2><p>Prima partita? Provate “La statua al contrario”. Tutte le 8 storie sono disponibili. Nuove Scintille, la seconda collezione, arriverà in futuro.</p></div><div class="story-toolbar"><input type="search" data-story-search value="${S.esc(S.storyUi.query)}" placeholder="Cerca titolo, luogo o personaggio"><button type="button" class="secondary" data-random-story>Casuale</button></div><div class="category-grid"><button type="button" class="${S.storyUi.category === 'all' ? 'active' : ''}" data-category="all">Tutte<small>${S.stories.length} storie</small></button>${categoryButtons}</div><div class="story-list">${storyCards || '<div class="hint">Nessuna storia trovata.</div>'}</div><div class="pagination"${pages === 1 ? ' hidden' : ''}><button type="button" data-page-prev${S.storyUi.page === 0 ? ' disabled' : ''}>← Precedenti</button><span>${S.storyUi.page + 1} / ${pages}</span><button type="button" data-page-next${S.storyUi.page >= pages - 1 ? ' disabled' : ''}>Successive →</button></div></section>`;
   };
+
+  window.addEventListener?.('epoi:languagechange', () => {
+    const session = S.currentSession;
+    if (session?.stage !== 'stories' || !S.play?.querySelector('.story-archive-surface')) return;
+    const previousScroll = window.scrollY;
+    S.renderStories(session, false);
+    // Preserve the selected genre, search text and page, as well as scroll.
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(() => window.scrollTo({top:previousScroll,behavior:'auto'}));
+    }
+  });
 })();
