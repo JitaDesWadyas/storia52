@@ -307,3 +307,10 @@ body.ep-learn-open { overflow: hidden !important; }
   .ep-doc-table-wrap tr { break-inside:avoid; }
   .ep-paper-end { break-inside:avoid; }
 }
+
+.ep-learn-tools { display:flex; align-items:center; gap:10px; }
+.ep-learn-print { display:block; background:#e6ac8c13; border:1px solid #f9c6a64d; color:#f7c49f; border-radius:10px; padding:10px 12px; font-size:.68rem!important; font-weight:900!important; white-space:nowrap; letter-spacing:.055em; }
+.ep-learn-print:hover { background:#edb59831; }
+.ep-learn-overlay:not([data-mode="manual"]) .ep-learn-print { display:none; }
+@media(max-width:680px) { .ep-learn-tools{gap:5px;} .ep-learn-print{font-size:.55rem!important;padding:9px 6px;letter-spacing:0;} }
+@media print { .ep-learn-tools { display:none!important; } }
