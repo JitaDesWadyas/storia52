@@ -152,6 +152,9 @@
     language = next === 'en' ? 'en' : 'it';
     try { localStorage.setItem('epoi_language', language); } catch {}
     apply();
+    // Separately-rendered screens need a synchronous notification to rebuild
+    // their bilingual templates without losing the current page or slide.
+    window.dispatchEvent(new CustomEvent('epoi:languagechange', { detail: { language } }));
   };
   const selector = document.querySelector('#epoiLanguage');
   selector?.addEventListener('click', () => setLanguage(language === 'it' ? 'en' : 'it'));
