@@ -80,7 +80,23 @@
 
   function deckMarkup() {
     const slide = slides[index];
-    return '<div class="ep-deck"><div class="ep-progress-top"><span>'+fmt(slide.chapter)+'</span><span class="ep-slide-number">'+String(index+1).padStart(2,'0')+' <i>/</i> '+String(slides.length).padStart(2,'0')+'</span></div><div class="ep-progress-line" role="progressbar" aria-label="'+T('Avanzamento tutorial','Tutorial progress')+'" aria-valuemin="1" aria-valuemax="'+slides.length+'" aria-valuenow="'+(index+1)+'"><span style="width:'+((index+1)/slides.length*100)+'%"></span></div><div class="ep-stage ep-stage-'+slide.kind+'" data-swap><div class="ep-stage-copy"><span class="ep-serial">E POI? / '+String(index+1).padStart(2,'0')+'</span><h2>'+L(slide.title)+'</h2><p>'+fmt(slide.body)+'</p>'+stageDetail(slide)+'</div><div class="ep-stage-art" aria-hidden="true">'+visualFor(slide)+'</div></div><div class="ep-deck-bottom"><button type="button" class="ep-button ep-button-ghost" data-action="prev" '+(index===0?'disabled':'')+'><span aria-hidden="true">←</span> '+T('Indietro','Back')+'</button><div class="ep-deck-dots" aria-label="'+T('Vai alla schermata','Jump to slide')+'">'+slides.map((s,i) => '<button type="button" data-slide="'+i+'" class="'+(i===index?'on':'')+'" aria-label="'+T('Schermata ','Slide ')+(i+1)+'" aria-current="'+(i===index?'step':'false')+'"></button>').join('')+'</div><button type="button" class="ep-button ep-button-primary" data-action="'+(index===slides.length-1?'play':'next')+'">'+(index===slides.length-1?T('Inizia una partita','Start a game'):T('Avanti','Next'))+' <span aria-hidden="true">→</span></button></div></div>';
+    const previous=index===0?' disabled':'';
+    const action=index===slides.length-1?'play':'next';
+    const label=index===slides.length-1?T('Gioca ora','Play now'):T('Avanti','Next');
+    return `<section class="ep-deck">
+      <div class="ep-progress-top"><span>${fmt(slide.chapter)}</span><span>${String(index+1).padStart(2,'0')} / ${slides.length}</span></div>
+      <div class="ep-progress-line" role="progressbar" aria-label="${T('Avanzamento','Progress')}" aria-valuemin="1" aria-valuemax="${slides.length}" aria-valuenow="${index+1}"><span style="width:${(index+1)/slides.length*100}%"></span></div>
+      <div class="ep-stage ep-stage-${slide.kind}" aria-live="polite">
+        <div class="ep-stage-copy"><span class="eyebrow">E POI? · ${String(index+1).padStart(2,'0')}</span><h2>${L(slide.title)}</h2><p>${fmt(slide.body)}</p></div>
+        <div class="ep-stage-art" aria-hidden="true">${visualFor(slide)}</div>
+        <div class="ep-stage-details">${stageDetail(slide)}</div>
+      </div>
+      <nav class="ep-deck-bottom" aria-label="${T('Navigazione tutorial','Tutorial navigation')}">
+        <button type="button" class="secondary ep-button" data-action="prev"${previous}>← ${T('Indietro','Back')}</button>
+        <span class="ep-deck-counter">${index+1} / ${slides.length}</span>
+        <button type="button" class="primary ep-button" data-action="${action}">${label} →</button>
+      </nav>
+    </section>`;
   }
 
   const para = (it,en) => '<p>'+T(it,en)+'</p>';
@@ -236,6 +252,7 @@
       document.body.classList.add('ep-learn-open');
     }
     activeMode=mode;
+    if(mode==='deck') index=0;
     render();
     host.querySelector('[data-action="close"]')?.focus({preventScroll:true});
   }
@@ -248,8 +265,29 @@
     if (panel === 'quick') return view('quick');
     return oldHomePanel?.(panel);
   };
-  S.openRulesModal = () => view('manual');
+  S.openRulesModal = () => view('quick');
   S.openQuickRules = () => view('quick');
+
+
+  S.quickReferenceMarkup = () => `<section class="game-card ep-game-ref" aria-label="${T('Promemoria di gioco','Game quick reference')}">
+    <header class="ep-game-ref-head">
+      <div><p class="eyebrow">${T('DURANTE LA PARTITA','DURING THE GAME')}</p><h3>${T('Promemoria rapido','Quick reference')}</h3></div>
+      <button type="button" class="secondary ep-game-ref-full" data-game-full-rules>${T('Regolamento completo','Full rules')} ↗</button>
+    </header>
+    <div class="ep-game-ref-turn">
+      <strong>${T('IL TURNO','YOUR TURN')}</strong><span>${T('Cambia','Exchange')} <i>→</i> ${T('Gioca','Play')} <i>→</i> ${T('Racconta','Narrate')} <i>→</i> ${T('Pesca o passa','Draw or pass')}</span>
+    </div>
+    <div class="ep-game-ref-cards">
+      <div><b class="ep-red">♥</b><span>${T('Relazione','Relationship')}</span><small>${T('Pari + · dispari −','Even + · odd −')}</small></div>
+      <div><b class="ep-red">♦</b><span>${T('Scoperta','Discovery')}</span><small>${T('Pari + · dispari −','Even + · odd −')}</small></div>
+      <div><b>♣</b><span>${T('Azione','Action')}</span><small>${T('Un tentativo','An attempt')}</small></div>
+      <div><b>♠</b><span>${T('Ostacolo','Obstacle')}</span><small>${T('Una difficoltà','A difficulty')}</small></div>
+    </div>
+    <div class="ep-game-ref-footer"><span><b>J</b> ${T('Oggetto','Object')}</span><span><b>Q</b> ${T('Personaggio','Character')}</span><span><b>K</b> ${T('Luogo','Place')}</span><span><b>A</b> ${T('Svolta','Twist')}</span></div>
+    <p class="ep-game-ref-colors">${T('Figure/assi: rosso positivo · nero negativo.','Face cards/aces: red positive · black negative.')}</p>
+    <p class="ep-game-ref-how"><b>${T('«E COME?»','“BUT HOW?”')}</b> ${T('Ogni novità deve collegarsi direttamente a un elemento già presente nella storia.','Every new addition must connect directly to an element already in the story.')}</p>
+    <p class="ep-game-ref-end">${T('Finale: con l’ultima carta, non pescare e chiudi nella stessa scena verso il tuo obiettivo.','Ending: with your last card, do not draw and finish in the same scene towards your goal.')}</p>
+  </section>`;
 
   const oldHome = S.homeMarkup;
   S.homeMarkup = () => {
@@ -260,7 +298,7 @@
       '<b>'+T('Regolamento completo','Complete rulebook')+'</b><small>'+T('Il manuale tecnico con indice e stampa PDF.','The indexed technical manual, printable as PDF.')+'</small>');
     const creator = '<button type="button" class="choice-card creator-menu-card"';
     const quick = '<button type="button" class="choice-card ep-home-quick" data-open-panel="quick"><span class="index">◎</span><span><b>'+T('Promemoria rapido','Quick reference')+'</b><small>'+T('Tutte le carte e i turni a colpo d’occhio.','Cards and turns at a glance.')+'</small></span><i>→</i></button>';
-    html = html.replace(creator,quick+creator);
+    // The quick reference lives inside the game; keep the home focused on three choices.
     return html;
   };
 
