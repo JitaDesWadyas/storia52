@@ -1,8 +1,8 @@
 'use strict';
 
 const CACHE_PREFIX = 'epoi-';
-const SHELL_CACHE = `${CACHE_PREFIX}shell-v51`;
-const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v51`;
+const SHELL_CACHE = `${CACHE_PREFIX}shell-v52`;
+const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v52`;
 const CORE_FILES = [
   './', './index.html', './privacy.html', './copyright.html',
   './clean-app.css', './refine-flow.css', './home-product.css', './app-polish.css', './home-fixes.css',
@@ -10,7 +10,7 @@ const CORE_FILES = [
   './loading-skeleton.css', './ux-rework.css', './scroll-fix.css', './content-polish.css',
   './collection-prima-scintilla.css', './public-release-polish.css', './virtual-cards.css', './release-polish.css',
   './app.js', './ui-core.js', './collection-data.js', './clean-core.js', './clean-rules.js',
-  './virtual-cards.js', './clean-home.js', './content-polish.js', './public-release-fixes.js', './clean-config.js',
+  './virtual-cards.js', './clean-home.js', './learning-experience.js', './content-polish.js', './public-release-fixes.js', './clean-config.js',
   './clean-stories-model.js',
   './archive-v20-objectives-01.js', './archive-v20-objectives-02.js', './archive-v20-objectives-03-04.js',
   './archive-v20-objectives-05-06.js', './archive-v20-objectives-07-08.js',
@@ -20,7 +20,7 @@ const CORE_FILES = [
   './clean-exit.js', './interaction-polish.js', './scroll-safety.js', './clean-init.js', './pwa-refresh.js',
   './icon.svg', './storia52-cards-logo.svg', './creator-jita.svg', './creator-jita.webp',
   './manifest.webmanifest',
-  './locale.css', './locale-en-stories.js', './locale-en-objectives-real01.js', './locale-en-objectives-mys02.js', './locale-en-objectives-sci01.js', './locale-en-objectives-fan02.js', './locale-en-objectives-hor02a.js', './locale-en-objectives-hor02b.js', './locale-en-objectives-lov01.js', './locale-en-objectives-adv01a.js', './locale-en-objectives-adv01b.js', './locale-en-objectives-com03.js', './locale-en-ui-home.js', './locale-en-ui-tutorial.js', './locale-en-ui-rules.js', './locale-en-ui-setup.js', './locale-en-ui-qr.js', './locale-en-ui-join.js', './locale-en-ui-game.js', './locale-en-ui-misc.js', './locale-runtime.js'
+  './learning-experience.css', './locale.css', './locale-en-stories.js', './locale-en-objectives-real01.js', './locale-en-objectives-mys02.js', './locale-en-objectives-sci01.js', './locale-en-objectives-fan02.js', './locale-en-objectives-hor02a.js', './locale-en-objectives-hor02b.js', './locale-en-objectives-lov01.js', './locale-en-objectives-adv01a.js', './locale-en-objectives-adv01b.js', './locale-en-objectives-com03.js', './locale-en-ui-home.js', './locale-en-ui-tutorial.js', './locale-en-ui-rules.js', './locale-en-ui-setup.js', './locale-en-ui-qr.js', './locale-en-ui-join.js', './locale-en-ui-game.js', './locale-en-ui-misc.js', './locale-runtime.js'
 ];
 
 const scopedUrl = path => new URL(path, self.registration.scope).toString();
