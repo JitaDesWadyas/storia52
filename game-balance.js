@@ -12,10 +12,35 @@
     if (players === 4) return 4;
     return 5;
   };
+  const isEnglish = () => window.EpoiI18n?.language === 'en';
   const handRuleSummary = '2–3 giocatori: 5 carte a testa. 4 giocatori: 4 carte. 5–8 giocatori: 3 carte.';
+  const englishHandRuleSummary = '2–3 players: 5 cards each. 4 players: 4 cards each. 5–8 players: 3 cards each.';
   const handSizeText = count => {
     const size = handSizeForPlayers(count);
-    return `${size} ${size === 1 ? 'carta' : 'carte'} a testa`;
+    return isEnglish()
+      ? `${size} ${size === 1 ? 'card' : 'cards'} each`
+      : `${size} ${size === 1 ? 'carta' : 'carte'} a testa`;
+  };
+  const balanceSetupCopy = session => {
+    const count = normalizePlayerCount(session?.count || 2);
+    const size = handSizeForPlayers(count);
+    const virtual = S.play?.querySelector('[data-card-mode="virtual"]');
+    const virtualIcon = virtual?.querySelector(':scope > span');
+    const virtualCopy = virtual?.querySelector('small');
+    if (virtualIcon) virtualIcon.textContent = String(size);
+    if (virtualCopy) virtualCopy.textContent = isEnglish()
+      ? `Each player gets ${size} ${size === 1 ? 'card' : 'cards'} on their phone. The app handles exchanges, plays and draws.`
+      : `Ogni giocatore riceve ${handSizeText(count)} sul proprio telefono. L’app guida cambio, giocata e pesca.`;
+    const physicalCopy = S.play?.querySelector('[data-card-mode="physical"] small');
+    if (physicalCopy) physicalCopy.textContent = isEnglish()
+      ? `Use a 52-card deck without jokers. With ${count} players, deal ${handSizeText(count)}.`
+      : `Usate un mazzo francese da 52 carte senza jolly. Con ${count} giocatori distribuite ${handSizeText(count)}.`;
+  };
+  const balancePreparationCopy = session => {
+    const steps = S.play?.querySelectorAll('.prep-step b');
+    if (steps?.[1]) steps[1].textContent = isEnglish()
+      ? `Deal ${handSizeText(session?.count)}.`
+      : `Date ${handSizeText(session?.count)}.`;
   };
 
   S.handSizeForPlayers = handSizeForPlayers;
@@ -115,16 +140,7 @@
   if (typeof originalRenderSetup === 'function') {
     S.renderSetup = (...args) => {
       const result = originalRenderSetup(...args);
-      const session = S.currentSession || S.load?.();
-      const count = normalizePlayerCount(session?.count || args[1]?.count || 2);
-      const size = handSizeForPlayers(count);
-      const virtualOption = S.play?.querySelector('[data-card-mode="virtual"]');
-      const virtualIcon = virtualOption?.querySelector(':scope > span');
-      const virtualCopy = virtualOption?.querySelector('small');
-      if (virtualIcon) virtualIcon.textContent = String(size);
-      if (virtualCopy) virtualCopy.textContent = `Ogni giocatore riceve ${handSizeText(count)} sul proprio telefono. L’app guida cambio, giocata e pesca.`;
-      const physicalCopy = S.play?.querySelector('[data-card-mode="physical"] small');
-      if (physicalCopy) physicalCopy.textContent = `Usate un mazzo francese da 52 carte senza jolly. Con ${count} giocatori distribuite ${handSizeText(count)}.`;
+      balanceSetupCopy(S.currentSession || S.load?.() || args[1]);
       return result;
     };
   }
@@ -133,8 +149,7 @@
   if (typeof originalRenderPreparation === 'function') {
     S.renderPreparation = (session, ...args) => {
       const result = originalRenderPreparation(session, ...args);
-      const steps = S.play?.querySelectorAll('.prep-step b');
-      if (steps?.[1]) steps[1].textContent = `Date ${handSizeText(session.count)}.`;
+      balancePreparationCopy(session);
       return result;
     };
   }
@@ -143,11 +158,21 @@
   if (typeof originalPreparationGuideMarkup === 'function') {
     S.preparationGuideMarkup = () => originalPreparationGuideMarkup().replace(
       'Con il mazzo reale usate 52 carte francesi e togliete i jolly. Con le carte virtuali ogni giocatore riceve la mano sul proprio telefono.',
-      `Usate 52 carte francesi senza jolly. ${handRuleSummary} Le carte virtuali applicano automaticamente la stessa distribuzione.`
+      isEnglish()
+        ? `Use a standard 52-card deck without jokers. ${englishHandRuleSummary} Virtual cards use the same distribution automatically.`
+        : `Usate 52 carte francesi senza jolly. ${handRuleSummary} Le carte virtuali applicano automaticamente la stessa distribuzione.`
     );
   }
 
-  const originalFinalRulesMarkup = S.finalRulesMarkup;
+  // Balance captions are generated after S.mount translates the page.
+  // Update them explicitly when the user switches languages mid-game.
+  window.addEventListener?.('epoi:languagechange', () => {
+    const session = S.currentSession || S.load?.();
+    if (S.play?.querySelector('.prep-grid .prep-step')) balancePreparationCopy(session);
+    if (S.play?.querySelector('[data-card-mode]')) balanceSetupCopy(session);
+  });
+
+    const originalFinalRulesMarkup = S.finalRulesMarkup;
   if (typeof originalFinalRulesMarkup === 'function') {
     S.finalRulesMarkup = () => originalFinalRulesMarkup()
       .replace(
