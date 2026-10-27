@@ -23,7 +23,10 @@ assert(!/statua|mortaio|sindaco|sicario|inaugurazione|camion|artista/i.test(sour
 assert(source.includes('ESEMPIO INVENTATO · AQUILONI'), 'Tutorial-only illustrative scenario missing');
 assert(css.includes('.ep-deck-counter {display:none;}'), 'Mobile control footer still duplicates progress');
 assert(!/backdrop-filter\s*:|filter\s*:\s*blur\(/.test(css.replace(/\/\*[\s\S]*?\*\//g,'')), 'Expensive blur/filter restored');
-assert(source.includes('Essere semplicemente nello stesso luogo'), 'The E COME direct link requirement is missing');
+assert(source.includes('collegamento diretto con almeno un elemento già presente'), 'The E COME direct link requirement is missing');
+assert(source.includes('function goToSlide(') && source.includes('function animateSlide('), 'Motion system missing');
+assert(source.includes('ep-secret-card') && source.includes('ep-colors-art'), 'Distinct slide animations missing');
+assert(source.includes('ep-doc-how-chat') && source.includes('ep-doc-suit-grid'), 'Illustrated rulebook sections missing');
 
 function checkLanguage(lang) {
   const state = { printed: 0, setups: 0 };
@@ -78,7 +81,7 @@ function checkLanguage(lang) {
   assert(window.S52.quickReferenceMarkup().includes('ep-game-ref'), 'Shared game quick reference missing');
   assert(!window.S52.homeMarkup().includes('data-open-panel="quick"'), 'Quick reference must not be an extra home item');
   window.EpoiLearning.openPresentation();
-  assert(content.innerHTML.includes(lang==='it'?'Una storia.':'One story.'), 'First slide not rendered');
+  assert(content.innerHTML.includes(lang==='it'?'La storia è una.':'One story.'), 'First slide not rendered');
   assert(fitted.scale < 1 && fitted.scale * inner.offsetHeight <= viewport.height - 6, 'Tall slide is clipped');
   viewport.height = 245;  // simulate browser toolbars and small-screen landscape height
   window.EpoiLearning.openRulebook();
@@ -107,6 +110,9 @@ function checkLanguage(lang) {
   assert(content.innerHTML.includes('ep-stage-connect'), 'Presentation progress should survive tab switching');
   window.EpoiLearning.openRulebook();
   assert(content.innerHTML.includes('ep-doc-toc'), 'Document index missing');
+  assert(content.innerHTML.includes('ep-paper-cover-cards'), 'Rulebook cover missing card illustration');
+  assert(content.innerHTML.includes('ep-doc-suit-grid'), 'Rulebook card guide missing');
+  assert(content.innerHTML.includes('ep-doc-step'), 'Rulebook step-by-step examples missing');
   assert(content.innerHTML.includes('data-section="how"'), 'Rulebook links are not navigable');
   assert(content.innerHTML.includes('ep-rule-how'), 'Direct-link rule absent');
   overlay.handlers.click({target:{closest:()=>({dataset:{action:'print'}})}});
