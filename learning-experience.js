@@ -146,10 +146,13 @@
     }
     changingSlide = true;
     // Exit only the scene; chapter and navigation stay in place.
-    tween(old.querySelector('.ep-stage-fit'),[
-      {opacity:1,transform:'translate(-50%,-50%) scale(var(--ep-fit-scale, 1))'},
-      {opacity:0,transform:'translate(-50%,-50%) scale(calc(var(--ep-fit-scale, 1) * .98))'}
-    ], {duration:145,easing:'ease-in'});
+    // Do not animate the fitted wrapper's transform: it controls the
+    // viewport scale and must remain untouched throughout the transition.
+    tween(old.querySelector('.ep-stage-fit'),[{opacity:1},{opacity:0}],{duration:145,easing:'ease-in'});
+    tween(old.querySelector('.ep-stage-art'),[
+      {opacity:1,transform:'translateX(0) rotate(0deg)'},
+      {opacity:0,transform:'translateX('+(direction>0?'-24px':'24px')+') rotate('+(direction>0?'-3deg':'3deg')+')'}
+    ],{duration:145,easing:'ease-in'});
     setTimeout(() => {
       changingSlide=false;
       if (!host || activeMode!=='deck') return;
