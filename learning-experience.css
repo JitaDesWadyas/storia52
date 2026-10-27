@@ -294,3 +294,6 @@ body.ep-learn-open { overflow:hidden!important; }
  .ep-doc-table-wrap tr {break-inside:avoid;}
  .ep-doc-note,.ep-doc-ranks>div,.ep-doc-example {background:#f4ead7!important;print-color-adjust:exact;}
 }
+
+/* The popup already has its own "Open full rules" action below. */
+.ep-quick .ep-game-ref-full {display:none!important;}
