@@ -1,8 +1,8 @@
 'use strict';
 
 const CACHE_PREFIX = 'epoi-';
-const SHELL_CACHE = `${CACHE_PREFIX}shell-v52`;
-const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v52`;
+const SHELL_CACHE = `${CACHE_PREFIX}shell-v53`;
+const RUNTIME_CACHE = `${CACHE_PREFIX}runtime-v53`;
 const CORE_FILES = [
   './', './index.html', './privacy.html', './copyright.html',
   './clean-app.css', './refine-flow.css', './home-product.css', './app-polish.css', './home-fixes.css',
