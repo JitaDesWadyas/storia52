@@ -81,6 +81,82 @@
   let index = 0;
   let previouslyFocused = null;
   let touchStart = null;
+  let changingSlide = false;
+
+  // Native Web Animations: only opacity and transform. No composited blur,
+  // infinite animations or expensive layout properties.
+  const tween = (element, frames, options) => {
+    if (!element?.animate || reduceMotion()) return;
+    const a = element.animate(frames, {duration:300, easing:'cubic-bezier(.22,1,.36,1)', fill:'both', ...options});
+    a.addEventListener?.('finish', () => { try { a.cancel(); } catch {} }, {once:true});
+  };
+  function animateSlide(direction, fromIndex) {
+    if (!host || activeMode !== 'deck' || reduceMotion()) return;
+    const stage = host.querySelector('.ep-stage');
+    if (!stage) return;
+    const sideways = direction < 0 ? '-20px' : '20px';
+    const parts = [
+      ['.ep-stage-copy',0],
+      ['.ep-stage-art',45],
+      ['.ep-stage-details',90]
+    ];
+    for (const [selector, delay] of parts) {
+      const element = stage.querySelector(selector);
+      if (!element || element.matches?.(':empty')) continue;
+      tween(element, [{opacity:0, transform:'translate3d('+sideways+',11px,0)'},{opacity:1, transform:'translate3d(0,0,0)'}], {duration:260,delay});
+    }
+    const kind = slides[index].kind;
+    const childSelectors = {
+      cover:'.ep-cover-card',
+      secret:'.ep-secret-card',
+      turn:'.ep-turn-steps > div',
+      colors:'.ep-colors-art > div',
+      connect:'.ep-dialog-bubble',
+      ending:'.ep-final-note',
+      summary:'.ep-summary-art > div'
+    };
+    if (kind === 'card') {
+      const c = stage.querySelector('.ep-card-display .ep-playing-card');
+      tween(c, [{opacity:0,transform:'translate3d('+(direction<0?'-32px':'32px')+',30px,0) rotate('+(direction<0?'-10deg':'10deg')+') scale(.88)'},{opacity:1,transform:'translate3d(0,0,0) rotate(0deg) scale(1)'}],{duration:390,delay:35,easing:'cubic-bezier(.17,.87,.25,1)'});
+      tween(stage.querySelector('.ep-card-foot'),[{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'translateY(0)'}],{duration:260,delay:160});
+      stage.querySelectorAll('.ep-example').forEach((el,i)=>tween(el,[{opacity:0,transform:'translateY(17px)'},{opacity:1,transform:'translateY(0)'}],{duration:280,delay:140+i*65}));
+    } else if (childSelectors[kind]) {
+      stage.querySelectorAll(childSelectors[kind]).forEach((el,i)=>{
+        const x = kind==='colors' ? (i===0?'-30px':'30px') : (kind==='secret'?'20px':'0px');
+        tween(el,[{opacity:0,transform:'translate3d('+x+',16px,0)'},{opacity:1,transform:'translate3d(0,0,0)'}],{duration:310,delay:70+i*85});
+      });
+    }
+    if (fromIndex !== null && fromIndex !== undefined) {
+      const previous = (fromIndex+1)/slides.length;
+      const current = (index+1)/slides.length;
+      const bar = host.querySelector('.ep-progress-line > span');
+      if (bar && current>0) tween(bar,[{transform:'scaleX('+(previous/current)+')'},{transform:'scaleX(1)'}],{duration:300,easing:'ease-out'});
+    }
+  }
+  function goToSlide(next) {
+    next = Math.max(0,Math.min(slides.length-1,next));
+    if (changingSlide || activeMode!=='deck' || next === index) return;
+    const previous = index;
+    const direction = next>index?1:-1;
+    const old = host?.querySelector('.ep-stage');
+    if (!old?.animate || reduceMotion() || typeof setTimeout !== 'function') {
+      index=next;
+      render(direction,previous);
+      return;
+    }
+    changingSlide = true;
+    // Exit only the scene; chapter and navigation stay in place.
+    tween(old.querySelector('.ep-stage-fit'),[
+      {opacity:1,transform:'translate(-50%,-50%) scale(var(--ep-fit-scale, 1))'},
+      {opacity:0,transform:'translate(-50%,-50%) scale(calc(var(--ep-fit-scale, 1) * .98))'}
+    ], {duration:145,easing:'ease-in'});
+    setTimeout(() => {
+      changingSlide=false;
+      if (!host || activeMode!=='deck') return;
+      index=next;
+      render(direction,previous);
+    }, 150);
+  }
 
   function deckMarkup() {
     const slide = slides[index];
@@ -193,7 +269,7 @@
     inner.style.setProperty('--ep-fit-scale', String(Math.min(1, Math.max(.01, Math.floor(fit * 1000) / 1000))));
   }
 
-  function render() {
+  function render(direction = 0, fromIndex = null) {
     if (!host) return;
     const content = host.querySelector('[data-content]');
     host.dataset.mode = activeMode;
@@ -208,6 +284,7 @@
     if (docScroll) docScroll.scrollTop = 0;
     fitDeck();
     if (typeof requestAnimationFrame === 'function') requestAnimationFrame(fitDeck);
+    animateSlide(direction, fromIndex);
   }
   window.addEventListener?.('resize', () => {
     if (typeof requestAnimationFrame === 'function') requestAnimationFrame(fitDeck);
@@ -220,6 +297,7 @@
     const removed = host;
     host = null;
     removed.remove();
+    changingSlide=false;
     document.body.classList.remove('ep-learn-open');
     previouslyFocused?.isConnected && previouslyFocused.focus();
     previouslyFocused = null;
@@ -241,11 +319,11 @@
           section?.scrollIntoView({behavior:reduceMotion()?'auto':'smooth',block:'start'});
           return;
         }
-        if (target.dataset.slide !== undefined) { index = Number(target.dataset.slide); render(); return; }
+        if (target.dataset.slide !== undefined) { goToSlide(Number(target.dataset.slide)); return; }
         const action = target.dataset.action;
         if (action === 'close') return close();
-        if (action === 'prev' && index>0) { index--; render(); return; }
-        if (action === 'next' && index<slides.length-1) { index++; render(); return; }
+        if (action === 'prev' && index>0) { goToSlide(index-1); return; }
+        if (action === 'next' && index<slides.length-1) { goToSlide(index+1); return; }
         if (action === 'play') { close(); document.body.classList.remove('home-static-entry'); S.renderSetup('play'); return; }
         if (action === 'print') { if (activeMode !== 'manual') { activeMode='manual'; render(); } window.print(); return; }
         if (['deck','manual','quick'].includes(action)) { activeMode=action; render(); }
@@ -255,11 +333,10 @@
         if (activeMode === 'deck' && ['ArrowRight','ArrowLeft','Home','End'].includes(event.key)) {
           if (event.target.matches('input,textarea,select')) return;
           event.preventDefault();
-          if (event.key === 'ArrowRight') index=Math.min(slides.length-1,index+1);
-          if (event.key === 'ArrowLeft') index=Math.max(0,index-1);
-          if (event.key === 'Home') index=0;
-          if (event.key === 'End') index=slides.length-1;
-          render();
+          if (event.key === 'ArrowRight') goToSlide(index+1);
+          if (event.key === 'ArrowLeft') goToSlide(index-1);
+          if (event.key === 'Home') goToSlide(0);
+          if (event.key === 'End') goToSlide(slides.length-1);
         }
         if (event.key === 'Tab') {
           const controls = [...host.querySelectorAll('button:not([disabled]),a[href]')].filter(el => el.getClientRects().length);
@@ -277,7 +354,7 @@
         if (!touchStart || activeMode!=='deck' || !event.changedTouches.length) {touchStart=null;return;}
         const dx=event.changedTouches[0].clientX-touchStart.x,dy=event.changedTouches[0].clientY-touchStart.y;
         touchStart=null;
-        if (Math.abs(dx)>70 && Math.abs(dx)>Math.abs(dy)*1.4) { index=Math.max(0,Math.min(slides.length-1,index+(dx<0?1:-1))); render(); }
+        if (Math.abs(dx)>70 && Math.abs(dx)>Math.abs(dy)*1.4) goToSlide(index+(dx<0?1:-1));
       }, {passive:true});
       document.body.appendChild(host);
       document.body.classList.add('ep-learn-open');
