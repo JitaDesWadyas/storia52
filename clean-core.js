@@ -46,6 +46,39 @@
     catch { /* Nessuna azione richiesta. */ }
   };
 
+  // One browser-history entry keeps Android/Chrome Back inside an active game
+  // or dialog. It is created only when needed, not on the home screen.
+  const backGuard = '__epoiBackGuard';
+  let backArmed = false;
+  S.armBrowserBack = () => {
+    if (history.state?.[backGuard]) { backArmed = true; return; }
+    try {
+      history.pushState({ ...(history.state || {}), [backGuard]: 1 }, '', location.href);
+      backArmed = true;
+    } catch { backArmed = false; }
+  };
+  window.addEventListener('popstate', event => {
+    // Browser Forward returning to the synthetic entry is not Back.
+    if (event.state?.[backGuard]) { backArmed = true; return; }
+    if (!backArmed) return;
+    backArmed = false;
+
+    let handled = window.EpoiLearning?.handleBack?.() === true;
+    if (!handled) {
+      const opened = [...document.querySelectorAll('.modal:not(.closing)')].at(-1);
+      if (opened) {
+        opened.querySelector('.modal-close')?.click();
+        handled = true;
+      }
+    }
+    if (!handled && (document.body.classList.contains('session-mode') || S.currentSession)) {
+      S.openExitModal?.();
+      handled = true;
+    }
+    if (handled) S.armBrowserBack();
+    // On the home screen we don't trap Back; the browser may leave normally.
+  });
+
   S.mount = (html, { session = false, scroll = true, animate = scroll, preserveHash = false } = {}) => {
     const previousY = window.scrollY;
     S.play.innerHTML = `<div class="screen${animate ? ' screen-enter' : ''}">${html}</div>`;
@@ -56,8 +89,9 @@
     if (!preserveHash) {
       const url = new URL(location.href);
       url.hash = 'play';
-      history.replaceState(null, '', url);
+      history.replaceState(history.state, '', url);
     }
+    if (session) S.armBrowserBack();
     if (animate) requestAnimationFrame(() => S.play.querySelector('.screen')?.classList.remove('screen-enter'));
     if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
     else requestAnimationFrame(() => window.scrollTo({ top: previousY, behavior: 'auto' }));
@@ -74,6 +108,7 @@
     host.addEventListener('click', event => { if (event.target === host) close(); });
     host.querySelector('.modal-close').addEventListener('click', close);
     document.body.appendChild(host);
+    S.armBrowserBack();
     requestAnimationFrame(() => host.classList.add('open'));
     return { host, close };
   };
