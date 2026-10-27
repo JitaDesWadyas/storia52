@@ -17,6 +17,9 @@ assert(index.indexOf('locale-runtime.js') < index.indexOf('learning-experience.j
 assert(index.indexOf('learning-experience.js') < index.indexOf('clean-init.js'), 'Learning must load before app init');
 assert(sw.includes("'./learning-experience.js'") && sw.includes("'./learning-experience.css'"), 'Learning is not cached offline');
 assert(css.includes('@media print') && css.includes('@media (prefers-reduced-motion:reduce)'), 'Print or reduced-motion CSS missing');
+assert(css.includes('justify-content:space-evenly') && css.includes('orientation:landscape'), 'Responsive slide layouts missing');
+assert(css.includes('.ep-deck-counter {display:none;}'), 'Mobile control footer still duplicates progress');
+assert(!/backdrop-filter\s*:|filter\s*:\s*blur\(/.test(css.replace(/\/\*[\s\S]*?\*\//g,'')), 'Expensive blur/filter restored');
 assert(source.includes('Essere semplicemente nello stesso luogo'), 'The E COME direct link requirement is missing');
 
 function checkLanguage(lang) {
@@ -60,9 +63,24 @@ function checkLanguage(lang) {
   window.EpoiLearning.openPresentation();
   assert(content.innerHTML.includes(lang==='it'?'Una storia.':'One story.'), 'First slide not rendered');
 
-  for (let i = 0; i < 13; i++) overlay.handlers.click({target:{closest:()=>({dataset:{action:'next'}})}});
+  for (let i = 0; i < 16; i++) {
+    const slide = content.innerHTML;
+    assert(slide.includes('ep-stage-copy') && slide.includes('ep-stage-art'), 'Slide ' + (i + 1) + ' missing its main content');
+    assert(slide.includes('aria-valuenow="' + (i + 1) + '"'), 'Progress mismatch on slide ' + (i + 1));
+    if (i >= 4 && i <= 11) {
+      assert(slide.includes('ep-playing-card'), 'Card illustration absent on slide ' + (i + 1));
+      assert(slide.includes('ep-stage-examples'), 'Card examples absent on slide ' + (i + 1));
+    }
+    if (i < 15) overlay.handlers.click({target:{closest:()=>({dataset:{action:'next'}})}});
+  }
+  assert(content.innerHTML.includes('data-action="play"'), 'Last slide must offer to play');
+  for (let i = 0; i < 2; i++) overlay.handlers.click({target:{closest:()=>({dataset:{action:'prev'}})}});
   assert(content.innerHTML.includes(lang==='it'?'«E COME?»':'“BUT HOW?”'), 'E COME slide missing');
+  assert(content.innerHTML.includes('ep-stage-connect'), 'E COME art/layout missing');
 
+  window.EpoiLearning.openRulebook();
+  window.EpoiLearning.openPresentation();
+  assert(content.innerHTML.includes('ep-stage-connect'), 'Presentation progress should survive tab switching');
   window.EpoiLearning.openRulebook();
   assert(content.innerHTML.includes('ep-doc-toc'), 'Document index missing');
   assert(content.innerHTML.includes('data-section="how"'), 'Rulebook links are not navigable');
@@ -80,4 +98,4 @@ const game = read('clean-prep.js');
 assert(game.includes('S.quickReferenceMarkup()'), 'Physical game does not show the quick reference');
 assert(game.includes("data-game-full-rules"), 'Physical game has no way to open full rules');
 assert(!game.includes('S.turnGuideMarkup()') && !game.includes('S.cardRulesMarkup()'), 'Old oversized game rule sections are still rendered');
-console.log('Learning checks passed: 16 slides, both languages, quick reference in game, navigation, document, print and offline assets.');
+console.log('Learning checks passed: all 16 slides (IT/EN), responsive UX contracts, game reference, manual, print and offline assets.');
